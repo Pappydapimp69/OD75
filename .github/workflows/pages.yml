@@ -28,6 +28,18 @@ jobs:
         run: |
           mkdir -p _site
           cat payload-0.txt payload-1.txt payload-2.txt payload-3.txt | base64 --decode | gzip --decompress > _site/index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('_site/index.html')
+          html = p.read_text()
+          addons = '<script src="gamepad.js"></script><script src="heart-total.js"></script>'
+          if '</body>' in html:
+              html = html.replace('</body>', addons + '</body>', 1)
+          else:
+              html += addons
+          p.write_text(html)
+          PY
+          cp gamepad.js heart-total.js _site/
           touch _site/.nojekyll
 
       - name: Configure Pages
