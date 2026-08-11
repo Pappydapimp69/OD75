@@ -6,6 +6,10 @@
     touchOwned: false
   };
 
+  const turnBrake = {
+    active: false
+  };
+
   function buttonDown(gamepad, index) {
     const b = gamepad?.buttons?.[index];
     return !!(b && (b.pressed || b.value > 0.55));
@@ -52,77 +56,108 @@
   }
 
   function gamepadDashDown(gamepad) {
-    // Standard mapping: A, B, X, or right bumper.
     return buttonDown(gamepad, 0) ||
            buttonDown(gamepad, 1) ||
            buttonDown(gamepad, 2) ||
            buttonDown(gamepad, 5);
   }
 
-  function applyDirectionalTurnFriction(dt) {
-    if (typeof S === "undefined" || !S?.run || S.end || S.dashTime > 0) return;
-    if (typeof P === "undefined" || !P) return;
-
+  function desiredMovementVector() {
     let x = 0, y = 0;
-    const left = keys.has("ArrowLeft") || keys.has("a");
-    const right = keys.has("ArrowRight") || keys.has("d");
-    const up = keys.has("ArrowUp") || keys.has("w");
-    const down = keys.has("ArrowDown") || keys.has("s");
 
-    if (left) x -= 1;
-    if (right) x += 1;
-    if (up) y -= 1;
-    if (down) y += 1;
+    if (keys.has("ArrowLeft") || keys.has("a")) x -= 1;
+    if (keys.has("ArrowRight") || keys.has("d")) x += 1;
+    if (keys.has("ArrowUp") || keys.has("w")) y -= 1;
+    if (keys.has("ArrowDown") || keys.has("s")) y += 1;
 
     if (joy.active) {
       x += joy.dx;
       y += joy.dy;
     }
 
-    const inputMag = Math.hypot(x, y);
-    const speed = Math.hypot(P.vx, P.vy);
-    if (inputMag <= 0.12 || speed <= 4) return;
+    const mag = Math.hypot(x, y);
+    if (mag <= 0.12) return { x: 0, y: 0, active: false };
+    return { x: x / mag, y: y / mag, active: true };
+  }
 
-    x /= inputMag;
-    y /= inputMag;
+  function shouldEnterTurnBrake() {
+    if (typeof S === "undefined" || !S?.run || S.end || S.dashTime > 0) return false;
+    if (typeof P === "undefined" || !P) return false;
+
+    const desired = desiredMovementVector();
+    const speed = Math.hypot(P.vx, P.vy);
+
+    if (!desired.active || speed <= 4) return false;
 
     const velocityAngle = Math.atan2(P.vy, P.vx);
-    const inputAngle = Math.atan2(y, x);
+    const inputAngle = Math.atan2(desired.y, desired.x);
     let delta = Math.abs(inputAngle - velocityAngle);
     if (delta > Math.PI) delta = Math.PI * 2 - delta;
 
-    if (delta <= 8 * Math.PI / 180) return;
-
-    // More than 8 degrees of directional change gets exactly the same
-    // hard friction as releasing the controls.
-    const brake = 1050 * dt;
-    if (speed <= brake || speed < 2) {
-      P.vx = 0;
-      P.vy = 0;
-    } else {
-      const next = speed - brake;
-      P.vx = (P.vx / speed) * next;
-      P.vy = (P.vy / speed) * next;
-    }
+    return delta > 8 * Math.PI / 180;
   }
 
-  // Preserve the game's original update function. We temporarily feed
-  // the controller vector through its existing analog touch joystick.
+  function runBaseUpdateWithTurnBrake(dt, baseUpdate) {
+    if (S.dashTime > 0) turnBrake.active = false;
+
+    if (!turnBrake.active && shouldEnterTurnBrake()) {
+      turnBrake.active = true;
+    }
+
+    const speed = Math.hypot(P.vx, P.vy);
+
+    // Stay in the brake state until the old velocity is actually gone.
+    // During this phase, the base game receives ZERO movement input, so
+    // it executes its normal "controls released" friction path without
+    // simultaneously accelerating toward the new direction.
+    if (turnBrake.active && speed > 2) {
+      const savedKeys = [...keys];
+      const savedJoy = {
+        active: joy.active,
+        id: joy.id,
+        dx: joy.dx,
+        dy: joy.dy
+      };
+
+      keys.clear();
+      joy.active = false;
+      joy.dx = 0;
+      joy.dy = 0;
+
+      try {
+        return baseUpdate(dt);
+      } finally {
+        for (const k of savedKeys) keys.add(k);
+        joy.active = savedJoy.active;
+        joy.id = savedJoy.id;
+        joy.dx = savedJoy.dx;
+        joy.dy = savedJoy.dy;
+      }
+    }
+
+    if (turnBrake.active && speed <= 2) {
+      P.vx = 0;
+      P.vy = 0;
+      turnBrake.active = false;
+    }
+
+    return baseUpdate(dt);
+  }
+
   const baseUpdate = update;
   update = function gamepadUpdate(dt) {
     const gamepad = currentGamepad();
+
     if (!gamepad) {
       gp.connected = false;
       gp.dashDown = false;
-      applyDirectionalTurnFriction(dt);
-      return baseUpdate(dt);
+      return runBaseUpdateWithTurnBrake(dt, baseUpdate);
     }
 
     gp.connected = true;
     const v = readVector(gamepad);
     const moving = Math.hypot(v.x, v.y) > 0.001;
 
-    // Only borrow the touch joystick when a real touch pointer is not active.
     const realTouchActive = joy.active && joy.id !== null;
     const saved = realTouchActive ? null : {
       active: joy.active,
@@ -143,10 +178,8 @@
     if (dashDown && !gp.dashDown) dash();
     gp.dashDown = dashDown;
 
-    applyDirectionalTurnFriction(dt);
-
     try {
-      return baseUpdate(dt);
+      return runBaseUpdateWithTurnBrake(dt, baseUpdate);
     } finally {
       if (saved) {
         joy.active = saved.active;
@@ -171,11 +204,11 @@
       gp.index = null;
       gp.connected = false;
       gp.dashDown = false;
+      turnBrake.active = false;
       if (typeof announce === "function") announce("GAMEPAD DISCONNECTED", 850);
     }
   });
 
-  // Update start-screen discoverability without changing game layout.
   queueMicrotask(() => {
     for (const rule of document.querySelectorAll(".rule")) {
       const title = rule.querySelector("b")?.textContent?.trim();
@@ -183,7 +216,7 @@
       if (!small) continue;
       if (title === "MOVE") {
         small.textContent =
-          "Drag anywhere, use WASD/arrows, or use a gamepad left stick/D-pad. Speed starts at zero, builds gradually, and brakes hard on release.";
+          "Drag anywhere, use WASD/arrows, or use a gamepad left stick/D-pad. Turns over 8° fully brake old momentum before rebuilding speed.";
       } else if (title === "DASH") {
         small.textContent =
           "Tap DASH, Space, or gamepad A/B/X/RB. Mobility, dodge, and finisher. Purple cores chain-react.";
