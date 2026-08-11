@@ -1,1 +1,15 @@
-<!doctype html><meta charset="utf-8"><title>OVERDRIVE 75</title><body style="margin:0;background:#05070b;color:white;font-family:system-ui"><script>(async()=>{let s="";for(let i=0;i<8;i++)s+=await (await fetch(`page-${i}.txt`)).text();document.open();document.write(s);document.close()})().catch(e=>document.body.textContent="Load error: "+e)</script>
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OVERDRIVE 75</title>
+<body style="margin:0;background:#05070b;color:white;font-family:system-ui">
+<script>
+(async()=>{
+  let b64="";
+  for(let i=0;i<4;i++) b64 += await (await fetch(`payload-${i}.txt`)).text();
+  const bin=atob(b64), bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const html=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+  document.open(); document.write(html); document.close();
+})().catch(e=>document.body.textContent="OD75 load error: "+e);
+</script>
