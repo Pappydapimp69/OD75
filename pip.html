@@ -112,7 +112,7 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 </div></div>
 
 <div id="log" class="modal hidden"><div class="card">
-  <div class="kicker">FLIGHT LOG · YOU & PIP</div>
+  <div class="kicker">OD75 RECORD · YOU &amp; PIP</div>
   <h2 style="margin:6px 0">Our story so far</h2>
   <div class="statgrid" id="logStats"></div>
   <div id="keepsakes" class="small" style="margin:8px 0"></div>
@@ -155,7 +155,7 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 </div></div>
 </div>
 <div id="flash"></div>
-<div style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff55;pointer-events:none">PIPROOM-2026-08-12-L11B</div>
+<div style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff55;pointer-events:none">PIPROOM-2026-08-12-L12</div>
 
 <script>
 "use strict";
@@ -776,8 +776,8 @@ $("actLog").addEventListener("click",()=>{
    ?SV.journal.slice().reverse().map(e=>"<div>· "+e.txt.replace(/&/g,"&amp;").replace(/</g,"&lt;")+"</div>").join("")
    :"<div>· Our story starts today ✦</div>";
  $("arenaLine").textContent=m.hearts>0||m.sounds>0
-   ?"From the arena: "+m.hearts.toLocaleString()+" heart bits gathered together, "+m.sounds+" sounds in Pip's collection"+(m.echo>0?", "+m.echo+" star echo waiting for the next run.":".")
-   :"No arena flights on this device yet — Pip would love to show you OVERDRIVE 75.";
+   ?"From OVERDRIVE 75: "+m.hearts.toLocaleString()+" heart bits gathered together, "+m.sounds+" sounds in Pip's collection"+(m.echo>0?", "+m.echo+" star echo waiting for your next run.":".")
+   :"No OVERDRIVE 75 runs found on this browser yet — play a run and Pip will remember it here.";
  $("log").classList.remove("hidden");
 });
 $("closeLog").addEventListener("click",()=>$("log").classList.add("hidden"));
