@@ -16,12 +16,14 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 #bond{font-weight:900}
 #mood{color:#ffe7a3;border-color:#ffd36f38;background:#151008bf}
 #audioToggle{pointer-events:auto;cursor:pointer;color:#ffe9a6;margin-left:auto}
-.gauges{position:absolute;z-index:7;left:8px;right:8px;top:52px;display:grid;grid-template-columns:1fr 1fr;gap:7px;pointer-events:none}
+.gauges{position:absolute;z-index:7;left:8px;right:8px;top:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;pointer-events:none}
 .gbox{display:grid;gap:2px;min-width:0}
 .gbox>span{font-size:11px;letter-spacing:.12em;color:#ffffffa8;text-align:center;white-space:nowrap}
 .gbar{height:7px;border-radius:999px;background:#ffffff0f;overflow:hidden}
 .gbar i{display:block;height:100%;transition:width .25s}
 #energyBar{background:linear-gradient(90deg,var(--cyan),#c9f3ff)}
+#fedBar{background:linear-gradient(90deg,var(--green),#c9ffe0)}
+#affBar{background:linear-gradient(90deg,var(--hot),#ffc2d2)}
 #xpBar{background:linear-gradient(90deg,var(--gold),var(--hot))}
 .bottom{position:absolute;z-index:8;left:max(9px,env(safe-area-inset-left));right:max(9px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom));display:flex;justify-content:center;gap:9px;pointer-events:none;flex-wrap:wrap}
 .act{pointer-events:auto;cursor:pointer;width:86px;height:86px;border-radius:50%;border:1px solid var(--line);background:#0d131dcc;backdrop-filter:blur(8px);font-weight:900;font-size:12.5px;letter-spacing:.05em;line-height:1.3;touch-action:manipulation}
@@ -53,7 +55,7 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 .stat span{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 #journal{font-size:14.5px;color:#cdd5e0;line-height:1.7;max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:#ffffff04;margin:10px 0}
 #grade{font-size:52px;font-weight:1000;letter-spacing:-.06em;margin:3px 0}
-@media(max-width:560px){.rules{grid-template-columns:1fr}.act{width:76px;height:76px;font-size:11.5px}.act small{font-size:16px}.pill{font-size:12.5px;padding:6px 10px}.gauges{top:96px}}
+@media(max-width:560px){.rules{grid-template-columns:1fr}.act{width:76px;height:76px;font-size:11.5px}.act small{font-size:16px}.pill{font-size:12.5px;padding:6px 10px}.gauges{top:96px;grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -67,6 +69,8 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 </div>
 <div class="gauges">
   <div class="gbox"><span>ENERGY</span><div class="gbar"><i id="energyBar" style="width:100%"></i></div></div>
+  <div class="gbox"><span>FED</span><div class="gbar"><i id="fedBar" style="width:100%"></i></div></div>
+  <div class="gbox"><span>LOVED</span><div class="gbar"><i id="affBar" style="width:100%"></i></div></div>
   <div class="gbox"><span id="xpLabel">BOND XP</span><div class="gbar"><i id="xpBar" style="width:0%"></i></div></div>
 </div>
 <div id="speech"></div>
@@ -156,7 +160,8 @@ function rawGet(k){try{return localStorage.getItem(k)}catch(_){return memStore&&
 function rawSet(k,v){try{localStorage.setItem(k,v)}catch(_){if(k===SAVE_KEY)memStore=v}}
 const num=(v,lo,hi,dflt)=>Number.isFinite(v)?clamp(Math.floor(v),lo,hi):dflt;
 
-const ENERGY_MAX=100,SNACK_MAX=5,DRILL_COST=15;
+const ENERGY_MAX=100,SNACK_MAX=5,DRILL_COST=15,NEED_MAX=100;
+const FED_DECAY_MS=3e5,AFF_DECAY_MS=48e4,AWAY_NEED_FLOOR=15; // gentle: needs never drop below 15 while away
 const ENERGY_REGEN_MS=40e3;   // +1 energy per 40s, away or here
 const SNACK_REGEN_MS=72e5;    // +1 snack per 2h
 function pipNeed(level){return 65+(level-1)*45}
@@ -167,7 +172,7 @@ function pipBondName(level){
 }
 
 function freshSave(){return{v:1,bondLevel:1,bondXP:0,love:0,compassion:0,support:0,
- energy:80,snacks:3,lastMs:Date.now(),
+ energy:80,snacks:3,fed:75,affection:70,lastMs:Date.now(),
  totals:{feeds:0,pets:0,wishes:0,hypes:0,guards:0},
  best:{wish:0,hype:0,guard:0},journal:[],welcomed:0}}
 function loadSave(){
@@ -179,6 +184,7 @@ function loadSave(){
      bondLevel:num(v.bondLevel,1,99,1),bondXP:num(v.bondXP,0,1e6,0),
      love:num(v.love,0,10,0),compassion:num(v.compassion,0,10,0),support:num(v.support,0,10,0),
      energy:num(v.energy,0,ENERGY_MAX,ENERGY_MAX),snacks:num(v.snacks,0,SNACK_MAX,SNACK_MAX),
+     fed:num(v.fed,0,NEED_MAX,75),affection:num(v.affection,0,NEED_MAX,70),
      lastMs:num(v.lastMs,0,4102444800000,Date.now()),
      totals:{feeds:num(t.feeds,0,1e9,0),pets:num(t.pets,0,1e9,0),wishes:num(t.wishes,0,1e9,0),hypes:num(t.hypes,0,1e9,0),guards:num(t.guards,0,1e9,0)},
      best:{wish:num(b.wish,0,1e6,0),hype:num(b.hype,0,1e6,0),guard:num(b.guard,0,1e6,0)},
@@ -204,6 +210,8 @@ function arenaMemories(){
  const away=Math.max(0,Date.now()-SV.lastMs);
  SV.energy=num(SV.energy+Math.floor(away/ENERGY_REGEN_MS),0,ENERGY_MAX,SV.energy);
  SV.snacks=num(SV.snacks+Math.floor(away/SNACK_REGEN_MS),0,SNACK_MAX,SV.snacks);
+ SV.fed=Math.max(Math.min(SV.fed,AWAY_NEED_FLOOR),SV.fed-Math.floor(away/FED_DECAY_MS));
+ SV.affection=Math.max(Math.min(SV.affection,AWAY_NEED_FLOOR),SV.affection-Math.floor(away/AFF_DECAY_MS));
  window._awayHours=away/36e5;
 })();
 
@@ -362,6 +370,8 @@ function updateHud(){
  $("xpLabel").textContent="BOND · "+SV.bondXP+"/"+pipNeed(SV.bondLevel)+" XP";
  $("xpBar").style.width=(SV.bondXP/pipNeed(SV.bondLevel)*100)+"%";
  $("energyBar").style.width=(SV.energy/ENERGY_MAX*100)+"%";
+ $("fedBar").style.width=(SV.fed/NEED_MAX*100)+"%";
+ $("affBar").style.width=(SV.affection/NEED_MAX*100)+"%";
  const tired=SV.energy<DRILL_COST||pip.sleeping;
  $("actWish").disabled=tired||mode!=="room";$("actHype").disabled=tired||mode!=="room";$("actGuard").disabled=tired||mode!=="room";
  $("actFeed").disabled=SV.snacks<=0||mode!=="room"||pip.sleeping;
@@ -370,6 +380,8 @@ function updateHud(){
 function mood(){
  if(pip.sleeping)return"Pip is fast asleep — shh";
  if(pip.happy>0)return"Pip is beaming at you";
+ if(SV.fed<30)return"Pip\u2019s tummy is rumbling — snack time?";
+ if(SV.affection<30)return"Pip could really use a pet";
  if(SV.energy<15)return"Pip is sleepy — let it rest";
  if(SV.energy<40)return"Pip could use a snack";
  if(SV.bondLevel>=5)return"being here with you is Pip's favorite";
@@ -406,7 +418,7 @@ C.addEventListener("pointermove",e=>{
  if(ball.held){ball.vx=(p.x-ball.x)*16;ball.vy=(p.y-ball.y)*16;ball.x=p.x;ball.y=p.y}
  if(petting&&mode==="room"){
    petAccum+=1;
-   if(petAccum%7===0){heartPop(pip.x+(Math.random()-.5)*40,pip.y-20);sfx.pet();pip.happy=2.5;SV.totals.pets++;gainXP(1,true)}
+   if(petAccum%7===0){heartPop(pip.x+(Math.random()-.5)*40,pip.y-20);sfx.pet();pip.happy=2.5;SV.totals.pets++;SV.affection=clamp(SV.affection+4,0,NEED_MAX);gainXP(1,true)}
  }
  if(mode==="guard")guardPointer(p);
  pointer=p;
@@ -529,6 +541,7 @@ function guardTick(dt){
 function endMinigame(grade,kicker,title,text,xp){
  mode="room";
  pip.chase=null;pip.tx=pipHome().x;pip.ty=pipHome().y;
+ SV.affection=clamp(SV.affection+12,0,NEED_MAX);
  gainXP(xp,true);pip.happy=3;
  $("resultKicker").textContent=kicker+" · +"+xp+" BOND XP";
  $("grade").textContent=grade;
@@ -575,7 +588,7 @@ document.addEventListener("keydown",e=>{
 });
 
 // ---------------------------------------------------------- main loop
-let last=performance.now(),regenAccum=0,blinkCd=2;
+let last=performance.now(),regenAccum=0,blinkCd=2,fedAccum=0,affAccum=0;
 function frame(now){
  const realGap=now-last;
  const dt=Math.min(.05,realGap/1000);last=now;
@@ -596,6 +609,9 @@ function frame(now){
    if(pip.zzCd<=0){pip.zzCd=1.4;particles.push({x:pip.x+18,y:pip.y-26,vx:9,vy:-26,c:"#9adcf0",life:1.8,r:0,zz:true})}
  }
  if(regenAccum>=ENERGY_REGEN_MS){regenAccum-=ENERGY_REGEN_MS;SV.energy=clamp(SV.energy+1,0,ENERGY_MAX);persist();updateHud()}
+ fedAccum+=dt*1000;affAccum+=dt*1000;
+ if(fedAccum>=FED_DECAY_MS){fedAccum-=FED_DECAY_MS;SV.fed=clamp(SV.fed-1,0,NEED_MAX);persist();updateHud()}
+ if(affAccum>=AFF_DECAY_MS){affAccum-=AFF_DECAY_MS;SV.affection=clamp(SV.affection-1,0,NEED_MAX);persist();updateHud()}
  pip.angle+=dt*(pip.sleeping?.5:pip.happy>0?3.4:2.2);
  pip.happy=Math.max(0,pip.happy-dt);
  pip.eating=Math.max(0,pip.eating-dt);
@@ -609,6 +625,8 @@ function frame(now){
    if(d<12){
      if(t.kind==="snack"){
        pip.eating=.9;pip.happy=3;SV.energy=clamp(SV.energy+12,0,ENERGY_MAX);
+       const wasHungry=SV.fed<30;SV.fed=clamp(SV.fed+35,0,NEED_MAX);
+       if(wasHungry){gainXP(4,true);say("you noticed I was hungry... you always notice ✦",3000)}
        particle(pip.x,pip.y,"#7be0ae",16,120);sfx.eat();gainXP(6,true);
        say(["mmmm stardust","crunchy ✦","I was SO hungry, how did you know"][Math.floor(Math.random()*3)],2400);
        journal("Shared a stardust snack.");persist();
