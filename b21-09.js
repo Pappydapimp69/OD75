@@ -121,3 +121,6 @@ OVER_ORDER.forEach((id,i)=>{
  btn.addEventListener("pointercancel",e=>cancelOverdriveHold(e.pointerId));
  btn.addEventListener("lostpointercapture",e=>cancelOverdriveHold(e.pointerId));
 });
+
+const overdriveHelp=$("overdriveStep")?.querySelector("p");
+if(overdriveHelp)overdriveHelp.textContent="Tap a skill to select it. Press and hold an unlocked skill for 4 seconds to upgrade it; the button fills to confirm. Releasing early cancels with no Stars spent.";
