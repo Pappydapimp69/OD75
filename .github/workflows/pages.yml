@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 StarDrive B21 ${{ github.sha }}
+run-name: OD75 Stage Growth B22 ${{ github.sha }}
 
 on:
   push:
@@ -24,14 +24,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify StarDrive direct source
+      - name: Verify stage growth and StarDrive source
         run: |
           test -f index.html
           for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'OD75-2026-08-12-B21-STARDRIVE' index.html
-          grep -Fq 'game.js?v=B21-STARDRIVE' index.html
           grep -Fq 'function triggerOverdrive()' b21-*.js
           grep -Fq 'if(k==="e")triggerOverdrive()' b21-*.js
           grep -Fq 'OVER_ORDER=["beam","storm","guardian","nova","gravity","pip"]' b21-*.js
@@ -41,7 +39,9 @@ jobs:
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
-          grep -Fq 'if(S.bossRewardPending)openStageUpgrade();else advanceToNextStage()' b21-*.js
+          grep -Fq 'if(S.stageEnding&&!S.stagePending)' b21-04.js
+          grep -Fq 'STAGE COMPLETE · PIP GROWS WITH YOU' b21-04.js
+          grep -Fq 'if(S.bossRewardPending){openOverdriveStep();return}' b21-04.js
           ! grep -Fq 'announce("PIP POWER!"' b21-*.js
           ! grep -Fq 'turnDelta>(8*Math.PI/180)' b21-*.js
       - name: Assemble direct site
@@ -50,6 +50,10 @@ jobs:
           cp index.html _site/
           cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js > _site/game.js
           node --check _site/game.js
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B22-STAGE-GROWTH/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B22-STAGE-GROWTH/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B22-STAGE-GROWTH' _site/index.html
+          grep -Fq 'game.js?v=B22-STAGE-GROWTH' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
