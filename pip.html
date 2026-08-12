@@ -108,7 +108,9 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
   <div class="kicker">FLIGHT LOG · YOU & PIP</div>
   <h2 style="margin:6px 0">Our story so far</h2>
   <div class="statgrid" id="logStats"></div>
+  <div id="keepsakes" class="small" style="margin:8px 0"></div>
   <div id="journal"></div>
+  <button id="btnPhoto" class="primary" style="margin-bottom:8px">📸 keepsake photo</button>
   <p id="arenaLine" class="small"></p>
   <button id="closeLog" class="primary">Back to Pip</button>
 </div></div>
@@ -204,6 +206,8 @@ function loadSave(){
      fed:num(v.fed,0,NEED_MAX,75),affection:num(v.affection,0,NEED_MAX,70),
      dust:num(v.dust,0,1e6,0),
      decos:Array.isArray(v.decos)?v.decos.filter(d=>typeof d==="string").slice(0,24):[],
+     keeps:Array.isArray(v.keeps)?v.keeps.filter(d=>typeof d==="string").slice(0,64):[],
+     sCount:num(v.sCount,0,1e6,0),
      lastMs:num(v.lastMs,0,4102444800000,Date.now()),
      totals:{feeds:num(t.feeds,0,1e9,0),pets:num(t.pets,0,1e9,0),wishes:num(t.wishes,0,1e9,0),hypes:num(t.hypes,0,1e9,0),guards:num(t.guards,0,1e9,0)},
      best:{wish:num(b.wish,0,1e6,0),hype:num(b.hype,0,1e6,0),guard:num(b.guard,0,1e6,0)},
@@ -385,6 +389,7 @@ function gainXP(n,quiet){
    pip.happy=4;
  }
  if(!quiet)persist();
+ checkKeepsakes();
  updateHud();
 }
 
@@ -414,6 +419,30 @@ function mood(){
  return"Pip is rooting for you";
 }
 
+// ---------------------------------------------------------- keepsakes
+const KEEPSAKES=[
+ {id:"first-snack",icon:"✧",name:"First Snack",test:()=>SV.totals.feeds>=1},
+ {id:"snack-25",icon:"✧",name:"25 Snacks Shared",test:()=>SV.totals.feeds>=25},
+ {id:"pets-100",icon:"♥",name:"A Hundred Pets",test:()=>SV.totals.pets>=100},
+ {id:"games-25",icon:"◎",name:"25 Games Together",test:()=>SV.totals.wishes+SV.totals.hypes+SV.totals.guards>=25},
+ {id:"first-s",icon:"S",name:"First S Grade",test:()=>SV.sCount>=1},
+ {id:"first-deco",icon:"✵",name:"Homemaker",test:()=>SV.decos.length>=1},
+ {id:"full-room",icon:"✵",name:"Fully Decorated",test:()=>SV.decos.length>=5},
+ {id:"bond-2",icon:"✦",name:"Pal",test:()=>SV.bondLevel>=2},
+ {id:"bond-3",icon:"✦",name:"Bestie",test:()=>SV.bondLevel>=3},
+ {id:"bond-4",icon:"✦",name:"Heartstar",test:()=>SV.bondLevel>=4},
+ {id:"bond-5",icon:"✦",name:"Soulstar",test:()=>SV.bondLevel>=5},
+ {id:"bond-6",icon:"✦",name:"Forever Friend",test:()=>SV.bondLevel>=6},
+];
+function checkKeepsakes(){
+ for(const k of KEEPSAKES){
+   if(SV.keeps.indexOf(k.id)>=0||!k.test())continue;
+   SV.keeps.push(k.id);
+   journal("Keepsake earned: "+k.name+".");
+   announce("KEEPSAKE ✦ "+k.name,1500);
+   particle(pip.x,pip.y,"#ffd36f",26,170);sfx.levelup();
+ }
+}
 // -------------------------------------------------------------- decor
 // canon: the SAVE holds only the unlock flag; the renderer derives the look
 const DECOR=[
@@ -440,7 +469,7 @@ function renderShop(){
      SV.dust-=d.cost;SV.decos.push(d.id);
      journal("Decorated the room: "+d.name+".");
      say(d.id==="bow"?"a BOW. for ME. I am never taking it off":"our room keeps getting better ✦",3000);
-     sfx.levelup();persist();updateHud();renderShop();
+     sfx.levelup();persist();checkKeepsakes();updateHud();renderShop();
    });
    grid.appendChild(b);
  }
@@ -620,6 +649,7 @@ function guardTick(dt){
 function endMinigame(grade,kicker,title,text,xp){
  const dustEarn={S:9,A:6,B:4,C:2}[grade]||2;
  SV.dust+=dustEarn;
+ if(grade==="S")SV.sCount++;
  kicker+=" · +"+dustEarn+" ✵";
  mode="room";
  pip.chase=null;pip.tx=pipHome().x;pip.ty=pipHome().y;
@@ -641,6 +671,9 @@ $("actLog").addEventListener("click",()=>{
    ["♥ "+SV.love,"Loving"],["♡ "+SV.compassion,"Compassionate"],["✦ "+SV.support,"Supportive"],
    [SV.totals.pets,"pets"],[SV.totals.feeds,"snacks shared"],[SV.totals.wishes+SV.totals.hypes+SV.totals.guards,"games played"],
  ].map(x=>'<div class="stat"><b>'+x[0]+"</b><span>"+x[1]+"</span></div>").join("");
+ $("keepsakes").innerHTML="KEEPSAKES · "+(SV.keeps.length?SV.keeps.map(id=>{
+   const k=KEEPSAKES.find(x=>x.id===id);return k?"<span style=\"color:#ffd36f\">"+k.icon+" "+k.name+"</span>":"";
+ }).filter(Boolean).join(" &nbsp;·&nbsp; "):"none yet — they find you while you two hang out");
  $("journal").innerHTML=SV.journal.length
    ?SV.journal.slice().reverse().map(e=>"<div>· "+e.txt.replace(/&/g,"&amp;").replace(/</g,"&lt;")+"</div>").join("")
    :"<div>· Our story starts today ✦</div>";
@@ -652,6 +685,29 @@ $("actLog").addEventListener("click",()=>{
 $("closeLog").addEventListener("click",()=>$("log").classList.add("hidden"));
 $("actShop").addEventListener("click",()=>{renderShop();$("shop").classList.remove("hidden")});
 $("closeShop").addEventListener("click",()=>$("shop").classList.add("hidden"));
+$("btnPhoto").addEventListener("click",()=>{
+ try{
+   const t=document.createElement("canvas");t.width=C.width;t.height=C.height+56*DPR;
+   const g=t.getContext("2d");
+   g.fillStyle="#05070b";g.fillRect(0,0,t.width,t.height);
+   g.drawImage(C,0,0);
+   g.setTransform(DPR,0,0,DPR,0,0);
+   g.fillStyle="#ffd36f";g.font="900 16px Inter,system-ui";
+   g.fillText("PIP · "+pipBondName(SV.bondLevel).toUpperCase()+" · LV "+SV.bondLevel,12,H+22);
+   g.fillStyle="#aab4c2";g.font="12px Inter,system-ui";
+   g.fillText(new Date().toLocaleDateString()+" · pip's room · overdrive 75",12,H+42);
+   t.toBlob(b=>{
+     if(!b){flash("Couldn't take the photo here.");return}
+     try{
+       const a=document.createElement("a");
+       a.href=URL.createObjectURL(b);a.download="pip-"+Date.now()+".png";
+       document.body.appendChild(a);a.click();a.remove();
+       setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+       flash("Photo saved ✦");journal("Took a keepsake photo.");persist();
+     }catch(_){flash("Couldn't save here — screenshot works too ✦")}
+   });
+ }catch(_){flash("Couldn't take the photo here.")}
+});
 
 // ------------------------------------------------------------- welcome
 $("begin").addEventListener("click",()=>{
