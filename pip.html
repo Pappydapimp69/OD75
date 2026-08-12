@@ -362,7 +362,36 @@ function journal(txt){
 
 // --------------------------------------------------------------- pip
 const pip={x:0,y:0,tx:0,ty:0,angle:0,happy:0,blink:0,scale:1,
- chase:null,eating:0,wanderCd:2,sleeping:false,zzCd:0,flashT:0};
+ chase:null,eating:0,wanderCd:2,sleeping:false,zzCd:0,flashT:0,
+ act:{name:"drift",t:0,max:5,step:0}};
+let lastAutoSay=0;
+function autoSay(lines){
+ const now=performance.now();
+ if(now-lastAutoSay<9000)return; // one voice channel; never interrupt fresh speech
+ if($("speech").classList.contains("on"))return;
+ lastAutoSay=now;
+ say(lines[Math.floor(Math.random()*lines.length)],2800);
+}
+function setAct(name,max){pip.act={name,t:0,max,step:0}}
+function chooseAct(){
+ const opts=[["drift",3],["stargaze",isNight()?4:1.5],["doodle",1.6],
+   ["snuggle",SV.affection<50?2.6:1.1],["nudge",hyp(ball.vx,ball.vy)<10?1.4:0]];
+ let sum=0;for(const o of opts)sum+=o[1];
+ let r=Math.random()*sum;
+ for(const o of opts){r-=o[1];if(r<=0)return startAct(o[0])}
+ startAct("drift");
+}
+function startAct(name){
+ // every act carries a max-dwell so no state can trap Pip (liveness)
+ if(name==="stargaze"){setAct("stargaze",6+Math.random()*3);pip.tx=W*(.3+Math.random()*.4);pip.ty=H*.24;
+   autoSay(["that one's my favorite star. after you.","do you think they can see us?","I named one after you. obviously."])}
+ else if(name==="doodle"){setAct("doodle",7);
+   autoSay(["watch this!!","I've been practicing this one"])}
+ else if(name==="snuggle"){setAct("snuggle",5+Math.random()*3);pip.tx=W*.5;pip.ty=H*.62;
+   autoSay(["just wanted to be closer","this is my favorite spot. it's near you."])}
+ else if(name==="nudge"){setAct("nudge",4);pip.tx=ball.x;pip.ty=ball.y-4}
+ else{setAct("drift",4+Math.random()*4)}
+}
 function isNight(){const h=new Date().getHours();return h>=21||h<7}
 // toy ball: flingable, bounces, Pip chases and bats it back
 const ball={x:0,y:0,vx:0,vy:0,r:11,held:false,lastBat:0,lastXp:0};
@@ -390,10 +419,10 @@ function drawPip(px,py,r){
  X.closePath();X.fill();
  X.rotate(-pip.angle*.35);
  // face — same little face as the arena, scaled up
- const e=r/7;
+ const e=r/7,up=(!pip.sleeping&&pip.act&&pip.act.name==="stargaze")?-e*.5:0;
  X.fillStyle="#47340d";
  if(pip.blink>0||pip.sleeping){X.fillRect(-2.6*e,-e*1.2,1.6*e,.5*e);X.fillRect(e,-e*1.2,1.6*e,.5*e)}
- else{X.beginPath();X.arc(-1.8*e,-e,e*.55,0,6.29);X.arc(1.8*e,-e,e*.55,0,6.29);X.fill()}
+ else{X.beginPath();X.arc(-1.8*e,-e+up,e*.55,0,6.29);X.arc(1.8*e,-e+up,e*.55,0,6.29);X.fill()}
  X.strokeStyle="#47340d";X.lineWidth=Math.max(1,e*.5);
  X.beginPath();
  if(pip.happy>0)X.arc(0,e*.8,e*1.5,.15,Math.PI-.15);
@@ -838,8 +867,24 @@ function frame(now){
  } else if(mode==="room"&&pip.sleeping){
    const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*1.2);pip.y+=(h.y-pip.y)*Math.min(1,dt*1.2);
  } else if(mode==="room"){
-   pip.wanderCd-=dt;
-   if(pip.wanderCd<=0){pip.wanderCd=2.5+Math.random()*3;const h=pipHome();pip.tx=h.x+(Math.random()-.5)*W*.3;pip.ty=h.y+(Math.random()-.5)*H*.22}
+   const act=pip.act;
+   act.t+=dt;
+   if(act.t>=act.max)chooseAct(); // unconditional exit: no act outlives its dwell
+   if(act.name==="drift"){
+     pip.wanderCd-=dt;
+     if(pip.wanderCd<=0){pip.wanderCd=2.5+Math.random()*3;const h=pipHome();pip.tx=h.x+(Math.random()-.5)*W*.3;pip.ty=h.y+(Math.random()-.5)*H*.22}
+   } else if(act.name==="doodle"){
+     // trace a little five-point star around home
+     const h=pipHome(),R=Math.min(W,H)*.16;
+     const k=Math.floor(act.t*1.4)%5,a=-Math.PI/2+k*(4*Math.PI/5);
+     pip.tx=h.x+Math.cos(a)*R;pip.ty=h.y+Math.sin(a)*R*.7;
+     if(!reducedMotion()&&Math.random()<.5)particles.push({x:pip.x,y:pip.y,vx:0,vy:0,c:"#ffd36f",life:.9,r:1.6});
+   } else if(act.name==="nudge"){
+     if(hyp(ball.x-pip.x,ball.y-pip.y)<26){
+       ball.vx=(Math.random()-.5)*160;ball.vy=-120-Math.random()*60;
+       sfx.pet();autoSay(["boop.","your turn!!"]);setAct("drift",4);
+     } else {pip.tx=ball.x;pip.ty=ball.y-4}
+   }
    if(petting){pip.tx=pip.x;pip.ty=pip.y}
    pip.x+=(pip.tx-pip.x)*Math.min(1,dt*2.2);
    pip.y+=(pip.ty-pip.y)*Math.min(1,dt*2.2);
