@@ -1,15 +1,138 @@
 <!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>OVERDRIVE 75</title>
-<body style="margin:0;background:#05070b;color:white;font-family:system-ui">
-<script>
-(async()=>{
-  let b64="";
-  for(let i=0;i<4;i++) b64 += await (await fetch(`payload-${i}.txt`)).text();
-  const bin=atob(b64), bytes=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-  const html=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
-  document.open(); document.write(html); document.close();
-})().catch(e=>document.body.textContent="OD75 load error: "+e);
-</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>OVERDRIVE 75 · OD75-2026-08-12-B18</title>
+<link rel="stylesheet" href="styles.css?v=B18">
+</head>
+<body>
+<div id="app">
+<canvas id="c"></canvas>
+
+<div class="top">
+  <span id="time" class="pill">75.0</span>
+  <span id="score" class="pill">0</span>
+  <span id="combo" class="pill">x1.0</span>
+  <span id="phase" class="pill">WARMUP</span>
+  <button id="audioToggle" class="pill" type="button">♫ ON</button>
+</div>
+<div class="bars">
+  <div class="bar"><i id="dashBar" style="width:100%"></i></div>
+  <div class="bar"><i id="heatBar" style="width:0%"></i></div>
+</div>
+<div class="healthwrap">
+  <span class="healthlabel">HP</span>
+  <div class="healthbar"><i id="healthBar"></i></div>
+  <div id="shieldPips"></div>
+  <span id="regenText">SHIELDS</span>
+</div>
+<div id="tip">AUTO-FIRE locks nearest enemy · DASH to finish · purple cores chain-explode</div>
+<div id="pipMood">✦ Pip is rooting for you</div>
+<div id="pipLevel"><b>PIP LV 1</b> · 0/65 XP</div>
+<div id="currencyHud">♥ 0 HEART BITS</div>
+<div id="announce"></div>
+
+<div class="bottom">
+  <div id="actions">
+    <button id="attack" class="ready" disabled>AUTO</button>
+    <button id="dash" class="ready">DASH</button>
+  </div>
+</div>
+
+<div id="start" class="modal">
+  <div class="card">
+    <div class="kicker">75 seconds · one tiny hype-friend</div>
+    <div class="logo">OVER<br>DRIVE 75</div>
+    <p><b>Goal:</b> clear each wave, collect Heart Bits, and grow Pip.</p>
+    <div class="rules">
+      <div class="rule"><b>MOVE</b><span class="small">Touch · WASD/arrows · left stick/D-pad</span></div>
+      <div class="rule"><b>AUTO-FIRE</b><span class="small">Aims and shoots for you</span></div>
+      <div class="rule"><b>DASH</b><span class="small">On-screen button · Space · A/Cross</span></div>
+    </div>
+    <button id="begin" class="startBtn">Start run · A/Cross</button>
+  </div>
+</div>
+
+<div id="stageUp" class="modal hidden">
+  <div class="card">
+    <div class="kicker">STAGE COMPLETE · PIP GROWS WITH YOU</div>
+
+    <div id="bossRewardStep" class="stagehidden">
+      <h2 id="bossRewardTitle">Boss Bond ✦</h2>
+      <p id="bossRewardText">That fight changed Pip. Choose one mutation to keep.</p>
+      <div class="bossgrid">
+        <button id="bossReward0" class="upgrade"></button>
+        <button id="bossReward1" class="upgrade"></button>
+        <button id="bossReward2" class="upgrade"></button>
+      </div>
+    </div>
+
+    <div id="emotionStep">
+      <h2 id="stageTitle">Pip learned something from you.</h2>
+      <p id="stageText">Choose what Pip should become better at giving you.</p>
+      <div id="stageBond"></div>
+      <div class="upgradegrid">
+        <button id="upLove" class="upgrade">
+          <div class="heart">♥</div>
+          <b>More Loving · ♥ 12</b>
+          <span class="small">Warmer, more sentimental affection. Slightly more Wish Stars.</span>
+        </button>
+        <button id="upCompassion" class="upgrade">
+          <div class="heart">♡</div>
+          <b>More Compassionate · ♥ 12</b>
+          <span class="small">Kinder responses to damage and faster shield recovery.</span>
+        </button>
+        <button id="upSupport" class="upgrade">
+          <div class="heart">✦</div>
+          <b>More Supportive · ♥ 12</b>
+          <span class="small">More encouragement and extra power when you're under pressure.</span>
+        </button>
+      </div>
+      <button id="skipPipUpgrade" class="primary" style="margin-top:8px">Continue without emotional upgrade</button>
+    </div>
+
+    <div id="abilityStep" class="stagehidden">
+      <h2>Upgrade Pip's abilities ✦</h2>
+      <p id="abilityText">Spend Heart Bits on as many upgrades as you can afford, then continue.</p>
+      <div id="abilityBalance" class="small"></div>
+      <div class="abilitygrid">
+        <button id="abilityRange" class="upgrade"></button>
+        <button id="abilitySpeed" class="upgrade"></button>
+        <button id="abilityPower" class="upgrade"></button>
+        <button id="abilityGuard" class="upgrade"></button>
+      </div>
+      <button id="continueAbilities" class="primary" style="margin-top:8px">Continue to sound unlock</button>
+    </div>
+
+    <div id="audioStep" class="stagehidden">
+      <h2>Pip found a new sound ✦</h2>
+      <p>Choose one new piece of music or one sound effect. Pip keeps it between runs.</p>
+      <div id="audioOwned" class="small"></div>
+      <div class="audiogrid">
+        <button id="audioChoice0" class="audiochoice"></button>
+        <button id="audioChoice1" class="audiochoice"></button>
+        <button id="audioChoice2" class="audiochoice"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="end" class="modal hidden">
+  <div class="card">
+    <div class="kicker">RUN COMPLETE</div>
+    <div id="grade">A</div>
+    <h2 id="endTitle">You bent the arena.</h2>
+    <div id="endStats" class="endstats"></div>
+    <p id="endText"></p>
+    <button id="again" class="startBtn">Again</button>
+  </div>
+</div>
+</div>
+
+<script src="game-1.js?v=B18"></script>
+<script src="game-2.js?v=B18"></script>
+<script src="game-3.js?v=B18"></script>
+<script src="game-4.js?v=B18"></script>
+<div id="od75BuildStamp" style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff66;pointer-events:none">OD75-2026-08-12-B18</div></body>
+</html>
