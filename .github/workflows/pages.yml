@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Upgrade Readability B40 ${{ github.sha }}
+run-name: OD75 Sound Lab Resonance B41 ${{ github.sha }}
 
 on:
   push:
@@ -24,26 +24,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify B40 upgrade readability and current systems
+      - name: Verify B41 Sound Lab resonance and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const B38_BASIC_IGNITION_PERCENT=20' b21-25.js
           grep -Fq 'function ensureAscendedPauseB39()' b21-26.js
-          grep -Fq 'Evolution ${tier}' b21-27.js
           grep -Fq 'installUpgradeCompressionB40' b21-28.js
-          grep -Fq 'grid-template-columns:auto 1fr' b21-28.js
-          grep -Fq 'font-size:17px' b21-28.js
-          grep -Fq 'Spend Heart Bits to strengthen Pip for this run.' b21-28.js
+          grep -Fq 'const B41_AUDIO_MAX_LEVEL=4' b21-29.js
+          grep -Fq 'if(lv%5===0)earned++' b21-29.js
+          grep -Fq 'function resonanceRankB41(theme)' b21-29.js
+          grep -Fq 'No mismatch debuffs' b21-29.js
+          grep -Fq 'Continue with current mix' b21-29.js
+          grep -Fq 'renderAscendedPauseB39=function()' b21-29.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
       - name: Assemble direct site
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -51,19 +53,21 @@ jobs:
           for marker in [
               'const B38_BASIC_IGNITION_PERCENT=20',
               'function ensureAscendedPauseB39()',
-              'Evolution ${tier}',
               'installUpgradeCompressionB40',
-              'grid-template-columns:auto 1fr',
-              'Spend Heart Bits to strengthen Pip for this run.'
+              'const B41_AUDIO_MAX_LEVEL=4',
+              'function resonanceRankB41(theme)',
+              'Continue with current mix'
           ]:
               assert marker in s, marker
-          assert s.rfind('renderPipPortraitB39=function()') > s.find('function renderPipPortraitB39()')
-          assert s.rfind('installUpgradeCompressionB40') > s.rfind('const B39_ECHO_TEXT=')
+          assert s.rfind('gainPipXP=function') > s.find('// B29 Pip Sound progression')
+          assert s.rfind('chooseAudioUnlock=function') > s.find('// B34 Sound Lab')
+          assert s.rfind('renderAscendedPauseB39=function()') > s.find('function renderAscendedPauseB39()')
+          assert s.rfind('const B41_AUDIO_MAX_LEVEL=4') > s.rfind('installUpgradeCompressionB40')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B40-UPGRADE-READABILITY/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B40-UPGRADE-READABILITY/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B40-UPGRADE-READABILITY' _site/index.html
-          grep -Fq 'game.js?v=B40-UPGRADE-READABILITY' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B41-SOUND-LAB-RESONANCE/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B41-SOUND-LAB-RESONANCE/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B41-SOUND-LAB-RESONANCE' _site/index.html
+          grep -Fq 'game.js?v=B41-SOUND-LAB-RESONANCE' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
