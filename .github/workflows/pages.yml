@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Economy Fix B28 ${{ github.sha }}
+run-name: OD75 Pip Sounds B29 ${{ github.sha }}
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify corrected Pip economies and current systems
+      - name: Verify Pip sound progression and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
@@ -40,11 +40,16 @@ jobs:
           grep -Fq 'return 5.00+n*.55' b21-13.js
           grep -Fq 'function renderEmotionButtonsB28()' b21-14.js
           grep -Fq 'Prism Seeds deepen Loving, Compassionate, and Supportive' b21-14.js
-          grep -Fq 'S.prismSeeds--' b21-14.js
-          grep -Fq 'Continue without emotional upgrade' b21-14.js
-          grep -Fq '♥ ${S.heartCurrency} Heart Bits available' b21-14.js
-          grep -Fq 'const cost=pipAbilityCost(kind)' b21-14.js
           grep -Fq 'S.heartCurrency-=cost' b21-14.js
+          grep -Fq 'const PIP_SOUND_MAX_LEVEL=4' b21-15.js
+          grep -Fq 'S.pipSoundCredits=1' b21-15.js
+          grep -Fq 'S.pipSoundCredits=(S.pipSoundCredits||0)+(after-before)' b21-15.js
+          grep -Fq 'Each Pip level grants one sound choice.' b21-15.js
+          grep -Fq 'S.pipSoundCredits--' b21-15.js
+          grep -Fq 'S.pipSoundLevels[id]=lv+1' b21-15.js
+          grep -Fq 'function pipSoundFlairB29' b21-15.js
+          grep -Fq 'particle(x,y,fx.color' b21-15.js
+          grep -Fq 'audioEngine.fmBell(fx.freq' b21-15.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
@@ -53,33 +58,34 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
           s=Path('_site/game.js').read_text()
           for marker in [
               'const OVERDRIVE_HOLD_MS=1800',
-              'function resetPipRunProgressB26()',
               'function updateAscendantHeartMagnetB26(dt)',
               'function overdriveDurationB27(id,lv)',
-              'S.over=overdriveDurationB27(id,lv)',
               'function renderEmotionButtonsB28()',
-              'Prism Seeds deepen Loving, Compassionate, and Supportive',
-              'Continue without emotional upgrade',
-              'S.prismSeeds--',
-              '♥ ${S.heartCurrency} Heart Bits available',
-              'S.heartCurrency-=cost'
+              'const PIP_SOUND_MAX_LEVEL=4',
+              'S.pipSoundCredits=1',
+              'S.pipSoundCredits=(S.pipSoundCredits||0)+(after-before)',
+              'Each Pip level grants one sound choice.',
+              'S.pipSoundLevels[id]=lv+1',
+              'function pipSoundFlairB29'
           ]:
               assert marker in s, marker
           assert s.rfind('renderAbilityShop=function()') > s.find('// One Prism Seed buys one attribute level.')
-          assert s.rfind('choosePipUpgrade=function(kind)') > s.find('function choosePipUpgrade(kind)')
+          assert s.rfind('renderPipSoundStepB26=function()') > s.find('function renderPipSoundStepB26()')
+          assert s.rfind('selectPipSoundPackB26=function(id)') > s.find('function selectPipSoundPackB26(id)')
+          assert s.rfind('gainPipXP=function(amount,reason="")') > s.find('function gainPipXP(amount,reason="")')
           assert s.rfind('triggerOverdrive=function()') > s.find('function triggerOverdrive()')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B28-ECONOMY-FIX/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B28-ECONOMY-FIX/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B28-ECONOMY-FIX' _site/index.html
-          grep -Fq 'game.js?v=B28-ECONOMY-FIX' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B29-PIP-SOUNDS/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B29-PIP-SOUNDS/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B29-PIP-SOUNDS' _site/index.html
+          grep -Fq 'game.js?v=B29-PIP-SOUNDS' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
