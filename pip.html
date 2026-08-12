@@ -188,27 +188,65 @@ function arenaMemories(){
 })();
 
 // -------------------------------------------------------------- audio
-let audioCtx=null,audioOn=true;
-function chirp(freq,dur=.09,type="sine",gain=.05,delay=0){
- if(!audioOn)return;
+// Canon rules: look-ahead scheduling on the AudioContext clock (JS timers
+// drift and throttle in background); never await resume() (fire-and-forget,
+// guard every call); voice budget + onended disconnect (nodes aren't freed).
+let audioCtx=null,audioOn=true,voices=0,musicTimer=null,nextNoteAt=0,lastSfx={};
+const VOICE_BUDGET=14,SFX_COOLDOWN_MS=60;
+function audioBoot(){ // called from a user gesture; never awaited
+ if(audioCtx)return;
+ try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();musicStart()}catch(_){audioOn=false}
+}
+function tone(freq,dur,type,gain,when,bendTo){
+ if(!audioOn||!audioCtx||voices>=VOICE_BUDGET)return;
  try{
-   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
-   if(audioCtx.state==="suspended")audioCtx.resume();
-   const t=audioCtx.currentTime+delay,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+   if(audioCtx.state==="suspended")audioCtx.resume(); // fire-and-forget
+   const t=when||audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();
    o.type=type;o.frequency.setValueAtTime(freq,t);
-   o.frequency.exponentialRampToValueAtTime(freq*1.35,t+dur);
+   o.frequency.exponentialRampToValueAtTime(bendTo||freq*1.28,t+dur);
    g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-   o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+dur+.02);
- }catch(_){audioOn=false}
+   o.connect(g);g.connect(audioCtx.destination);
+   voices++;
+   o.onended=()=>{voices--;try{o.disconnect();g.disconnect()}catch(_){}};
+   o.start(t);o.stop(t+dur+.02);
+ }catch(_){}
+}
+function chirp(freq,dur=.09,type="sine",gain=.05,delay=0){
+ tone(freq,dur,type,gain,audioCtx?audioCtx.currentTime+delay:0);
+}
+// ambient lullaby: pentatonic notes topped up on a 180ms look-ahead horizon
+const SCALE=[262,294,330,392,440,523,587,659];
+function musicStart(){
+ if(musicTimer||!audioCtx)return;
+ nextNoteAt=audioCtx.currentTime+.2;
+ musicTimer=setInterval(()=>{
+   if(!audioOn||!audioCtx||document.hidden)return;
+   try{
+     while(nextNoteAt<audioCtx.currentTime+.18){
+       if(nextNoteAt<audioCtx.currentTime)nextNoteAt=audioCtx.currentTime; // resync after throttle
+       const bright=pip.happy>0?3:0;
+       const n=SCALE[Math.min(SCALE.length-1,Math.floor(Math.random()*5)+bright)];
+       if(Math.random()<.8)tone(n,1.6,"sine",.016,nextNoteAt,n);
+       if(Math.random()<.25)tone(n/2,2.2,"sine",.012,nextNoteAt,n/2);
+       nextNoteAt+=1.05+Math.random()*.5;
+     }
+   }catch(_){}
+ },60);
+}
+function playSfx(kind,fn){
+ const now=performance.now();
+ if(lastSfx[kind]&&now-lastSfx[kind]<SFX_COOLDOWN_MS)return;
+ lastSfx[kind]=now;fn();
 }
 const sfx={
- pet:()=>chirp(620+Math.random()*140,.07,"sine",.035),
- eat:()=>{chirp(430,.08,"square",.03);chirp(650,.1,"sine",.04,.09)},
- star:()=>chirp(880,.1,"sine",.045),
- good:()=>{chirp(520,.09,"sine",.05);chirp(780,.12,"sine",.05,.08)},
- miss:()=>chirp(190,.12,"sine",.03),
+ pet:()=>playSfx("pet",()=>chirp(620+Math.random()*140,.07,"sine",.035)),
+ eat:()=>playSfx("eat",()=>{chirp(430,.08,"square",.03);chirp(650,.1,"sine",.04,.09)}),
+ star:()=>playSfx("star",()=>chirp(880,.1,"sine",.045)),
+ good:()=>playSfx("good",()=>{chirp(520,.09,"sine",.05);chirp(780,.12,"sine",.05,.08)}),
+ miss:()=>playSfx("miss",()=>chirp(190,.12,"sine",.03)),
  levelup:()=>{[440,554,659,880].forEach((f,i)=>chirp(f,.16,"sine",.05,i*.11))},
 };
+document.addEventListener("pointerdown",audioBoot,{once:false});
 $("audioToggle").addEventListener("click",()=>{audioOn=!audioOn;$("audioToggle").textContent=audioOn?"♫ ON":"♫ OFF"});
 
 // ------------------------------------------------------------- fx bits
@@ -489,7 +527,7 @@ $("closeLog").addEventListener("click",()=>$("log").classList.add("hidden"));
 // ------------------------------------------------------------- welcome
 $("begin").addEventListener("click",()=>{
  $("welcome").classList.add("hidden");
- chirp(520,.1);chirp(780,.14,"sine",.05,.1);
+ audioBoot();chirp(520,.1);chirp(780,.14,"sine",.05,.1);
  if(!SV.welcomed){SV.welcomed=1;journal("You opened the door to Pip's Room.");say("you came!! okay okay — this is where I live ✦",3800)}
  else if(window._awayHours>8)say("I napped in your helmet while you were gone. missed you ✦",3800);
  else say("you're back!! I was just thinking about you ✦",3200);
