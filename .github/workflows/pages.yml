@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Gamepad Menus B35 ${{ github.sha }}
+run-name: OD75 Upgrade Readability B36 ${{ github.sha }}
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify gamepad menus and current systems
+      - name: Verify readable upgrade screens and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
@@ -45,13 +45,11 @@ jobs:
           grep -Fq 'const gamepadMenuB35=' b21-22.js
           grep -Fq 'function gamepadMenuButtonsB35()' b21-22.js
           grep -Fq 'function moveGamepadMenuFocusB35(dx,dy)' b21-22.js
-          grep -Fq 'function gamepadBackActionB35()' b21-22.js
-          grep -Fq 'function beginGamepadOverdriveHoldB35(id)' b21-22.js
-          grep -Fq 'overHold.pointerId="gamepad"' b21-22.js
-          grep -Fq 'if(a&&!gamepadMenuB35.aHeld)pressGamepadMenuA_B35()' b21-22.js
-          grep -Fq 'if(b&&!gamepadMenuB35.bHeld)gamepadBackActionB35()' b21-22.js
-          grep -Fq 'updateGamepadInput=function()' b21-22.js
-          grep -Fq 'updateGamepadMenuB35()' b21-22.js
+          grep -Fq 'function installUpgradeReadabilityB36' b21-23.js || grep -Fq 'installUpgradeReadabilityB36' b21-23.js
+          grep -Fq 'width:min(780px,96vw)' b21-23.js
+          grep -Fq 'font-size:clamp(24px,3.1vw,34px)' b21-23.js
+          grep -Fq 'font-size:clamp(16px,1.8vw,19px)' b21-23.js
+          grep -Fq '@media(max-height:620px)' b21-23.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
@@ -60,7 +58,7 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -75,9 +73,10 @@ jobs:
               'function ensureSoundLabB34()',
               'const gamepadMenuB35=',
               'function moveGamepadMenuFocusB35(dx,dy)',
-              'function beginGamepadOverdriveHoldB35(id)',
-              'overHold.pointerId="gamepad"',
-              'updateGamepadMenuB35()'
+              'installUpgradeReadabilityB36',
+              'width:min(780px,96vw)',
+              'font-size:clamp(24px,3.1vw,34px)',
+              '@media(max-height:620px)'
           ]:
               assert marker in s, marker
           assert s.rfind('renderAbilityShop=function()') > s.find('// One Prism Seed buys one attribute level.')
@@ -88,14 +87,12 @@ jobs:
           assert s.rfind('rollExplorationDropB30=function()') > s.find('function rollExplorationDropB30()')
           assert s.rfind('openAudioStep=function()') > s.find('function openAudioStep()')
           assert s.rfind('updateGamepadInput=function()') > s.find('function updateGamepadInput()')
-          tail=s[s.find('// B35 gamepad modal navigation:'):]
-          for marker in ['stageUpgradeVisibleB35()', 'gamepadMenuButtonsB35()', 'pressGamepadMenuA_B35()', 'gamepadBackActionB35()', 'beginGamepadOverdriveHoldB35(id)']:
-              assert marker in tail, marker
+          assert s.rfind('installUpgradeReadabilityB36') > s.find('// B35 gamepad modal navigation:')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B35-GAMEPAD-MENUS/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B35-GAMEPAD-MENUS/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B35-GAMEPAD-MENUS' _site/index.html
-          grep -Fq 'game.js?v=B35-GAMEPAD-MENUS' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B36-UPGRADE-READABILITY/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B36-UPGRADE-READABILITY/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B36-UPGRADE-READABILITY' _site/index.html
+          grep -Fq 'game.js?v=B36-UPGRADE-READABILITY' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
