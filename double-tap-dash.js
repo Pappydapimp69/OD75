@@ -4,7 +4,7 @@
     lastX: 0,
     lastY: 0,
     pointerType: "",
-    maxDelay: 330,
+    maxDelay: 660,
     maxDistance: 56
   };
 
