@@ -240,8 +240,19 @@ function loadSave(){
  }catch(_){return freshSave()}
 }
 let SV=loadSave();
-function persist(){SV.lastMs=Date.now();rawSet(SAVE_KEY,JSON.stringify(SV))}
-window.addEventListener("beforeunload",persist);
+// hot paths (petting, drills) call persist() often — debounce the actual
+// storage write, but flush synchronously when the tab hides or unloads
+// (mobile browsers reclaim tabs without firing beforeunload)
+let persistT=null;
+function persistNow(){SV.lastMs=Date.now();rawSet(SAVE_KEY,JSON.stringify(SV))}
+function persist(){
+ if(persistT)return;
+ persistT=setTimeout(()=>{persistT=null;persistNow()},400);
+}
+function flushPersist(){if(persistT){clearTimeout(persistT);persistT=null}persistNow()}
+window.addEventListener("beforeunload",flushPersist);
+window.addEventListener("pagehide",flushPersist);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)flushPersist()});
 
 // arena saves — READ ONLY, each guarded and validated
 function arenaMemories(){
@@ -327,7 +338,9 @@ $("audioToggle").addEventListener("click",()=>{audioOn=!audioOn;$("audioToggle")
 // ------------------------------------------------------------- fx bits
 let particles=[],rings=[],stars=[];
 for(let i=0;i<90;i++)stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.4+.3,tw:Math.random()*6.28});
-function particle(x,y,c,n=10,sp=90){if(reducedMotion())n=Math.ceil(n/3);for(let i=0;i<n;i++){const a=Math.random()*6.28,s=sp*(.4+Math.random()*.8);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:.6+Math.random()*.5,r:1.5+Math.random()*2})}}
+const PARTICLE_BUDGET=220;
+function particle(x,y,c,n=10,sp=90){if(reducedMotion())n=Math.ceil(n/3);for(let i=0;i<n;i++){const a=Math.random()*6.28,s=sp*(.4+Math.random()*.8);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:.6+Math.random()*.5,r:1.5+Math.random()*2})}
+ if(particles.length>PARTICLE_BUDGET)particles.splice(0,particles.length-PARTICLE_BUDGET)}
 function ring(x,y,c,r=70){rings.push({x,y,c,r:8,max:r,life:.55})}
 function heartPop(x,y){particles.push({x,y,vx:(Math.random()-.5)*30,vy:-55-Math.random()*40,c:"#ff9fba",life:1,r:0,heart:true})}
 
