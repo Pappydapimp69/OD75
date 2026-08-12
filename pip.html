@@ -101,7 +101,7 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 <div id="welcome" class="modal"><div class="card">
   <div class="kicker">OD75 companion · between runs</div>
   <div class="logo">PIP'S<br>ROOM</div>
-  <p>This is where Pip lives when you two aren't flying. Feed it, pet it (just touch it — go on), and train together. Everything you build here stays here, in your bond.</p>
+  <p>This is where Pip lives when you two aren't flying. Feed it, pet it (just touch it — go on), fling the ball, and train together. Earn stardust to decorate, collect keepsakes, and let Pip surprise you — it has a life of its own in here.</p>
   <div class="rules">
     <div class="rule"><b>CARE</b><span class="small">Touch Pip to pet. Feed it stardust snacks — they restock over real time, so come back.</span></div>
     <div class="rule"><b>PLAY & TRAIN</b><span class="small">Wish Chase, Hype Drill, and Guard Drill grow Loving, Supportive, and Compassionate.</span></div>
@@ -213,7 +213,8 @@ function pipBondName(level){
 }
 
 function freshSave(){return{v:1,bondLevel:1,bondXP:0,love:0,compassion:0,support:0,
- energy:80,snacks:3,fed:75,affection:70,dust:0,decos:[],lastMs:Date.now(),
+ energy:80,snacks:3,fed:75,affection:70,dust:0,decos:[],keeps:[],sCount:0,
+ prefs:{ts:100,motion:"auto"},lastMs:Date.now(),
  totals:{feeds:0,pets:0,wishes:0,hypes:0,guards:0},
  best:{wish:0,hype:0,guard:0},journal:[],welcomed:0}}
 function loadSave(){
@@ -240,6 +241,13 @@ function loadSave(){
  }catch(_){return freshSave()}
 }
 let SV=loadSave();
+// fresh-path/load-path drift guard: every field the code mutates must exist
+SV.totals=SV.totals||{feeds:0,pets:0,wishes:0,hypes:0,guards:0};
+SV.best=SV.best||{wish:0,hype:0,guard:0};
+SV.decos=SV.decos||[];SV.keeps=SV.keeps||[];SV.journal=SV.journal||[];
+if(!Number.isFinite(SV.dust))SV.dust=0;
+if(!Number.isFinite(SV.sCount))SV.sCount=0;
+if(!SV.prefs||[100,115,130].indexOf(SV.prefs.ts)<0)SV.prefs={ts:100,motion:"auto"};
 // hot paths (petting, drills) call persist() often — debounce the actual
 // storage write, but flush synchronously when the tab hides or unloads
 // (mobile browsers reclaim tabs without firing beforeunload)
