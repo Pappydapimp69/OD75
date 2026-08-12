@@ -24,23 +24,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Rebuild static site
+      - name: Rebuild canonical game
         run: |
           mkdir -p _site
           cat payload-0.txt payload-1.txt payload-2.txt payload-3.txt | base64 --decode | gzip --decompress > _site/index.html
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('_site/index.html')
-          html = p.read_text()
-          addons = '<script src="gamepad.js"></script><script src="heart-total.js"></script><script src="double-tap-dash.js"></script><script src="stage-clear-timer.js"></script>'
-          if '</body>' in html:
-              html = html.replace('</body>', addons + '</body>', 1)
-          else:
-              html += addons
-          p.write_text(html)
-          PY
-          cp gamepad.js heart-total.js double-tap-dash.js stage-clear-timer.js _site/
           touch _site/.nojekyll
+
+      - name: Verify canonical build
+        run: |
+          echo "e78d8bfe2ecc9cc602f7ee937f6af3db6e37f69266cd1dd7606c1911ef42704c  _site/index.html" | sha256sum -c -
+          grep -q 'OD75-2026-08-12-B17' _site/index.html
+          grep -q 'maxDelay: 660' _site/index.html
+          grep -q 'turnBrake.active && speed > 2' _site/index.html
+          grep -q 'STAGE_CLEAR_SECONDS = 10' _site/index.html
+          grep -q 'WALLET · ${S.heartTotal || 0} TOTAL' _site/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
