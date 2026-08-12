@@ -30,3 +30,5 @@ OVERDRIVE_INFO.guardian.desc="Absorbs hits, restores shields and blasts attacker
 OVERDRIVE_INFO.nova.desc="Repeated expanding shockwaves punish anything surrounding you. Levels add radius, damage and duration.";
 OVERDRIVE_INFO.gravity.desc="Pulls enemies into a damaging singularity near your current target. Levels add pull power and duration.";
 OVERDRIVE_INFO.pip.desc="Pip becomes the super. Starts at 5 seconds; levels extend duration while Loving, Compassionate and Supportive reshape it.";
+
+// Publish retry only; gameplay values above are unchanged.
