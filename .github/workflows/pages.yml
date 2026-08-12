@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Hold Unlock B25 ${{ github.sha }}
+run-name: OD75 Exploration B26 ${{ github.sha }}
 
 on:
   push:
@@ -24,35 +24,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify held unlocks and banked Overdrive charge
+      - name: Verify exploration progression source
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'function triggerOverdrive()' b21-*.js
-          grep -Fq 'OVER_ORDER=["beam","storm","guardian","nova","gravity","pip"]' b21-*.js
-          grep -Fq 'BOSS_STAR_THRESHOLDS=[4,11,20,32,47,65]' b21-*.js
-          grep -Fq 'if(S.stageEnding&&!S.stagePending)' b21-04.js
-          grep -Fq 'if(S.bossRewardPending){openOverdriveStep();return}' b21-04.js
           grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
-          grep -Fq 'function completeOverdriveHoldAction(id)' b21-09.js
-          grep -Fq 'S.overUnlocked.add(id)' b21-09.js
-          grep -Fq 'S.overLevels[id]=lv+1' b21-09.js
-          grep -Fq 'hold the skill to unlock it' b21-09.js
-          grep -Fq 'HOLD TO UNLOCK' b21-09.js
-          grep -Fq 'HOLD TO UPGRADE' b21-09.js
-          ! grep -Fq 'TAP TO UNLOCK' b21-09.js
-          ! grep -Fq '4 seconds' b21-09.js
-          ! grep -Fq '4s' b21-09.js
           grep -Fq 'if(S&&S.run&&S.over<=0&&S.heat<heatBefore)S.heat=heatBefore' b21-11.js
           grep -Fq 'PipAudioEngine.prototype.scheduleBossStep=function(time)' b21-10.js
-          grep -Fq 'hpRatio<=.30?2:hpRatio<=.65?1:0' b21-10.js
-          grep -Fq 'hasAudio("melody")' b21-10.js
-          grep -Fq 'hasAudio("harmony")' b21-10.js
-          grep -Fq 'hasAudio("bass")' b21-10.js
-          grep -Fq 'hasAudio("bells")' b21-10.js
-          grep -Fq 'hasAudio("heartbeat")' b21-10.js
+          grep -Fq 'S.pipLevel=1;S.pipXP=0;S.pipLove=0;S.pipCompassion=0;S.pipSupport=0' b21-12.js
+          grep -Fq 'rangeLv:0,speedLv:0,powerLv:0,guardLv:0,bossPowers:{}' b21-12.js
+          grep -Fq 'const outsideCurrent=Math.abs(x-CAM.x)>W*.58||Math.abs(y-CAM.y)>H*.58' b21-12.js
+          grep -Fq 'const outsideStart=Math.abs(x-startX)>W*.58||Math.abs(y-startY)>H*.58' b21-12.js
+          grep -Fq 'function spawnMusicStarEvent()' b21-12.js
+          grep -Fq 'function spawnPrismEvent()' b21-12.js
+          grep -Fq 'function drawWaypointB26(item,color,symbol)' b21-12.js
+          grep -Fq 'S.musicNotes=(S.musicNotes||0)+(n.reward||1)' b21-12.js
+          grep -Fq 'S.prismSeeds=(S.prismSeeds||0)+1' b21-12.js
+          grep -Fq 'one seed = one attribute level' b21-12.js
+          grep -Fq 'S.prismSeeds--' b21-12.js
+          grep -Fq 'const PIP_SOUND_PACKS=[' b21-12.js
+          grep -Fq 'Music Notes unlock new Pip voice palettes for this run' b21-12.js
+          grep -Fq 'function playPipPackCueB26' b21-12.js
+          grep -Fq 'if(!S.run||S.end||S.over<=0||S.overType!=="pip")return' b21-12.js
+          grep -Fq 'const radius=190+lv*75' b21-12.js
+          grep -Fq 'const pullSpeed=260+lv*130' b21-12.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
@@ -61,24 +58,33 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
           s=Path('_site/game.js').read_text()
-          assert 'const OVERDRIVE_HOLD_MS=1800' in s
-          assert 'function completeOverdriveHoldAction(id)' in s
-          assert 'HOLD TO UNLOCK' in s and 'HOLD TO UPGRADE' in s
-          assert 'TAP TO UNLOCK' not in s
-          assert 'if(S&&S.run&&S.over<=0&&S.heat<heatBefore)S.heat=heatBefore' in s
-          old=s.find('scheduleBossStep(time){')
-          new=s.rfind('PipAudioEngine.prototype.scheduleBossStep=function(time)')
-          assert old >= 0 and new > old, (old,new)
+          for marker in [
+              'const OVERDRIVE_HOLD_MS=1800',
+              'PipAudioEngine.prototype.scheduleBossStep=function(time)',
+              'function resetPipRunProgressB26()',
+              'function spawnAmbientMusicNote()',
+              'function spawnMusicStarEvent()',
+              'function spawnPrismEvent()',
+              'function drawWaypointB26(item,color,symbol)',
+              'function updateAscendantHeartMagnetB26(dt)',
+              'const radius=190+lv*75',
+              'const pullSpeed=260+lv*130',
+              'one seed = one attribute level',
+              'Music Notes unlock new Pip voice palettes for this run'
+          ]:
+              assert marker in s, marker
+          assert s.rfind('update=function(dt)') > s.find('// B25: manual Overdrive charge no longer decays.')
+          assert s.rfind('draw=function()') > s.find('function draw(){')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B25-HOLD-UNLOCK/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B25-HOLD-UNLOCK/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B25-HOLD-UNLOCK' _site/index.html
-          grep -Fq 'game.js?v=B25-HOLD-UNLOCK' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B26-EXPLORATION/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B26-EXPLORATION/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B26-EXPLORATION' _site/index.html
+          grep -Fq 'game.js?v=B26-EXPLORATION' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
