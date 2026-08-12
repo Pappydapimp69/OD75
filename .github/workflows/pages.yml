@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 hybrid B19 ${{ github.sha }}
+run-name: OD75 multitouch B20 ${{ github.sha }}
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Verify hybrid direct source
+      - name: Verify multitouch direct source
         run: |
           test -f index.html
           test -f styles.css
@@ -35,11 +35,14 @@ jobs:
           done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'OD75-2026-08-12-B19-HYBRID' index.html
-          grep -Fq 'game-6.js?v=B19-HYBRID' index.html
+          grep -Fq 'OD75-2026-08-12-B20-MULTITOUCH' index.html
+          grep -Fq 'game-6.js?v=B20-MULTITOUCH' index.html
           grep -Fq 'dtap<=660' game-6.js
           grep -Fq 'JOY_RADIUS=55' game-6.js
           grep -Fq 'rect.width*.48&&y>=rect.height*.42' game-6.js
+          grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' game-6.js
+          grep -Fq 'tapDash.sourcePointer===joy.id' game-6.js
+          grep -Fq 'Auxiliary dash fingers can lift independently without disturbing movement.' game-6.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' game-4.js
           grep -Fq 'turnDrag=2.25*Math.pow(severity,1.4)' game-4.js
           ! grep -Fq 'turnDelta>(8*Math.PI/180)' game-4.js
