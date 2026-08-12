@@ -3,144 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>OVERDRIVE 75 · OD75-2026-08-12-B20-MULTITOUCH</title>
-<link rel="stylesheet" href="styles.css?v=B20-MULTITOUCH">
+<title>OVERDRIVE 75 · OD75-2026-08-12-B21-STARDRIVE</title>
 <style>
-#joyViz{position:fixed;z-index:14;width:110px;height:110px;border:1px solid #9ae6ff42;border-radius:50%;background:#0a25321f;box-shadow:inset 0 0 20px #7ed8ff12,0 0 20px #0004;pointer-events:none;display:none;transform:translate(-50%,-50%);backdrop-filter:blur(1px)}
-#joyViz.on{display:block}
-#joyViz i{position:absolute;left:50%;top:50%;width:34px;height:34px;border-radius:50%;background:#9ae6ff55;border:1px solid #c9f3ff88;box-shadow:0 0 14px #7ed8ff33;transform:translate(-50%,-50%);will-change:transform}
+:root{--bg:#05070b;--text:#f7f9fc;--muted:#aab4c2;--line:#ffffff20;--cyan:#7ed8ff;--hot:#ff6e8b;--gold:#ffd36f;--violet:#b388ff;--green:#7be0ae}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;overscroll-behavior:none}button{font:inherit;color:inherit}#app{position:fixed;inset:0;overflow:hidden;background:#030509}canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:none;-webkit-user-select:none}.top{position:absolute;z-index:8;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));top:max(7px,env(safe-area-inset-top));display:flex;gap:6px;align-items:center;pointer-events:none}.pill{border:1px solid var(--line);border-radius:999px;background:#070a11ce;backdrop-filter:blur(8px);padding:6px 9px;font-size:11px;white-space:nowrap}#time{font-weight:900}#score{font-weight:800}#combo{color:#dfe7ff}#phase{margin-left:auto}#audioToggle{pointer-events:auto;cursor:pointer;color:#ffe9a6;border:1px solid var(--line)}.bars{position:absolute;z-index:7;left:8px;right:8px;top:46px;display:grid;grid-template-columns:1fr 1fr;gap:7px;pointer-events:none}.bar{height:5px;border-radius:999px;background:#ffffff0f;overflow:hidden}.bar i{display:block;height:100%;transition:width .12s}#dashBar{background:linear-gradient(90deg,var(--cyan),#c9f3ff)}#heatBar{background:linear-gradient(90deg,var(--gold),var(--hot))}.healthwrap{position:absolute;z-index:7;left:8px;right:8px;top:58px;display:flex;align-items:center;gap:7px;pointer-events:none}.healthlabel{font-size:9px;letter-spacing:.1em;color:#ffffffa0}.healthbar{height:7px;flex:1;border-radius:999px;background:#ffffff10;overflow:hidden;border:1px solid #ffffff12}#healthBar{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--hot),var(--green));transition:width .15s}#shieldPips{display:flex;gap:4px}.shieldpip{width:9px;height:9px;border-radius:3px;border:1px solid #7ed8ff88;background:#7ed8ff;box-shadow:0 0 8px #7ed8ff55}.shieldpip.empty{background:#ffffff0b;box-shadow:none}#regenText{font-size:9px;color:#9ddfff;min-width:54px;text-align:right}#announce{position:absolute;z-index:9;left:50%;top:16%;transform:translate(-50%,-6px);font-weight:950;font-size:clamp(23px,6vw,54px);letter-spacing:-.04em;text-shadow:0 5px 30px #000;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}#announce.on{opacity:1;transform:translate(-50%,0)}#tip{position:absolute;z-index:7;left:50%;top:78px;transform:translateX(-50%);font-size:11px;border:1px solid var(--line);background:#070a11c9;backdrop-filter:blur(7px);border-radius:999px;padding:5px 8px;pointer-events:none;white-space:nowrap}#pipMood{position:absolute;z-index:9;right:max(9px,env(safe-area-inset-right));top:105px;font-size:10px;color:#ffe7a3;border:1px solid #ffd36f38;background:#151008bf;backdrop-filter:blur(7px);border-radius:999px;padding:5px 8px;pointer-events:none;opacity:1;transform:translateY(0);transition:opacity .45s ease,transform .45s ease}#pipMood.fading{opacity:0;transform:translateY(-5px)}#pipLevel{position:absolute;z-index:9;right:max(9px,env(safe-area-inset-right));top:133px;font-size:9px;color:#fff1bd;border:1px solid #ffd36f28;background:#100d08bf;border-radius:999px;padding:4px 7px;pointer-events:none;white-space:nowrap}#currencyHud{position:absolute;z-index:9;left:max(9px,env(safe-area-inset-left));top:105px;font-size:10px;color:#ffc2d2;border:1px solid #ff9fba44;background:#190b11bf;backdrop-filter:blur(7px);border-radius:999px;padding:5px 8px;pointer-events:none}#pipLevel b{color:#ffd36f}.bottom{position:absolute;z-index:8;left:max(9px,env(safe-area-inset-left));right:max(9px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom));display:flex;justify-content:flex-end;align-items:end;pointer-events:none}#actions{pointer-events:none;display:flex;gap:10px;align-items:flex-end}#attack,#dash{pointer-events:auto;border-radius:50%;font-weight:950;letter-spacing:.04em;touch-action:none}#attack{width:68px;height:68px;border:1px solid #b8a0ff;background:#39285fcc;box-shadow:0 0 0 6px #b388ff10}#attack.ready{box-shadow:0 0 0 6px #b388ff15,0 0 22px #b388ff33}#attack:disabled{opacity:.78;cursor:default}#dash{width:82px;height:82px;border:1px solid #9ae6ff;background:#163a4ecc;backdrop-filter:blur(8px);font-size:12px;box-shadow:0 0 0 7px #7ed8ff12}#dash.ready{box-shadow:0 0 0 7px #7ed8ff16,0 0 28px #7ed8ff3d}#dash.over{border-color:#ffd36f;background:#553a15cc;box-shadow:0 0 34px #ffd36f66}.modal{position:absolute;z-index:30;inset:0;display:grid;place-items:center;background:#030509e0;backdrop-filter:blur(10px);padding:16px}.modal.hidden{display:none}.card{width:min(560px,94vw);border:1px solid var(--line);border-radius:18px;background:#0d131dee;padding:17px;max-height:92dvh;overflow:auto}.kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#b9c7ef}.logo{font-size:clamp(46px,13vw,86px);font-weight:1000;line-height:.82;letter-spacing:-.07em;margin:8px 0 12px}.card p{font-size:13px;color:#cdd5e0;margin:7px 0}.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}.rule{border:1px solid var(--line);border-radius:12px;padding:9px;background:#ffffff05}.rule b{display:block;font-size:12px;margin-bottom:3px}.small{font-size:10px;color:var(--muted)}.startBtn,.primary{width:100%;border:1px solid #70c9ec;background:#12344a;border-radius:12px;padding:11px;font-weight:850;cursor:pointer}.endstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:11px 0}.mini{border:1px solid var(--line);border-radius:10px;padding:7px;background:#ffffff06}.mini b{display:block;font-size:18px}#grade{font-size:54px;font-weight:1000;letter-spacing:-.06em;margin:3px 0}.upgradegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.bossgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.abilitygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}.audiogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.audiochoice,.upgrade{border:1px solid var(--line);background:#ffffff06;border-radius:14px;padding:12px;text-align:left;cursor:pointer;min-height:112px}.audiochoice:hover,.upgrade:hover{border-color:#ffd36f}.audiochoice b,.upgrade b{display:block;font-size:14px;margin-bottom:4px}.audiochoice .note,.upgrade .heart{font-size:22px;margin-bottom:6px}.stagehidden{display:none!important}#stageBond{font-size:12px;color:#ffe7a3;margin:8px 0}#joyViz{position:fixed;z-index:14;width:110px;height:110px;border:1px solid #9ae6ff42;border-radius:50%;background:#0a25321f;box-shadow:inset 0 0 20px #7ed8ff12,0 0 20px #0004;pointer-events:none;display:none;transform:translate(-50%,-50%);backdrop-filter:blur(1px)}#joyViz.on{display:block}#joyViz i{position:absolute;left:50%;top:50%;width:34px;height:34px;border-radius:50%;background:#9ae6ff55;border:1px solid #c9f3ff88;box-shadow:0 0 14px #7ed8ff33;transform:translate(-50%,-50%);will-change:transform}.barbox{display:grid;gap:2px;min-width:0}.barbox>span{font-size:8px;letter-spacing:.1em;color:#ffffff88;text-align:center;white-space:nowrap}.overbar{border:1px solid #ffd36f35}#overdrive{pointer-events:auto;width:78px;height:78px;border-radius:50%;border:1px solid #ffd36f55;background:#2e2411cc;color:#ffe9a6;font-weight:950;font-size:10px;line-height:1.05;touch-action:none;box-shadow:0 0 0 6px #ffd36f0b;opacity:.7}#overdrive small{font-size:9px;color:#fff7cf}#overdrive.ready{opacity:1;border-color:#fff0a8;background:#58410dcc;box-shadow:0 0 0 7px #ffd36f18,0 0 30px #ffd36f55;animation:overReadyPulse .9s ease-in-out infinite alternate}#overdrive.active{opacity:1;background:#6b3b17cc;border-color:#fff0a8;box-shadow:0 0 30px #ffd36f66}@keyframes overReadyPulse{to{transform:scale(1.035)}}.overgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}.overgrid .upgrade{min-height:118px}.overgrid .upgrade.equipped{border-color:#ffd36f;box-shadow:0 0 20px #ffd36f20}.overgrid .upgrade.locked{opacity:.78}
+@media(max-width:560px){.upgradegrid,.audiogrid,.bossgrid{grid-template-columns:1fr}.abilitygrid{grid-template-columns:1fr 1fr}.upgrade,.audiochoice{min-height:auto;padding:10px}#pipMood{top:98px;right:8px;max-width:62vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#pipLevel{top:125px;right:8px;max-width:62vw;overflow:hidden;text-overflow:ellipsis}#tip{max-width:88vw;overflow:hidden;text-overflow:ellipsis}#attack{width:60px;height:60px}#dash{width:70px;height:70px}.pill{padding:5px 7px}.overgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.overgrid .upgrade{min-height:105px;padding:9px}.bars{top:44px}.healthwrap{top:67px}#tip{top:88px}}
 </style>
 </head>
 <body>
-<div id="app">
-<canvas id="c"></canvas>
-<div id="joyViz" aria-hidden="true"><i></i></div>
-
-<div class="top">
-  <span id="time" class="pill">75.0</span>
-  <span id="score" class="pill">0</span>
-  <span id="combo" class="pill">x1.0</span>
-  <span id="phase" class="pill">WARMUP</span>
-  <button id="audioToggle" class="pill" type="button">♫ ON</button>
-</div>
-<div class="bars">
-  <div class="bar"><i id="dashBar" style="width:100%"></i></div>
-  <div class="bar"><i id="heatBar" style="width:0%"></i></div>
-</div>
-<div class="healthwrap">
-  <span class="healthlabel">HP</span>
-  <div class="healthbar"><i id="healthBar"></i></div>
-  <div id="shieldPips"></div>
-  <span id="regenText">SHIELDS</span>
-</div>
-<div id="tip">AUTO-FIRE locks nearest enemy · DASH to finish · purple cores chain-explode</div>
-<div id="pipMood">✦ Pip is rooting for you</div>
-<div id="pipLevel"><b>PIP LV 1</b> · 0/65 XP</div>
-<div id="currencyHud">♥ 0 HEART BITS</div>
-<div id="announce"></div>
-
-<div class="bottom">
-  <div id="actions">
-    <button id="attack" class="ready" disabled>AUTO</button>
-    <button id="dash" class="ready">DASH</button>
-  </div>
-</div>
-
-<div id="start" class="modal">
-  <div class="card">
-    <div class="kicker">75 seconds · one tiny hype-friend</div>
-    <div class="logo">OVER<br>DRIVE 75</div>
-    <p><b>Goal:</b> clear each wave, collect Heart Bits, and grow Pip.</p>
-    <div class="rules">
-      <div class="rule"><b>MOVE</b><span class="small">Touch the lower-left area to spawn a compact floating stick. Small turns keep momentum; harder turns scrub speed smoothly. WASD/arrows and gamepad also work.</span></div>
-      <div class="rule"><b>AUTO-FIRE</b><span class="small">Aims and shoots for you</span></div>
-      <div class="rule"><b>DASH</b><span class="small">Keep your movement thumb down and double-tap anywhere with another finger to dash there. Double-click, Space, DASH, and gamepad A/B/X/RB also work.</span></div>
-    </div>
-    <button id="begin" class="startBtn">Start run · A/Cross</button>
-  </div>
-</div>
-
-<div id="stageUp" class="modal hidden">
-  <div class="card">
-    <div class="kicker">STAGE COMPLETE · PIP GROWS WITH YOU</div>
-
-    <div id="bossRewardStep" class="stagehidden">
-      <h2 id="bossRewardTitle">Boss Bond ✦</h2>
-      <p id="bossRewardText">That fight changed Pip. Choose one mutation to keep.</p>
-      <div class="bossgrid">
-        <button id="bossReward0" class="upgrade"></button>
-        <button id="bossReward1" class="upgrade"></button>
-        <button id="bossReward2" class="upgrade"></button>
-      </div>
-    </div>
-
-    <div id="emotionStep">
-      <h2 id="stageTitle">Pip learned something from you.</h2>
-      <p id="stageText">Choose what Pip should become better at giving you.</p>
-      <div id="stageBond"></div>
-      <div class="upgradegrid">
-        <button id="upLove" class="upgrade">
-          <div class="heart">♥</div>
-          <b>More Loving · ♥ 12</b>
-          <span class="small">Warmer, more sentimental affection. Slightly more Wish Stars.</span>
-        </button>
-        <button id="upCompassion" class="upgrade">
-          <div class="heart">♡</div>
-          <b>More Compassionate · ♥ 12</b>
-          <span class="small">Kinder responses to damage and faster shield recovery.</span>
-        </button>
-        <button id="upSupport" class="upgrade">
-          <div class="heart">✦</div>
-          <b>More Supportive · ♥ 12</b>
-          <span class="small">More encouragement and extra power when you're under pressure.</span>
-        </button>
-      </div>
-      <button id="skipPipUpgrade" class="primary" style="margin-top:8px">Continue without emotional upgrade</button>
-    </div>
-
-    <div id="abilityStep" class="stagehidden">
-      <h2>Upgrade Pip's abilities ✦</h2>
-      <p id="abilityText">Spend Heart Bits on as many upgrades as you can afford, then continue.</p>
-      <div id="abilityBalance" class="small"></div>
-      <div class="abilitygrid">
-        <button id="abilityRange" class="upgrade"></button>
-        <button id="abilitySpeed" class="upgrade"></button>
-        <button id="abilityPower" class="upgrade"></button>
-        <button id="abilityGuard" class="upgrade"></button>
-      </div>
-      <button id="continueAbilities" class="primary" style="margin-top:8px">Continue to sound unlock</button>
-    </div>
-
-    <div id="audioStep" class="stagehidden">
-      <h2>Pip found a new sound ✦</h2>
-      <p>Choose one new piece of music or one sound effect. Pip keeps it between runs.</p>
-      <div id="audioOwned" class="small"></div>
-      <div class="audiogrid">
-        <button id="audioChoice0" class="audiochoice"></button>
-        <button id="audioChoice1" class="audiochoice"></button>
-        <button id="audioChoice2" class="audiochoice"></button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="end" class="modal hidden">
-  <div class="card">
-    <div class="kicker">RUN COMPLETE</div>
-    <div id="grade">A</div>
-    <h2 id="endTitle">You bent the arena.</h2>
-    <div id="endStats" class="endstats"></div>
-    <p id="endText"></p>
-    <button id="again" class="startBtn">Again</button>
-  </div>
-</div>
-</div>
-
-<script src="game-1.js?v=B20-MULTITOUCH"></script>
-<script src="game-2.js?v=B20-MULTITOUCH"></script>
-<script src="game-3.js?v=B20-MULTITOUCH"></script>
-<script src="game-4.js?v=B20-MULTITOUCH"></script>
-<script src="game-5.js?v=B20-MULTITOUCH"></script>
-<script src="game-6.js?v=B20-MULTITOUCH"></script>
-<div id="od75BuildStamp" style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff66;pointer-events:none">OD75-2026-08-12-B20-MULTITOUCH</div></body>
-</html>
+<div id="app"><canvas id="c"></canvas><div id="joyViz" aria-hidden="true"><i></i></div>
+<div class="top"><span id="time" class="pill">75.0</span><span id="score" class="pill">0</span><span id="combo" class="pill">x1.0</span><span id="phase" class="pill">WARMUP</span><button id="audioToggle" class="pill" type="button">♫ ON</button></div>
+<div class="bars"><div class="barbox"><span>DASH</span><div class="bar"><i id="dashBar" style="width:100%"></i></div></div><div class="barbox"><span id="overGaugeLabel">BEAM · 0%</span><div class="bar overbar"><i id="heatBar" style="width:0%"></i></div></div></div>
+<div class="healthwrap"><span class="healthlabel">HP</span><div class="healthbar"><i id="healthBar"></i></div><div id="shieldPips"></div><span id="regenText">SHIELDS</span></div>
+<div id="tip">AUTO-FIRE locks nearest enemy · DASH to finish · purple cores chain-explode</div><div id="pipMood">✦ Pip is rooting for you</div><div id="pipLevel"><b>PIP LV 1</b> · 0/65 XP</div><div id="currencyHud">♥ 0 HEART BITS</div><div id="announce"></div>
+<div class="bottom"><div id="actions"><button id="attack" class="ready" disabled>AUTO</button><button id="overdrive" type="button">BEAM<br><small>0%</small></button><button id="dash" class="ready">DASH</button></div></div>
+<div id="start" class="modal"><div class="card"><div class="kicker">75 seconds · one tiny hype-friend</div><div class="logo">OVER<br>DRIVE 75</div><p><b>Goal:</b> clear waves, collect Heart Bits and Wish Stars, and grow Pip. Wish Stars attract bosses and power your Overdrive build.</p><div class="rules"><div class="rule"><b>MOVE</b><span class="small">Touch the lower-left area to spawn a compact floating stick. Small turns keep momentum; harder turns scrub speed smoothly. WASD/arrows and gamepad also work.</span></div><div class="rule"><b>AUTO-FIRE</b><span class="small">Aims and shoots for you</span></div><div class="rule"><b>DASH</b><span class="small">Double-tap or double-click anywhere to dash toward that point. Space, DASH, or gamepad A/B/X/RB also work.</span></div></div><button id="begin" class="startBtn">Start run · A/Cross</button></div></div>
+<div id="stageUp" class="modal hidden"><div class="card"><div class="kicker">BOSS DEFEATED · CHOOSE HOW WE GROW</div>
+<div id="overdriveStep" class="stagehidden"><h2>Overdrive Constellation ★</h2><p>Boss down. Spend Run Stars to unlock, equip, or deepen one Overdrive. Only one can be equipped at a time.</p><div id="starBalance" class="small"></div><div class="overgrid"><button id="overChoice0" class="upgrade"></button><button id="overChoice1" class="upgrade"></button><button id="overChoice2" class="upgrade"></button><button id="overChoice3" class="upgrade"></button><button id="overChoice4" class="upgrade"></button><button id="overChoice5" class="upgrade"></button></div><button id="continueOverdrive" class="primary">Continue with equipped Overdrive</button></div>
+<div id="bossRewardStep" class="stagehidden"><h2 id="bossRewardTitle">Boss Bond ✦</h2><p id="bossRewardText">That fight changed Pip. Choose one mutation to keep.</p><div class="bossgrid"><button id="bossReward0" class="upgrade"></button><button id="bossReward1" class="upgrade"></button><button id="bossReward2" class="upgrade"></button></div></div>
+<div id="emotionStep"><h2 id="stageTitle">Pip learned something from you.</h2><p id="stageText">Choose what Pip should become better at giving you.</p><div id="stageBond"></div><div class="upgradegrid"><button id="upLove" class="upgrade"><div class="heart">♥</div><b>More Loving · ♥ 12</b><span class="small">Warmer affection and more Wish synergy.</span></button><button id="upCompassion" class="upgrade"><div class="heart">♡</div><b>More Compassionate · ♥ 12</b><span class="small">Protection and recovery.</span></button><button id="upSupport" class="upgrade"><div class="heart">✦</div><b>More Supportive · ♥ 12</b><span class="small">Combat boosts and confidence.</span></button></div><button id="skipPipUpgrade" class="primary">Continue without emotional upgrade</button></div>
+<div id="abilityStep" class="stagehidden"><h2>Upgrade Pip's abilities ✦</h2><p>Spend Heart Bits on as many upgrades as you can afford, then continue.</p><div id="abilityBalance" class="small"></div><div class="abilitygrid"><button id="abilityRange" class="upgrade"></button><button id="abilitySpeed" class="upgrade"></button><button id="abilityPower" class="upgrade"></button><button id="abilityGuard" class="upgrade"></button></div><button id="continueAbilities" class="primary">Continue to sound unlock</button></div>
+<div id="audioStep" class="stagehidden"><h2>Pip found a new sound ✦</h2><p>Choose one new piece of music or one sound effect. Pip keeps it between runs.</p><div id="audioOwned" class="small"></div><div class="audiogrid"><button id="audioChoice0" class="audiochoice"></button><button id="audioChoice1" class="audiochoice"></button><button id="audioChoice2" class="audiochoice"></button></div></div>
+</div></div>
+<div id="end" class="modal hidden"><div class="card"><div class="kicker">RUN COMPLETE</div><div id="grade">A</div><h2 id="endTitle">You bent the arena.</h2><div id="endStats" class="endstats"></div><p id="endText"></p><button id="again" class="startBtn">Again</button></div></div></div>
+<script src="game.js?v=B21-STARDRIVE"></script>
+<div id="od75BuildStamp" style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff66;pointer-events:none">OD75-2026-08-12-B21-STARDRIVE</div></body></html>
