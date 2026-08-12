@@ -1,4 +1,5 @@
 name: Deploy OD75 to Pages
+run-name: OD75 ${{ github.sha }}
 
 on:
   push:
