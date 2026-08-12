@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Run Audio Reset B32 ${{ github.sha }}
+run-name: OD75 Prism RNG B33 ${{ github.sha }}
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify run-scoped audio and current systems
+      - name: Verify exploration RNG and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
@@ -48,12 +48,12 @@ jobs:
           grep -Fq 'ids.forEach(id=>playPipSoundLayerB31(id,kind,false,scale))' b21-18.js
           grep -Fq 'function resetRunAudioB32()' b21-19.js
           grep -Fq 'S.musicNotes=0' b21-19.js
-          grep -Fq 'S.pipSoundCredits=1' b21-19.js
-          grep -Fq 'S.pipSoundLevels={}' b21-19.js
-          grep -Fq 'S.pipSoundUnlocked=new Set()' b21-19.js
           grep -Fq 'S.audioUnlocks=new Set()' b21-19.js
-          grep -Fq 'audio:[]' b21-19.js
-          grep -Fq 'a new run starts fresh' b21-19.js
+          grep -Fq 'function rollExplorationDropB33()' b21-20.js
+          grep -Fq 'if(rnd()<EXPLORATION_ROLL_CHANCE_B30){spawnAmbientMusicNote();spawned=true}' b21-20.js
+          grep -Fq 'if(rnd()<EXPLORATION_ROLL_CHANCE_B30){spawnMusicStarEvent();spawned=true}' b21-20.js
+          grep -Fq 'if(rnd()<EXPLORATION_ROLL_CHANCE_B30){spawnPrismEvent();spawned=true}' b21-20.js
+          grep -Fq 'rollExplorationDropB30=function(){return rollExplorationDropB33()}' b21-20.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
@@ -62,7 +62,7 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -75,31 +75,24 @@ jobs:
               'const EXPLORATION_KILL_INTERVAL_B30=30',
               'const EXPLORATION_ROLL_CHANCE_B30=.10',
               'function activePipSoundIdsB31()',
-              'ids.forEach(id=>playPipSoundLayerB31(id,kind,false,scale))',
               'function resetRunAudioB32()',
-              'S.musicNotes=0',
-              'S.pipSoundLevels={}',
-              'S.pipSoundUnlocked=new Set()',
-              'S.audioUnlocks=new Set()',
-              'audio:[]'
+              'function rollExplorationDropB33()',
+              'if(rnd()<EXPLORATION_ROLL_CHANCE_B30){spawnPrismEvent();spawned=true}',
+              'rollExplorationDropB30=function(){return rollExplorationDropB33()}'
           ]:
               assert marker in s, marker
           assert s.rfind('renderAbilityShop=function()') > s.find('// One Prism Seed buys one attribute level.')
-          assert s.rfind('renderPipSoundStepB26=function()') > s.find('// B29 Pip Sound progression')
           assert s.rfind('sfxPipCue=function(kind="talk")') > s.find('// B29 Pip Sound progression')
           assert s.rfind('updateB26Drops=function(dt)') > s.find('function updateB26Drops(dt)')
           assert s.rfind('killBoss=function(e)') > s.find('function killBoss(e)')
           assert s.rfind('triggerOverdrive=function()') > s.find('function triggerOverdrive()')
           assert s.rfind('reset=function()') > s.find('// B31 cumulative audio')
-          assert s.rfind('savePip=function()') > s.find('// B31 cumulative audio')
-          tail=s[s.rfind('reset=function()'):]
-          for marker in ['resetRunAudioB32()','savePip()','updateUI()']:
-              assert marker in tail, marker
+          assert s.rfind('rollExplorationDropB30=function()') > s.find('function rollExplorationDropB30()')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B32-RUN-AUDIO-RESET/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B32-RUN-AUDIO-RESET/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B32-RUN-AUDIO-RESET' _site/index.html
-          grep -Fq 'game.js?v=B32-RUN-AUDIO-RESET' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B33-PRISM-RNG/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B33-PRISM-RNG/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B33-PRISM-RNG' _site/index.html
+          grep -Fq 'game.js?v=B33-PRISM-RNG' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
