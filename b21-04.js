@@ -182,15 +182,26 @@ function emotionalBondLine(){
  return`Pip is becoming especially ${a[0][0].toLowerCase()} because of your choices.`;
 }
 function advanceToNextStage(){
+ // A normal stage clear still gets the full Pip growth sequence. The only
+ // extra reward reserved for boss stages is Overdrive management + Boss Bond.
+ if(S.stageEnding&&!S.stagePending){
+   openStageUpgrade();
+   return;
+ }
  S.stage++;S.stageCurrency=0;S.stageTime=0;S.stageEnding=false;S.stageWaveCount=0;S.bossActive=false;S.bossDefeated=false;S.bossName="";S.bossMaxHp=0;S.bossMidPraise=false;S.bossStartedAt=0;S.bossRewardPending=false;S.bossRewardChoices=[];S.stagePraiseMark=30;S.noHitClock=0;S.nextNoHitPraise=16;S.stagePending=false;S.run=true;last=performance.now();if(audioEngine)audioEngine.setTempo(S.stage>=5?124:116);startWave(S.wave+1);
 }
 function openStageUpgrade(){
+ const bossClear=!!S.bossRewardPending;
  S.waveState="stage";
  S.stagePending=true;
  S.run=false;
  enemies=[];shots=[];enemyShots=[];heartBits=[];S.pipPopupQueue=[];S.pipPopupBusy=false;S.pipState="orbit";S.pipTarget=null;P.pipX=P.x+24;P.pipY=P.y;CAM.x=P.x;CAM.y=P.y;
- $("stageTitle").textContent=`Boss cleared at Stage ${S.stage}.`;
- $("stageText").textContent=`You cleared the stage and its boss in ${Math.round(S.stageTime)} seconds. Boss victories are your only chance to reconfigure Overdrive and deepen Pip.`;
+ const kicker=$("stageUp").querySelector(".kicker");
+ if(kicker)kicker.textContent=bossClear?"BOSS DEFEATED · CHOOSE HOW WE GROW":"STAGE COMPLETE · PIP GROWS WITH YOU";
+ $("stageTitle").textContent=bossClear?`Boss cleared at Stage ${S.stage}.`:`Stage ${S.stage} complete.`;
+ $("stageText").textContent=bossClear
+   ?`You cleared the stage and its boss in ${Math.round(S.stageTime)} seconds. Reconfigure Overdrive first, then grow Pip as usual.`
+   :`You cleared the stage in ${Math.round(S.stageTime)} seconds. Choose how Pip should grow before the next stage.`;
  $("stageBond").textContent=emotionalBondLine()+`  ♥ ${S.pipLove}  ♡ ${S.pipCompassion}  ✦ ${S.pipSupport}`;
  $("overdriveStep").classList.add("stagehidden");
  $("bossRewardStep").classList.add("stagehidden");
