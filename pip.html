@@ -15,7 +15,11 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 .pill{border:1px solid var(--line);border-radius:999px;background:#070a11ce;backdrop-filter:blur(8px);padding:7px 12px;font-size:13.5px;white-space:nowrap}
 #bond{font-weight:900}
 #mood{color:#ffe7a3;border-color:#ffd36f38;background:#151008bf}
-#audioToggle{pointer-events:auto;cursor:pointer;color:#ffe9a6;margin-left:auto}
+#audioToggle{pointer-events:auto;cursor:pointer;color:#ffe9a6}
+.setrow{display:flex;gap:6px;align-items:center;margin:9px 0;flex-wrap:wrap}
+.setrow b{min-width:90px;font-size:13px}
+.setbtn{border:1px solid var(--line);background:#ffffff06;border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer}
+.setbtn.onopt{border-color:#ffd36f;color:#ffe9a6}
 .gauges{position:absolute;z-index:7;left:8px;right:8px;top:52px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;pointer-events:none}
 .gbox{display:grid;gap:2px;min-width:0}
 .gbox>span{font-size:11px;letter-spacing:.12em;color:#ffffffa8;text-align:center;white-space:nowrap}
@@ -45,6 +49,7 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 #speech.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
 #announce{position:absolute;z-index:9;left:50%;top:13%;transform:translate(-50%,-6px);font-weight:950;font-size:clamp(22px,6vw,50px);letter-spacing:-.04em;text-shadow:0 5px 30px #000;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}
 #announce.on{opacity:1;transform:translate(-50%,0)}
+body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 .modal{position:absolute;z-index:30;inset:0;display:grid;place-items:center;background:#030509e0;backdrop-filter:blur(10px);padding:16px}
 .modal.hidden{display:none}
 .card{width:min(540px,94vw);border:1px solid var(--line);border-radius:18px;background:#0d131dee;padding:17px;max-height:92dvh;overflow:auto}
@@ -73,6 +78,7 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
   <span id="snacks" class="pill">✧ 0</span>
   <span id="dust" class="pill">✵ 0</span>
   <span id="mood" class="pill">✦ …</span>
+  <button id="settingsBtn" class="pill" type="button" style="pointer-events:auto;cursor:pointer;margin-left:auto">⚙</button>
   <button id="audioToggle" class="pill" type="button">♫ ON</button>
 </div>
 <div class="gauges">
@@ -121,6 +127,22 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
   <p id="dustBalance" class="small"></p>
   <div class="shopgrid" id="shopGrid"></div>
   <button id="closeShop" class="primary">Back to Pip</button>
+</div></div>
+
+<div id="settings" class="modal hidden"><div class="card">
+  <div class="kicker">SETTINGS</div>
+  <h2 style="margin:6px 0">Make it comfortable</h2>
+  <div class="setrow"><b>Text size</b>
+    <button class="setbtn" data-ts="100" type="button">normal</button>
+    <button class="setbtn" data-ts="115" type="button">large</button>
+    <button class="setbtn" data-ts="130" type="button">huge</button>
+  </div>
+  <div class="setrow"><b>Motion</b>
+    <button class="setbtn" data-motion="auto" type="button">full</button>
+    <button class="setbtn" data-motion="less" type="button">reduced</button>
+  </div>
+  <p class="small">Keyboard: arrows/WASD do everything — Space taps rings, Enter grabs the nearest wish star, ←/→ turn the guard shield. Reduced motion also follows your system setting.</p>
+  <button id="closeSettings" class="primary">Done</button>
 </div></div>
 
 <div id="result" class="modal hidden"><div class="card">
@@ -208,6 +230,8 @@ function loadSave(){
      decos:Array.isArray(v.decos)?v.decos.filter(d=>typeof d==="string").slice(0,24):[],
      keeps:Array.isArray(v.keeps)?v.keeps.filter(d=>typeof d==="string").slice(0,64):[],
      sCount:num(v.sCount,0,1e6,0),
+     prefs:{ts:[100,115,130].indexOf((v.prefs||{}).ts)>=0?v.prefs.ts:100,
+            motion:(v.prefs||{}).motion==="less"?"less":"auto"},
      lastMs:num(v.lastMs,0,4102444800000,Date.now()),
      totals:{feeds:num(t.feeds,0,1e9,0),pets:num(t.pets,0,1e9,0),wishes:num(t.wishes,0,1e9,0),hypes:num(t.hypes,0,1e9,0),guards:num(t.guards,0,1e9,0)},
      best:{wish:num(b.wish,0,1e6,0),hype:num(b.hype,0,1e6,0),guard:num(b.guard,0,1e6,0)},
@@ -303,10 +327,23 @@ $("audioToggle").addEventListener("click",()=>{audioOn=!audioOn;$("audioToggle")
 // ------------------------------------------------------------- fx bits
 let particles=[],rings=[],stars=[];
 for(let i=0;i<90;i++)stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.4+.3,tw:Math.random()*6.28});
-function particle(x,y,c,n=10,sp=90){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=sp*(.4+Math.random()*.8);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:.6+Math.random()*.5,r:1.5+Math.random()*2})}}
+function particle(x,y,c,n=10,sp=90){if(reducedMotion())n=Math.ceil(n/3);for(let i=0;i<n;i++){const a=Math.random()*6.28,s=sp*(.4+Math.random()*.8);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:.6+Math.random()*.5,r:1.5+Math.random()*2})}}
 function ring(x,y,c,r=70){rings.push({x,y,c,r:8,max:r,life:.55})}
 function heartPop(x,y){particles.push({x,y,vx:(Math.random()-.5)*30,vy:-55-Math.random()*40,c:"#ff9fba",life:1,r:0,heart:true})}
 
+// ------------------------------------------------------- prefs/motion
+function reducedMotion(){
+ try{if(SV.prefs.motion==="less")return true;
+   return matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches}catch(_){return false}
+}
+function applyPrefs(){
+ const z=SV.prefs.ts/100;
+ for(const sel of [".top",".gauges",".bottom","#speech"]){
+   const el=document.querySelector(sel);if(el)el.style.zoom=String(z);
+ }
+ for(const el of document.querySelectorAll(".modal .card"))el.style.zoom=String(z);
+ document.body.classList.toggle("reduce",reducedMotion());
+}
 // ------------------------------------------------------------ speech
 let speechTimer=null;
 function say(txt,ms=3400){
@@ -685,6 +722,14 @@ $("actLog").addEventListener("click",()=>{
 $("closeLog").addEventListener("click",()=>$("log").classList.add("hidden"));
 $("actShop").addEventListener("click",()=>{renderShop();$("shop").classList.remove("hidden")});
 $("closeShop").addEventListener("click",()=>$("shop").classList.add("hidden"));
+function renderSettings(){
+ for(const b of document.querySelectorAll("[data-ts]"))b.classList.toggle("onopt",Number(b.getAttribute("data-ts"))===SV.prefs.ts);
+ for(const b of document.querySelectorAll("[data-motion]"))b.classList.toggle("onopt",b.getAttribute("data-motion")===SV.prefs.motion);
+}
+$("settingsBtn").addEventListener("click",()=>{renderSettings();$("settings").classList.remove("hidden")});
+$("closeSettings").addEventListener("click",()=>$("settings").classList.add("hidden"));
+for(const b of document.querySelectorAll("[data-ts]"))b.addEventListener("click",()=>{SV.prefs.ts=Number(b.getAttribute("data-ts"));persist();applyPrefs();renderSettings()});
+for(const b of document.querySelectorAll("[data-motion]"))b.addEventListener("click",()=>{SV.prefs.motion=b.getAttribute("data-motion");persist();applyPrefs();renderSettings()});
 $("btnPhoto").addEventListener("click",()=>{
  try{
    const t=document.createElement("canvas");t.width=C.width;t.height=C.height+56*DPR;
@@ -723,8 +768,18 @@ if(SV.welcomed){$("welcome").querySelector(".logo").innerHTML="PIP'S<br>ROOM";$(
 // keyboard
 document.addEventListener("keydown",e=>{
  if(e.key===" "&&mode==="hype"){hypeTap();e.preventDefault()}
+ if((e.key===" "||e.key==="Enter")&&mode==="wish"&&wish){
+   let best=null,bd=1e9;
+   for(const st of wish.stars){if(st.claimed)continue;const d=hyp(st.x-pip.x,st.y-pip.y);if(d<bd){bd=d;best=st}}
+   if(best){best.claimed=true;pip.chase={x:best.x,y:best.y,kind:"wish",star:best}}
+   e.preventDefault();
+ }
+ if(mode==="guard"&&guard&&(e.key==="ArrowLeft"||e.key==="a"))
+   {guard.angle-=.4;e.preventDefault()}
+ if(mode==="guard"&&guard&&(e.key==="ArrowRight"||e.key==="d"))
+   {guard.angle+=.4;e.preventDefault()}
  if(e.key.toLowerCase()==="f")$("actFeed").click();
- if(e.key==="Escape"){$("log").classList.add("hidden");$("result").classList.add("hidden");$("shop").classList.add("hidden")}
+ if(e.key==="Escape"){$("log").classList.add("hidden");$("result").classList.add("hidden");$("shop").classList.add("hidden");$("settings").classList.add("hidden")}
 });
 
 // ---------------------------------------------------------- main loop
@@ -835,7 +890,7 @@ function draw(){
  X.fillStyle=isNight()?"#01030a":"#030509";X.fillRect(0,0,W,H);
  // starfield
  for(const s of stars){
-   const tw=.35+.65*Math.abs(Math.sin(s.tw+performance.now()*.0006));
+   const tw=reducedMotion()?.6:.35+.65*Math.abs(Math.sin(s.tw+performance.now()*.0006));
    X.globalAlpha=tw*.7;X.fillStyle="#cdd5e0";
    X.fillRect(s.x*W,s.y*H,s.r,s.r);
  }
@@ -914,7 +969,7 @@ function draw(){
    X.strokeStyle="#7ed8ff";X.lineWidth=1.5;X.beginPath();X.arc(ball.x,ball.y,ball.r,0,6.29);X.stroke();
    X.fillStyle="#9ae6ff";X.font="11px system-ui";X.textAlign="center";X.fillText("✦",ball.x,ball.y+4);X.textAlign="start";
  }
- const bob=Math.sin(performance.now()*.0022)*5;
+ const bob=Math.sin(performance.now()*.0022)*(reducedMotion()?2:5);
  drawPip(pip.x,pip.y+bob,26+Math.min(8,(SV.bondLevel-1)*1.6));
 
  for(const r of rings){X.globalAlpha=clamp(r.life/.55,0,1);X.strokeStyle=r.c;X.lineWidth=2;X.beginPath();X.arc(r.x,r.y,r.r,0,6.29);X.stroke()}
@@ -928,6 +983,7 @@ function draw(){
 }
 
 updateHud();
+applyPrefs();
 requestAnimationFrame(frame);
 </script>
 </body>
