@@ -111,6 +111,26 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 
 <script>
 "use strict";
+// Viewport guard: artifact/embedded hosts wrap this page in their own <head>
+// without a viewport meta — phones then lay out at ~980px and shrink all UI.
+// Inject the meta if absent; if a touch device still reports a wide layout
+// after a tick, zoom the document as a fallback.
+(function ensureViewport(){
+ try{
+   if(!document.querySelector('meta[name="viewport"]')){
+     var m=document.createElement("meta");
+     m.name="viewport";m.content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no";
+     (document.head||document.documentElement).appendChild(m);
+   }
+   setTimeout(function(){
+     var coarse=matchMedia&&matchMedia("(pointer:coarse)").matches;
+     var sw=Math.min(screen.width||9999,screen.height||9999);
+     if(coarse&&sw>0&&window.innerWidth>sw*1.35){
+       document.documentElement.style.zoom=String(window.innerWidth/Math.max(390,sw));
+     }
+   },250);
+ }catch(_){}
+})();
 // ============================================================ PIP'S ROOM
 // Companion game for OVERDRIVE 75. Pip's arena growth is run-based by
 // design (B26 economy) — so this room NEVER writes the game's saves. It
@@ -274,7 +294,11 @@ function journal(txt){
 
 // --------------------------------------------------------------- pip
 const pip={x:0,y:0,tx:0,ty:0,angle:0,happy:0,blink:0,scale:1,
- chase:null,eating:0,wanderCd:2};
+ chase:null,eating:0,wanderCd:2,sleeping:false,zzCd:0};
+function isNight(){const h=new Date().getHours();return h>=21||h<7}
+function sleepNow(){if(pip.sleeping)return;pip.sleeping=true;pip.chase=null;say("getting sleepy... don't go far, okay","",0)||say("getting sleepy... don't go far, okay",2600);updateHud()}
+function wakeNow(gentle){if(!pip.sleeping)return;pip.sleeping=false;pip.blink=.3;
+ say(gentle?"mmh... oh!! you're here ✦":"okay!! I'm up, I'm up ✦",2800);updateHud()}
 function pipHome(){return{x:W*.5,y:H*.47}}
 pip.x=pipHome().x;pip.y=pipHome().y;pip.tx=pip.x;pip.ty=pip.y;
 
@@ -297,7 +321,7 @@ function drawPip(px,py,r){
  // face — same little face as the arena, scaled up
  const e=r/7;
  X.fillStyle="#47340d";
- if(pip.blink>0){X.fillRect(-2.6*e,-e*1.2,1.6*e,.5*e);X.fillRect(e,-e*1.2,1.6*e,.5*e)}
+ if(pip.blink>0||pip.sleeping){X.fillRect(-2.6*e,-e*1.2,1.6*e,.5*e);X.fillRect(e,-e*1.2,1.6*e,.5*e)}
  else{X.beginPath();X.arc(-1.8*e,-e,e*.55,0,6.29);X.arc(1.8*e,-e,e*.55,0,6.29);X.fill()}
  X.strokeStyle="#47340d";X.lineWidth=Math.max(1,e*.5);
  X.beginPath();
@@ -335,12 +359,13 @@ function updateHud(){
  $("xpLabel").textContent="BOND · "+SV.bondXP+"/"+pipNeed(SV.bondLevel)+" XP";
  $("xpBar").style.width=(SV.bondXP/pipNeed(SV.bondLevel)*100)+"%";
  $("energyBar").style.width=(SV.energy/ENERGY_MAX*100)+"%";
- const tired=SV.energy<DRILL_COST;
+ const tired=SV.energy<DRILL_COST||pip.sleeping;
  $("actWish").disabled=tired||mode!=="room";$("actHype").disabled=tired||mode!=="room";$("actGuard").disabled=tired||mode!=="room";
- $("actFeed").disabled=SV.snacks<=0||mode!=="room";
+ $("actFeed").disabled=SV.snacks<=0||mode!=="room"||pip.sleeping;
  $("mood").textContent="✦ "+mood();
 }
 function mood(){
+ if(pip.sleeping)return"Pip is fast asleep — shh";
  if(pip.happy>0)return"Pip is beaming at you";
  if(SV.energy<15)return"Pip is sleepy — let it rest";
  if(SV.energy<40)return"Pip could use a snack";
@@ -365,7 +390,9 @@ let petting=false,petAccum=0;
 function pointerPos(e){const r=C.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 C.addEventListener("pointerdown",e=>{
  const p=pointerPos(e);
- if(mode==="room"&&hyp(p.x-pip.x,p.y-pip.y)<58){petting=true;C.setPointerCapture(e.pointerId)}
+ if(mode==="room"&&hyp(p.x-pip.x,p.y-pip.y)<58){
+   if(pip.sleeping){wakeNow(true);return}
+   petting=true;C.setPointerCapture(e.pointerId)}
  if(mode==="wish")wishTap(p);
  if(mode==="hype")hypeTap();
  if(mode==="guard")guardPointer(p);
@@ -545,11 +572,26 @@ document.addEventListener("keydown",e=>{
 // ---------------------------------------------------------- main loop
 let last=performance.now(),regenAccum=0,blinkCd=2;
 function frame(now){
- const dt=Math.min(.05,(now-last)/1000);last=now;
- // passive regen while the room is open
- regenAccum+=dt*1000;
+ const realGap=now-last;
+ const dt=Math.min(.05,realGap/1000);last=now;
+ // returning from a throttled/hidden tab: credit the real time that passed
+ if(realGap>5000){
+   SV.energy=clamp(SV.energy+Math.floor(realGap/ENERGY_REGEN_MS),0,ENERGY_MAX);
+   persist();updateHud();
+ }
+ // passive regen while the room is open (3x while asleep)
+ regenAccum+=dt*1000*(pip.sleeping?3:1);
+ // sleep FSM — falls asleep exhausted; ALWAYS wakes at 60 energy (liveness)
+ if(mode==="room"&&!pip.chase){
+   if(!pip.sleeping&&SV.energy<12)sleepNow();
+   else if(pip.sleeping&&SV.energy>=60)wakeNow(false);
+ }
+ if(pip.sleeping){
+   pip.zzCd-=dt;
+   if(pip.zzCd<=0){pip.zzCd=1.4;particles.push({x:pip.x+18,y:pip.y-26,vx:9,vy:-26,c:"#9adcf0",life:1.8,r:0,zz:true})}
+ }
  if(regenAccum>=ENERGY_REGEN_MS){regenAccum-=ENERGY_REGEN_MS;SV.energy=clamp(SV.energy+1,0,ENERGY_MAX);persist();updateHud()}
- pip.angle+=dt*(pip.happy>0?3.4:2.2);
+ pip.angle+=dt*(pip.sleeping?.5:pip.happy>0?3.4:2.2);
  pip.happy=Math.max(0,pip.happy-dt);
  pip.eating=Math.max(0,pip.eating-dt);
  blinkCd-=dt;pip.blink=Math.max(0,pip.blink-dt);
@@ -569,6 +611,8 @@ function frame(now){
      if(t.kind==="wish"&&t.star){t.star.done=true;wish.score++;wish.combo++;particle(pip.x,pip.y,"#ffd36f",12,120);sfx.star();announce("✦ "+wish.score,420)}
      pip.chase=null;
    }
+ } else if(mode==="room"&&pip.sleeping){
+   const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*1.2);pip.y+=(h.y-pip.y)*Math.min(1,dt*1.2);
  } else if(mode==="room"){
    pip.wanderCd-=dt;
    if(pip.wanderCd<=0){pip.wanderCd=2.5+Math.random()*3;const h=pipHome();pip.tx=h.x+(Math.random()-.5)*W*.3;pip.ty=h.y+(Math.random()-.5)*H*.22}
@@ -592,7 +636,7 @@ function frame(now){
 }
 
 function draw(){
- X.fillStyle="#030509";X.fillRect(0,0,W,H);
+ X.fillStyle=isNight()?"#01030a":"#030509";X.fillRect(0,0,W,H);
  // starfield
  for(const s of stars){
    const tw=.35+.65*Math.abs(Math.sin(s.tw+performance.now()*.0006));
@@ -600,6 +644,11 @@ function draw(){
    X.fillRect(s.x*W,s.y*H,s.r,s.r);
  }
  X.globalAlpha=1;
+ if(isNight()){ // crescent moon
+   const mx=W*.85,my=H*.14;
+   X.fillStyle="#e8ecf5";X.beginPath();X.arc(mx,my,16,0,6.29);X.fill();
+   X.fillStyle=isNight()?"#01030a":"#030509";X.beginPath();X.arc(mx-7,my-4,14,0,6.29);X.fill();
+ }
  // floor glow
  const g=X.createRadialGradient(W*.5,H*.62,10,W*.5,H*.62,Math.min(W,H)*.55);
  g.addColorStop(0,"#7ed8ff10");g.addColorStop(1,"#7ed8ff00");
@@ -646,6 +695,7 @@ function draw(){
  for(const p of particles){
    X.globalAlpha=clamp(p.life,0,1);
    if(p.heart){X.fillStyle=p.c;X.font="13px system-ui";X.textAlign="center";X.fillText("♥",p.x,p.y);X.textAlign="start"}
+   else if(p.zz){X.fillStyle=p.c;X.font="15px system-ui";X.textAlign="center";X.fillText("z",p.x,p.y);X.textAlign="start"}
    else{X.fillStyle=p.c;X.beginPath();X.arc(p.x,p.y,p.r,0,6.29);X.fill()}
  }
  X.globalAlpha=1;
