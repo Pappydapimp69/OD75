@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 direct B18 ${{ github.sha }}
+run-name: OD75 hybrid B19 ${{ github.sha }}
 
 on:
   push:
@@ -25,19 +25,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Verify direct game source
+      - name: Verify hybrid direct source
         run: |
           test -f index.html
           test -f styles.css
-          for f in game-1.js game-2.js game-3.js game-4.js; do
+          for f in game-1.js game-2.js game-3.js game-4.js game-5.js game-6.js; do
             test -f "$f"
             node --check "$f"
           done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'OD75-2026-08-12-B18' index.html
-          grep -Fq 'dtap<=660' game-*.js
-          grep -Fq 'turnDelta>(8*Math.PI/180)' game-*.js
+          grep -Fq 'OD75-2026-08-12-B19-HYBRID' index.html
+          grep -Fq 'game-6.js?v=B19-HYBRID' index.html
+          grep -Fq 'dtap<=660' game-6.js
+          grep -Fq 'JOY_RADIUS=55' game-6.js
+          grep -Fq 'rect.width*.48&&y>=rect.height*.42' game-6.js
+          grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' game-4.js
+          grep -Fq 'turnDrag=2.25*Math.pow(severity,1.4)' game-4.js
+          ! grep -Fq 'turnDelta>(8*Math.PI/180)' game-4.js
           grep -Fq 'S.waveBreak=stageEnd?10:4.2;' game-*.js
           grep -Fq 'S.heartTotal=(S.heartTotal||0)+1' game-*.js
 
@@ -45,7 +50,7 @@ jobs:
         run: |
           rm -rf _site
           mkdir _site
-          cp index.html styles.css game-1.js game-2.js game-3.js game-4.js _site/
+          cp index.html styles.css game-1.js game-2.js game-3.js game-4.js game-5.js game-6.js _site/
           touch _site/.nojekyll
 
       - name: Configure Pages
