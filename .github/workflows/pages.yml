@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Boss Audio B24 ${{ github.sha }}
+run-name: OD75 Hold Unlock B25 ${{ github.sha }}
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify boss-audio and StarDrive source
+      - name: Verify held unlocks and banked Overdrive charge
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'function triggerOverdrive()' b21-*.js
@@ -35,10 +35,19 @@ jobs:
           grep -Fq 'BOSS_STAR_THRESHOLDS=[4,11,20,32,47,65]' b21-*.js
           grep -Fq 'if(S.stageEnding&&!S.stagePending)' b21-04.js
           grep -Fq 'if(S.bossRewardPending){openOverdriveStep();return}' b21-04.js
-          grep -Fq 'const OVERDRIVE_HOLD_MS=4000' b21-09.js
+          grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
+          grep -Fq 'function completeOverdriveHoldAction(id)' b21-09.js
+          grep -Fq 'S.overUnlocked.add(id)' b21-09.js
+          grep -Fq 'S.overLevels[id]=lv+1' b21-09.js
+          grep -Fq 'hold the skill to unlock it' b21-09.js
+          grep -Fq 'HOLD TO UNLOCK' b21-09.js
+          grep -Fq 'HOLD TO UPGRADE' b21-09.js
+          ! grep -Fq 'TAP TO UNLOCK' b21-09.js
+          ! grep -Fq '4 seconds' b21-09.js
+          ! grep -Fq '4s' b21-09.js
+          grep -Fq 'if(S&&S.run&&S.over<=0&&S.heat<heatBefore)S.heat=heatBefore' b21-11.js
           grep -Fq 'PipAudioEngine.prototype.scheduleBossStep=function(time)' b21-10.js
           grep -Fq 'hpRatio<=.30?2:hpRatio<=.65?1:0' b21-10.js
-          grep -Fq 'p.bpm+(phase===1?6:phase===2?12:0)' b21-10.js
           grep -Fq 'hasAudio("melody")' b21-10.js
           grep -Fq 'hasAudio("harmony")' b21-10.js
           grep -Fq 'hasAudio("bass")' b21-10.js
@@ -52,22 +61,24 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
           s=Path('_site/game.js').read_text()
+          assert 'const OVERDRIVE_HOLD_MS=1800' in s
+          assert 'function completeOverdriveHoldAction(id)' in s
+          assert 'HOLD TO UNLOCK' in s and 'HOLD TO UPGRADE' in s
+          assert 'TAP TO UNLOCK' not in s
+          assert 'if(S&&S.run&&S.over<=0&&S.heat<heatBefore)S.heat=heatBefore' in s
           old=s.find('scheduleBossStep(time){')
           new=s.rfind('PipAudioEngine.prototype.scheduleBossStep=function(time)')
           assert old >= 0 and new > old, (old,new)
-          assert 'const OVERDRIVE_HOLD_MS=4000' in s
-          for marker in ['hasAudio("melody")','hasAudio("harmony")','hasAudio("bass")','hasAudio("bells")','hasAudio("heartbeat")']:
-              assert marker in s
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B24-BOSS-AUDIO/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B24-BOSS-AUDIO/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B24-BOSS-AUDIO' _site/index.html
-          grep -Fq 'game.js?v=B24-BOSS-AUDIO' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B25-HOLD-UNLOCK/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B25-HOLD-UNLOCK/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B25-HOLD-UNLOCK' _site/index.html
+          grep -Fq 'game.js?v=B25-HOLD-UNLOCK' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
