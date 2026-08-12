@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Pip's Room · OD75 Companion</title>
+<style>
+:root{--bg:#05070b;--text:#f7f9fc;--muted:#aab4c2;--line:#ffffff20;--cyan:#7ed8ff;--hot:#ff6e8b;--gold:#ffd36f;--violet:#b388ff;--green:#7be0ae}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;overscroll-behavior:none}
+button{font:inherit;color:inherit}
+#app{position:fixed;inset:0;overflow:hidden;background:#030509}
+canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
+.top{position:absolute;z-index:8;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));top:max(7px,env(safe-area-inset-top));display:flex;gap:6px;align-items:center;pointer-events:none;flex-wrap:wrap}
+.pill{border:1px solid var(--line);border-radius:999px;background:#070a11ce;backdrop-filter:blur(8px);padding:6px 9px;font-size:11px;white-space:nowrap}
+#bond{font-weight:900}
+#mood{color:#ffe7a3;border-color:#ffd36f38;background:#151008bf}
+#audioToggle{pointer-events:auto;cursor:pointer;color:#ffe9a6;margin-left:auto}
+.gauges{position:absolute;z-index:7;left:8px;right:8px;top:48px;display:grid;grid-template-columns:1fr 1fr;gap:7px;pointer-events:none}
+.gbox{display:grid;gap:2px;min-width:0}
+.gbox>span{font-size:8px;letter-spacing:.1em;color:#ffffff88;text-align:center;white-space:nowrap}
+.gbar{height:5px;border-radius:999px;background:#ffffff0f;overflow:hidden}
+.gbar i{display:block;height:100%;transition:width .25s}
+#energyBar{background:linear-gradient(90deg,var(--cyan),#c9f3ff)}
+#xpBar{background:linear-gradient(90deg,var(--gold),var(--hot))}
+.bottom{position:absolute;z-index:8;left:max(9px,env(safe-area-inset-left));right:max(9px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom));display:flex;justify-content:center;gap:9px;pointer-events:none;flex-wrap:wrap}
+.act{pointer-events:auto;cursor:pointer;width:72px;height:72px;border-radius:50%;border:1px solid var(--line);background:#0d131dcc;backdrop-filter:blur(8px);font-weight:900;font-size:10px;letter-spacing:.05em;line-height:1.25;touch-action:manipulation}
+.act small{display:block;font-size:14px;font-weight:400}
+.act:disabled{opacity:.45;cursor:default}
+#actFeed{border-color:#7be0ae66}#actFeed:not(:disabled){box-shadow:0 0 0 5px #7be0ae0d}
+#actWish{border-color:#ffd36f66}#actWish:not(:disabled){box-shadow:0 0 0 5px #ffd36f0d}
+#actHype{border-color:#b388ff66}#actHype:not(:disabled){box-shadow:0 0 0 5px #b388ff0d}
+#actGuard{border-color:#7ed8ff66}#actGuard:not(:disabled){box-shadow:0 0 0 5px #7ed8ff0d}
+#actLog{border-color:#ff6e8b55}
+#speech{position:absolute;z-index:9;left:50%;top:20%;transform:translateX(-50%);max-width:min(86vw,470px);text-align:center;font-size:13px;color:#ffe7a3;border:1px solid #ffd36f38;background:#151008d9;backdrop-filter:blur(7px);border-radius:14px;padding:8px 13px;pointer-events:none;opacity:0;transition:opacity .4s ease,transform .4s ease}
+#speech.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
+#announce{position:absolute;z-index:9;left:50%;top:13%;transform:translate(-50%,-6px);font-weight:950;font-size:clamp(22px,6vw,50px);letter-spacing:-.04em;text-shadow:0 5px 30px #000;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}
+#announce.on{opacity:1;transform:translate(-50%,0)}
+.modal{position:absolute;z-index:30;inset:0;display:grid;place-items:center;background:#030509e0;backdrop-filter:blur(10px);padding:16px}
+.modal.hidden{display:none}
+.card{width:min(540px,94vw);border:1px solid var(--line);border-radius:18px;background:#0d131dee;padding:17px;max-height:92dvh;overflow:auto}
+.kicker{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#b9c7ef}
+.logo{font-size:clamp(38px,11vw,68px);font-weight:1000;line-height:.86;letter-spacing:-.06em;margin:8px 0 12px}
+.card p{font-size:13px;color:#cdd5e0;margin:7px 0}
+.small{font-size:10px;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}
+.rule{border:1px solid var(--line);border-radius:12px;padding:9px;background:#ffffff05}
+.rule b{display:block;font-size:12px;margin-bottom:3px}
+.primary{width:100%;border:1px solid #70c9ec;background:#12344a;border-radius:12px;padding:11px;font-weight:850;cursor:pointer}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:11px 0}
+.stat{border:1px solid var(--line);border-radius:12px;padding:9px;background:#ffffff05;text-align:center}
+.stat b{display:block;font-size:17px}
+.stat span{font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+#journal{font-size:12px;color:#cdd5e0;line-height:1.65;max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:#ffffff04;margin:10px 0}
+#grade{font-size:52px;font-weight:1000;letter-spacing:-.06em;margin:3px 0}
+@media(max-width:560px){.rules{grid-template-columns:1fr}.act{width:62px;height:62px;font-size:9px}.act small{font-size:12px}}
+</style>
+</head>
+<body>
+<div id="app">
+<canvas id="c"></canvas>
+<div class="top">
+  <span id="bond" class="pill">PIP</span>
+  <span id="snacks" class="pill">✧ 0</span>
+  <span id="mood" class="pill">✦ …</span>
+  <button id="audioToggle" class="pill" type="button">♫ ON</button>
+</div>
+<div class="gauges">
+  <div class="gbox"><span>ENERGY</span><div class="gbar"><i id="energyBar" style="width:100%"></i></div></div>
+  <div class="gbox"><span id="xpLabel">BOND XP</span><div class="gbar"><i id="xpBar" style="width:0%"></i></div></div>
+</div>
+<div id="speech"></div>
+<div id="announce"></div>
+<div class="bottom">
+  <button id="actFeed" class="act" type="button"><small>✧</small>FEED</button>
+  <button id="actWish" class="act" type="button"><small>✦</small>WISH<br>CHASE</button>
+  <button id="actHype" class="act" type="button"><small>◎</small>HYPE<br>DRILL</button>
+  <button id="actGuard" class="act" type="button"><small>◇</small>GUARD<br>DRILL</button>
+  <button id="actLog" class="act" type="button"><small>♥</small>LOG</button>
+</div>
+
+<div id="welcome" class="modal"><div class="card">
+  <div class="kicker">OD75 companion · between runs</div>
+  <div class="logo">PIP'S<br>ROOM</div>
+  <p>This is where Pip lives when you two aren't flying. Feed it, pet it (just touch it — go on), and train together. Everything you build here stays here, in your bond.</p>
+  <div class="rules">
+    <div class="rule"><b>CARE</b><span class="small">Touch Pip to pet. Feed it stardust snacks — they restock over real time, so come back.</span></div>
+    <div class="rule"><b>PLAY & TRAIN</b><span class="small">Wish Chase, Hype Drill, and Guard Drill grow Loving, Supportive, and Compassionate.</span></div>
+    <div class="rule"><b>BOND</b><span class="small">XP raises the same bond ladder as the arena: Spark, Pal, Bestie, Heartstar…</span></div>
+  </div>
+  <button id="begin" class="primary">Open the door ✦</button>
+</div></div>
+
+<div id="log" class="modal hidden"><div class="card">
+  <div class="kicker">FLIGHT LOG · YOU & PIP</div>
+  <h2 style="margin:6px 0">Our story so far</h2>
+  <div class="statgrid" id="logStats"></div>
+  <div id="journal"></div>
+  <p id="arenaLine" class="small"></p>
+  <button id="closeLog" class="primary">Back to Pip</button>
+</div></div>
+
+<div id="result" class="modal hidden"><div class="card">
+  <div class="kicker" id="resultKicker">DRILL COMPLETE</div>
+  <div id="grade">A</div>
+  <h2 id="resultTitle" style="margin:6px 0"></h2>
+  <p id="resultText"></p>
+  <button id="closeResult" class="primary">Back to Pip ✦</button>
+</div></div>
+</div>
+
+<script>
+"use strict";
+// ============================================================ PIP'S ROOM
+// Companion game for OVERDRIVE 75. Pip's arena growth is run-based by
+// design (B26 economy) — so this room NEVER writes the game's saves. It
+// keeps its own bond save, and only READS the arena keys to reminisce.
+const $=id=>document.getElementById(id);
+const C=$("c"),X=C.getContext("2d");
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),hyp=Math.hypot;
+let W=900,H=600,DPR=Math.min(2,window.devicePixelRatio||1);
+function resize(){
+ W=Math.max(320,window.innerWidth||900);H=Math.max(420,window.innerHeight||600);
+ DPR=Math.min(2,window.devicePixelRatio||1);
+ C.width=Math.round(W*DPR);C.height=Math.round(H*DPR);
+ C.style.width=W+"px";C.style.height=H+"px";
+ X.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener("resize",resize);resize();
+
+// ------------------------------------------------------------ storage
+// Every access guarded: sandboxed hosts can throw on touch, not just parse.
+const SAVE_KEY="overdrive75_pip_companion_v1";
+let memStore=null; // in-memory fallback when storage is unavailable
+function rawGet(k){try{return localStorage.getItem(k)}catch(_){return memStore&&k===SAVE_KEY?memStore:null}}
+function rawSet(k,v){try{localStorage.setItem(k,v)}catch(_){if(k===SAVE_KEY)memStore=v}}
+const num=(v,lo,hi,dflt)=>Number.isFinite(v)?clamp(Math.floor(v),lo,hi):dflt;
+
+const ENERGY_MAX=100,SNACK_MAX=5,DRILL_COST=15;
+const ENERGY_REGEN_MS=40e3;   // +1 energy per 40s, away or here
+const SNACK_REGEN_MS=72e5;    // +1 snack per 2h
+function pipNeed(level){return 65+(level-1)*45}
+function pipBondName(level){
+ if(level<=1)return"Spark";if(level===2)return"Pal";if(level===3)return"Bestie";
+ if(level===4)return"Heartstar";if(level===5)return"Soulstar";
+ if(level===6)return"Forever Friend";return"Constellation";
+}
+
+function freshSave(){return{v:1,bondLevel:1,bondXP:0,love:0,compassion:0,support:0,
+ energy:80,snacks:3,lastMs:Date.now(),
+ totals:{feeds:0,pets:0,wishes:0,hypes:0,guards:0},
+ best:{wish:0,hype:0,guard:0},journal:[],welcomed:0}}
+function loadSave(){
+ try{
+   const v=JSON.parse(rawGet(SAVE_KEY)||"null");
+   if(!v||!Number.isFinite(v.bondLevel))return freshSave();
+   const t=v.totals||{},b=v.best||{};
+   return{v:1,
+     bondLevel:num(v.bondLevel,1,99,1),bondXP:num(v.bondXP,0,1e6,0),
+     love:num(v.love,0,10,0),compassion:num(v.compassion,0,10,0),support:num(v.support,0,10,0),
+     energy:num(v.energy,0,ENERGY_MAX,ENERGY_MAX),snacks:num(v.snacks,0,SNACK_MAX,SNACK_MAX),
+     lastMs:num(v.lastMs,0,4102444800000,Date.now()),
+     totals:{feeds:num(t.feeds,0,1e9,0),pets:num(t.pets,0,1e9,0),wishes:num(t.wishes,0,1e9,0),hypes:num(t.hypes,0,1e9,0),guards:num(t.guards,0,1e9,0)},
+     best:{wish:num(b.wish,0,1e6,0),hype:num(b.hype,0,1e6,0),guard:num(b.guard,0,1e6,0)},
+     journal:Array.isArray(v.journal)?v.journal.filter(e=>e&&typeof e.txt==="string").slice(-24).map(e=>({t:num(e.t,0,4102444800000,0),txt:String(e.txt).slice(0,160)})):[],
+     welcomed:v.welcomed?1:0};
+ }catch(_){return freshSave()}
+}
+let SV=loadSave();
+function persist(){SV.lastMs=Date.now();rawSet(SAVE_KEY,JSON.stringify(SV))}
+window.addEventListener("beforeunload",persist);
+
+// arena saves — READ ONLY, each guarded and validated
+function arenaMemories(){
+ let hearts=0,echo=0,sounds=0;
+ try{const n=Number(rawGet("overdrive75_player_heart_total_v1")||0);if(Number.isFinite(n))hearts=Math.max(0,Math.floor(n))}catch(_){}
+ try{const n=Number(rawGet("overdrive75_star_echo_v1")||0);if(Number.isFinite(n))echo=Math.max(0,Math.floor(n))}catch(_){}
+ try{const v=JSON.parse(rawGet("overdrive75_pip_v2")||"null");if(v&&Array.isArray(v.audio))sounds=v.audio.length}catch(_){}
+ return{hearts,echo,sounds};
+}
+
+// offline regen since last visit
+(function catchUp(){
+ const away=Math.max(0,Date.now()-SV.lastMs);
+ SV.energy=num(SV.energy+Math.floor(away/ENERGY_REGEN_MS),0,ENERGY_MAX,SV.energy);
+ SV.snacks=num(SV.snacks+Math.floor(away/SNACK_REGEN_MS),0,SNACK_MAX,SV.snacks);
+ window._awayHours=away/36e5;
+})();
+
+// -------------------------------------------------------------- audio
+let audioCtx=null,audioOn=true;
+function chirp(freq,dur=.09,type="sine",gain=.05,delay=0){
+ if(!audioOn)return;
+ try{
+   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+   if(audioCtx.state==="suspended")audioCtx.resume();
+   const t=audioCtx.currentTime+delay,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+   o.type=type;o.frequency.setValueAtTime(freq,t);
+   o.frequency.exponentialRampToValueAtTime(freq*1.35,t+dur);
+   g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+   o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+dur+.02);
+ }catch(_){audioOn=false}
+}
+const sfx={
+ pet:()=>chirp(620+Math.random()*140,.07,"sine",.035),
+ eat:()=>{chirp(430,.08,"square",.03);chirp(650,.1,"sine",.04,.09)},
+ star:()=>chirp(880,.1,"sine",.045),
+ good:()=>{chirp(520,.09,"sine",.05);chirp(780,.12,"sine",.05,.08)},
+ miss:()=>chirp(190,.12,"sine",.03),
+ levelup:()=>{[440,554,659,880].forEach((f,i)=>chirp(f,.16,"sine",.05,i*.11))},
+};
+$("audioToggle").addEventListener("click",()=>{audioOn=!audioOn;$("audioToggle").textContent=audioOn?"♫ ON":"♫ OFF"});
+
+// ------------------------------------------------------------- fx bits
+let particles=[],rings=[],stars=[];
+for(let i=0;i<90;i++)stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.4+.3,tw:Math.random()*6.28});
+function particle(x,y,c,n=10,sp=90){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=sp*(.4+Math.random()*.8);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:.6+Math.random()*.5,r:1.5+Math.random()*2})}}
+function ring(x,y,c,r=70){rings.push({x,y,c,r:8,max:r,life:.55})}
+function heartPop(x,y){particles.push({x,y,vx:(Math.random()-.5)*30,vy:-55-Math.random()*40,c:"#ff9fba",life:1,r:0,heart:true})}
+
+// ------------------------------------------------------------ speech
+let speechTimer=null;
+function say(txt,ms=3400){
+ const el=$("speech");el.textContent="✦ "+txt;el.classList.add("on");
+ if(speechTimer)clearTimeout(speechTimer);
+ speechTimer=setTimeout(()=>el.classList.remove("on"),ms);
+}
+function announce(txt,ms=1100){
+ const el=$("announce");el.textContent=txt;el.style.color="#ffd36f";el.classList.add("on");
+ setTimeout(()=>el.classList.remove("on"),ms);
+}
+function journal(txt){
+ SV.journal.push({t:Date.now(),txt});
+ if(SV.journal.length>24)SV.journal.shift();
+}
+
+// --------------------------------------------------------------- pip
+const pip={x:0,y:0,tx:0,ty:0,angle:0,happy:0,blink:0,scale:1,
+ chase:null,eating:0,wanderCd:2};
+function pipHome(){return{x:W*.5,y:H*.47}}
+pip.x=pipHome().x;pip.y=pipHome().y;pip.tx=pip.x;pip.ty=pip.y;
+
+function drawPip(px,py,r){
+ X.save();X.translate(px,py);
+ // soft halo
+ const halo=X.createRadialGradient(0,0,r*.4,0,0,r*2.6);
+ halo.addColorStop(0,"#ffd36f2e");halo.addColorStop(1,"#ffd36f00");
+ X.fillStyle=halo;X.beginPath();X.arc(0,0,r*2.6,0,6.29);X.fill();
+ X.rotate(pip.angle*.35);
+ X.fillStyle=pip.eating>0?"#fff0a8":"#ffd36f";
+ X.beginPath();
+ for(let i=0;i<10;i++){
+   const a=-Math.PI/2+i*Math.PI/5,rr=i%2===0?r:r*.46,
+   xx=Math.cos(a)*rr,yy=Math.sin(a)*rr;
+   i?X.lineTo(xx,yy):X.moveTo(xx,yy);
+ }
+ X.closePath();X.fill();
+ X.rotate(-pip.angle*.35);
+ // face — same little face as the arena, scaled up
+ const e=r/7;
+ X.fillStyle="#47340d";
+ if(pip.blink>0){X.fillRect(-2.6*e,-e*1.2,1.6*e,.5*e);X.fillRect(e,-e*1.2,1.6*e,.5*e)}
+ else{X.beginPath();X.arc(-1.8*e,-e,e*.55,0,6.29);X.arc(1.8*e,-e,e*.55,0,6.29);X.fill()}
+ X.strokeStyle="#47340d";X.lineWidth=Math.max(1,e*.5);
+ X.beginPath();
+ if(pip.happy>0)X.arc(0,e*.8,e*1.5,.15,Math.PI-.15);
+ else X.arc(0,e*1.6,e*1.1,Math.PI*1.15,Math.PI*1.85,true);
+ X.stroke();
+ X.restore();
+ if(SV.bondLevel>=4){
+   const hx=px+Math.cos(-pip.angle*1.7)*(r+13),hy=py+Math.sin(-pip.angle*1.7)*(r+13);
+   X.fillStyle="#ff9fba";X.font="14px system-ui";X.textAlign="center";X.fillText("♥",hx,hy+4);X.textAlign="start";
+ }
+}
+
+// ------------------------------------------------------------- growth
+function gainXP(n,quiet){
+ SV.bondXP+=Math.max(1,Math.round(n));
+ while(SV.bondXP>=pipNeed(SV.bondLevel)){
+   SV.bondXP-=pipNeed(SV.bondLevel);
+   SV.bondLevel++;
+   const lines={2:"we're getting really good together ✦",3:"I think you're my favorite person to fly with",4:"I feel safer when it's you and me",5:"I remember every run with you. I mean that.",6:"wherever you go next, I want to be there too"};
+   announce("BOND LEVEL "+SV.bondLevel+"!",1400);
+   say(lines[SV.bondLevel]||"look how far we've come together ✦",4200);
+   journal("Bond reached "+pipBondName(SV.bondLevel)+" (Lv "+SV.bondLevel+").");
+   particle(pip.x,pip.y,"#ffd36f",30,180);ring(pip.x,pip.y,"#ffd36f",130);sfx.levelup();
+   pip.happy=4;
+ }
+ if(!quiet)persist();
+ updateHud();
+}
+
+// ---------------------------------------------------------------- HUD
+function updateHud(){
+ $("bond").innerHTML="<b>PIP · "+pipBondName(SV.bondLevel).toUpperCase()+"</b> · LV "+SV.bondLevel;
+ $("snacks").textContent="✧ "+SV.snacks+" snacks";
+ $("xpLabel").textContent="BOND · "+SV.bondXP+"/"+pipNeed(SV.bondLevel)+" XP";
+ $("xpBar").style.width=(SV.bondXP/pipNeed(SV.bondLevel)*100)+"%";
+ $("energyBar").style.width=(SV.energy/ENERGY_MAX*100)+"%";
+ const tired=SV.energy<DRILL_COST;
+ $("actWish").disabled=tired||mode!=="room";$("actHype").disabled=tired||mode!=="room";$("actGuard").disabled=tired||mode!=="room";
+ $("actFeed").disabled=SV.snacks<=0||mode!=="room";
+ $("mood").textContent="✦ "+mood();
+}
+function mood(){
+ if(pip.happy>0)return"Pip is beaming at you";
+ if(SV.energy<15)return"Pip is sleepy — let it rest";
+ if(SV.energy<40)return"Pip could use a snack";
+ if(SV.bondLevel>=5)return"being here with you is Pip's favorite";
+ return"Pip is rooting for you";
+}
+
+// ------------------------------------------------------------ actions
+let mode="room"; // room | wish | hype | guard
+function spendEnergy(n){SV.energy=clamp(SV.energy-n,0,ENERGY_MAX);persist();updateHud()}
+
+$("actFeed").addEventListener("click",()=>{
+ if(mode!=="room"||SV.snacks<=0)return;
+ SV.snacks--;SV.totals.feeds++;
+ const a=Math.random()*6.28,d=Math.min(W,H)*.22;
+ pip.chase={x:pipHome().x+Math.cos(a)*d,y:pipHome().y+Math.sin(a)*d*.7,kind:"snack"};
+ persist();updateHud();
+});
+
+// petting: pointer over Pip
+let petting=false,petAccum=0;
+function pointerPos(e){const r=C.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+C.addEventListener("pointerdown",e=>{
+ const p=pointerPos(e);
+ if(mode==="room"&&hyp(p.x-pip.x,p.y-pip.y)<58){petting=true;C.setPointerCapture(e.pointerId)}
+ if(mode==="wish")wishTap(p);
+ if(mode==="hype")hypeTap();
+ if(mode==="guard")guardPointer(p);
+});
+C.addEventListener("pointermove",e=>{
+ const p=pointerPos(e);
+ if(petting&&mode==="room"){
+   petAccum+=1;
+   if(petAccum%7===0){heartPop(pip.x+(Math.random()-.5)*40,pip.y-20);sfx.pet();pip.happy=2.5;SV.totals.pets++;gainXP(1,true)}
+ }
+ if(mode==="guard")guardPointer(p);
+ pointer=p;
+});
+C.addEventListener("pointerup",()=>{if(petting){petting=false;persist();say(petLine(),2600)}});
+let pointer={x:0,y:0};
+function petLine(){
+ const l=["hehe — again?","that's the spot ✦","I love hanging out with you","best. day.","you always find me"];
+ return l[Math.floor(Math.random()*l.length)];
+}
+
+// ------------------------------------------------------ minigame: wish
+let wish=null;
+$("actWish").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
+ spendEnergy(DRILL_COST);mode="wish";updateHud();
+ wish={t:30,score:0,combo:0,stars:[],spawnCd:0};
+ say("wish stars! tap one and I'll zip to it ✦",2800);
+});
+function wishTap(p){
+ if(!wish)return;
+ let best=null,bd=54;
+ for(const s of wish.stars){const d=hyp(p.x-s.x,p.y-s.y);if(d<bd){bd=d;best=s}}
+ if(best&&!best.claimed){best.claimed=true;pip.chase={x:best.x,y:best.y,kind:"wish",star:best}}
+}
+function wishTick(dt){
+ wish.t-=dt;wish.spawnCd-=dt;
+ if(wish.spawnCd<=0){
+   wish.spawnCd=.75+Math.random()*.55;
+   const edge=Math.random()<.5;
+   wish.stars.push({x:edge?(Math.random()<.5?-14:W+14):Math.random()*W,y:edge?Math.random()*H*.7+H*.1:(Math.random()<.5?60:H*.8),
+     vx:(Math.random()-.5)*70,vy:(Math.random()-.5)*40,life:6,claimed:false});
+ }
+ for(const s of wish.stars){s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt}
+ wish.stars=wish.stars.filter(s=>s.life>0&&!s.done);
+ if(wish.t<=0){
+   const sc=wish.score;SV.totals.wishes++;SV.best.wish=Math.max(SV.best.wish,sc);
+   let statLine="";
+   if(sc>=10&&SV.love<10){SV.love++;statLine=" Pip's Loving grew to "+SV.love+".";}
+   journal("Wish Chase: caught "+sc+" wish stars."+statLine);
+   endMinigame(sc>=14?"S":sc>=10?"A":sc>=6?"B":"C","WISH CHASE",
+     sc+" wish stars caught","Pip zipped after every single one you called."+statLine,10+sc*2);
+   wish=null;
+ }
+}
+
+// ------------------------------------------------------ minigame: hype
+let hype=null;
+$("actHype").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
+ spendEnergy(DRILL_COST);mode="hype";updateHud();
+ hype={round:0,rounds:8,r:0,speed:0,hits:0,perfects:0,state:"wait",wait:.8,flash:0};
+ say("hype drill — tap exactly when the ring hugs me ✦",2800);
+});
+function hypeTap(){
+ if(!hype||hype.state!=="ring")return;
+ const target=64,d=Math.abs(hype.r-target);
+ if(d<10){hype.hits++;hype.perfects+=d<4?1:0;hype.flash=.3;particle(pip.x,pip.y,d<4?"#ffd36f":"#b388ff",14,130);ring(pip.x,pip.y,"#b388ff",100);sfx.good();announce(d<4?"PERFECT":"GOOD",500)}
+ else{sfx.miss();announce("EARLY",400)}
+ hype.state="wait";hype.wait=.55;
+}
+function hypeTick(dt){
+ hype.flash=Math.max(0,hype.flash-dt);
+ if(hype.state==="wait"){
+   hype.wait-=dt;
+   if(hype.wait<=0){
+     if(hype.round>=hype.rounds){
+       const sc=hype.hits;SV.totals.hypes++;SV.best.hype=Math.max(SV.best.hype,sc);
+       let statLine="";
+       if(sc>=6&&SV.support<10){SV.support++;statLine=" Pip's Supportive grew to "+SV.support+".";}
+       journal("Hype Drill: "+sc+"/8 rings ("+hype.perfects+" perfect)."+statLine);
+       endMinigame(sc>=8?"S":sc>=6?"A":sc>=4?"B":"C","HYPE DRILL",
+         sc+"/8 rings · "+hype.perfects+" perfect","Timing is a love language, apparently."+statLine,8+sc*3);
+       hype=null;return;
+     }
+     hype.round++;hype.state="ring";hype.r=Math.min(W,H)*.42;hype.speed=(hype.r-64)/(1.5-hype.round*.06);
+   }
+ } else {
+   hype.r-=hype.speed*dt;
+   if(hype.r<48){sfx.miss();announce("MISS",400);hype.state="wait";hype.wait=.55}
+ }
+}
+
+// ----------------------------------------------------- minigame: guard
+let guard=null;
+$("actGuard").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
+ spendEnergy(DRILL_COST);mode="guard";updateHud();
+ guard={t:25,blocked:0,leaked:0,angle:0,blips:[],spawnCd:1};
+ say("guard drill — hold your shield between me and the sparks ◇",3000);
+});
+function guardPointer(p){if(guard)guard.angle=Math.atan2(p.y-pip.y,p.x-pip.x)}
+function guardTick(dt){
+ guard.t-=dt;guard.spawnCd-=dt;
+ if(guard.spawnCd<=0){
+   guard.spawnCd=Math.max(.55,1.15-(25-guard.t)*.02);
+   const a=Math.random()*6.28,d=Math.min(W,H)*.5;
+   guard.blips.push({x:pip.x+Math.cos(a)*d,y:pip.y+Math.sin(a)*d,sp:85+Math.random()*45});
+ }
+ for(const b of guard.blips){
+   const dx=pip.x-b.x,dy=pip.y-b.y,d=hyp(dx,dy)||1;
+   b.x+=dx/d*b.sp*dt;b.y+=dy/d*b.sp*dt;
+   if(d<74&&!b.done){
+     const ba=Math.atan2(b.y-pip.y,b.x-pip.x);
+     let diff=Math.abs(ba-guard.angle);diff=Math.min(diff,6.283-diff);
+     b.done=true;
+     if(diff<.75){guard.blocked++;particle(b.x,b.y,"#7ed8ff",10,110);ring(b.x,b.y,"#7ed8ff",44);sfx.good()}
+     else{guard.leaked++;particle(pip.x,pip.y,"#ff6e8b",8,90);sfx.miss();pip.happy=0}
+   }
+ }
+ guard.blips=guard.blips.filter(b=>!b.done);
+ if(guard.t<=0){
+   const sc=guard.blocked;SV.totals.guards++;SV.best.guard=Math.max(SV.best.guard,sc);
+   let statLine="";
+   if(sc>=12&&guard.leaked<=4&&SV.compassion<10){SV.compassion++;statLine=" Pip's Compassionate grew to "+SV.compassion+".";}
+   journal("Guard Drill: deflected "+sc+", leaked "+guard.leaked+"."+statLine);
+   endMinigame(sc>=18&&guard.leaked<=2?"S":sc>=12?"A":sc>=7?"B":"C","GUARD DRILL",
+     sc+" deflected · "+guard.leaked+" got through","Pip watched you stand guard the whole time."+statLine,8+sc*2);
+   guard=null;
+ }
+}
+
+function endMinigame(grade,kicker,title,text,xp){
+ mode="room";
+ pip.chase=null;pip.tx=pipHome().x;pip.ty=pipHome().y;
+ gainXP(xp,true);pip.happy=3;
+ $("resultKicker").textContent=kicker+" · +"+xp+" BOND XP";
+ $("grade").textContent=grade;
+ $("resultTitle").textContent=title;
+ $("resultText").textContent=text;
+ $("result").classList.remove("hidden");
+ persist();updateHud();
+}
+$("closeResult").addEventListener("click",()=>{$("result").classList.add("hidden");updateHud()});
+
+// ---------------------------------------------------------------- log
+$("actLog").addEventListener("click",()=>{
+ const m=arenaMemories();
+ $("logStats").innerHTML=[
+   ["♥ "+SV.love,"Loving"],["♡ "+SV.compassion,"Compassionate"],["✦ "+SV.support,"Supportive"],
+   [SV.totals.pets,"pets"],[SV.totals.feeds,"snacks shared"],[SV.totals.wishes+SV.totals.hypes+SV.totals.guards,"games played"],
+ ].map(x=>'<div class="stat"><b>'+x[0]+"</b><span>"+x[1]+"</span></div>").join("");
+ $("journal").innerHTML=SV.journal.length
+   ?SV.journal.slice().reverse().map(e=>"<div>· "+e.txt.replace(/&/g,"&amp;").replace(/</g,"&lt;")+"</div>").join("")
+   :"<div>· Our story starts today ✦</div>";
+ $("arenaLine").textContent=m.hearts>0||m.sounds>0
+   ?"From the arena: "+m.hearts.toLocaleString()+" heart bits gathered together, "+m.sounds+" sounds in Pip's collection"+(m.echo>0?", "+m.echo+" star echo waiting for the next run.":".")
+   :"No arena flights on this device yet — Pip would love to show you OVERDRIVE 75.";
+ $("log").classList.remove("hidden");
+});
+$("closeLog").addEventListener("click",()=>$("log").classList.add("hidden"));
+
+// ------------------------------------------------------------- welcome
+$("begin").addEventListener("click",()=>{
+ $("welcome").classList.add("hidden");
+ chirp(520,.1);chirp(780,.14,"sine",.05,.1);
+ if(!SV.welcomed){SV.welcomed=1;journal("You opened the door to Pip's Room.");say("you came!! okay okay — this is where I live ✦",3800)}
+ else if(window._awayHours>8)say("I napped in your helmet while you were gone. missed you ✦",3800);
+ else say("you're back!! I was just thinking about you ✦",3200);
+ persist();
+});
+if(SV.welcomed){$("welcome").querySelector(".logo").innerHTML="PIP'S<br>ROOM";$("begin").textContent="I'm home ✦"}
+
+// keyboard
+document.addEventListener("keydown",e=>{
+ if(e.key===" "&&mode==="hype"){hypeTap();e.preventDefault()}
+ if(e.key.toLowerCase()==="f")$("actFeed").click();
+ if(e.key==="Escape"){$("log").classList.add("hidden");$("result").classList.add("hidden")}
+});
+
+// ---------------------------------------------------------- main loop
+let last=performance.now(),regenAccum=0,blinkCd=2;
+function frame(now){
+ const dt=Math.min(.05,(now-last)/1000);last=now;
+ // passive regen while the room is open
+ regenAccum+=dt*1000;
+ if(regenAccum>=ENERGY_REGEN_MS){regenAccum-=ENERGY_REGEN_MS;SV.energy=clamp(SV.energy+1,0,ENERGY_MAX);persist();updateHud()}
+ pip.angle+=dt*(pip.happy>0?3.4:2.2);
+ pip.happy=Math.max(0,pip.happy-dt);
+ pip.eating=Math.max(0,pip.eating-dt);
+ blinkCd-=dt;pip.blink=Math.max(0,pip.blink-dt);
+ if(blinkCd<=0){blinkCd=2.4+Math.random()*3;pip.blink=.12}
+
+ // pip movement: chase target, else drift home + wander
+ if(pip.chase){
+   const t=pip.chase,dx=t.x-pip.x,dy=t.y-pip.y,d=hyp(dx,dy)||1;
+   pip.x+=dx/d*Math.min(d,340*dt);pip.y+=dy/d*Math.min(d,340*dt);
+   if(d<12){
+     if(t.kind==="snack"){
+       pip.eating=.9;pip.happy=3;SV.energy=clamp(SV.energy+12,0,ENERGY_MAX);
+       particle(pip.x,pip.y,"#7be0ae",16,120);sfx.eat();gainXP(6,true);
+       say(["mmmm stardust","crunchy ✦","I was SO hungry, how did you know"][Math.floor(Math.random()*3)],2400);
+       journal("Shared a stardust snack.");persist();
+     }
+     if(t.kind==="wish"&&t.star){t.star.done=true;wish.score++;wish.combo++;particle(pip.x,pip.y,"#ffd36f",12,120);sfx.star();announce("✦ "+wish.score,420)}
+     pip.chase=null;
+   }
+ } else if(mode==="room"){
+   pip.wanderCd-=dt;
+   if(pip.wanderCd<=0){pip.wanderCd=2.5+Math.random()*3;const h=pipHome();pip.tx=h.x+(Math.random()-.5)*W*.3;pip.ty=h.y+(Math.random()-.5)*H*.22}
+   if(petting){pip.tx=pip.x;pip.ty=pip.y}
+   pip.x+=(pip.tx-pip.x)*Math.min(1,dt*2.2);
+   pip.y+=(pip.ty-pip.y)*Math.min(1,dt*2.2);
+ } else {const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*3);pip.y+=(h.y-pip.y)*Math.min(1,dt*3)}
+
+ if(mode==="wish"&&wish)wishTick(dt);
+ if(mode==="hype"&&hype)hypeTick(dt);
+ if(mode==="guard"&&guard)guardTick(dt);
+
+ // fx
+ for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=(p.heart?-8:130)*dt;p.life-=dt}
+ particles=particles.filter(p=>p.life>0);
+ for(const r of rings){r.r+=(r.max-r.r)*dt*7;r.life-=dt}
+ rings=rings.filter(r=>r.life>0);
+
+ draw();
+ requestAnimationFrame(frame);
+}
+
+function draw(){
+ X.fillStyle="#030509";X.fillRect(0,0,W,H);
+ // starfield
+ for(const s of stars){
+   const tw=.35+.65*Math.abs(Math.sin(s.tw+performance.now()*.0006));
+   X.globalAlpha=tw*.7;X.fillStyle="#cdd5e0";
+   X.fillRect(s.x*W,s.y*H,s.r,s.r);
+ }
+ X.globalAlpha=1;
+ // floor glow
+ const g=X.createRadialGradient(W*.5,H*.62,10,W*.5,H*.62,Math.min(W,H)*.55);
+ g.addColorStop(0,"#7ed8ff10");g.addColorStop(1,"#7ed8ff00");
+ X.fillStyle=g;X.fillRect(0,0,W,H);
+
+ if(mode==="wish"&&wish){
+   X.fillStyle="#ffd36f";X.font="700 13px Inter,system-ui";X.textAlign="center";
+   X.fillText("✦ "+wish.score+"   ·   "+Math.max(0,wish.t).toFixed(1)+"s",W/2,H*.14);
+   for(const s of wish.stars){
+     X.save();X.translate(s.x,s.y);X.rotate(performance.now()*.002);
+     X.fillStyle=s.claimed?"#fff0a8":"#ffd36f";
+     X.globalAlpha=clamp(s.life,0,1);
+     X.beginPath();
+     for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2===0?9:4;i?X.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):X.moveTo(Math.cos(a)*rr,Math.sin(a)*rr)}
+     X.closePath();X.fill();X.restore();
+   }
+   X.globalAlpha=1;X.textAlign="start";
+ }
+ if(mode==="hype"&&hype){
+   X.fillStyle="#b388ff";X.font="700 13px Inter,system-ui";X.textAlign="center";
+   X.fillText("ROUND "+hype.round+"/8 · "+hype.hits+" HIT",W/2,H*.14);X.textAlign="start";
+   if(hype.state==="ring"){
+     X.strokeStyle=Math.abs(hype.r-64)<10?"#ffd36f":"#b388ff";X.lineWidth=3;
+     X.beginPath();X.arc(pip.x,pip.y,hype.r,0,6.29);X.stroke();
+     X.globalAlpha=.35;X.strokeStyle="#ffffff";X.lineWidth=1;
+     X.beginPath();X.arc(pip.x,pip.y,64,0,6.29);X.stroke();X.globalAlpha=1;
+   }
+ }
+ if(mode==="guard"&&guard){
+   X.fillStyle="#7ed8ff";X.font="700 13px Inter,system-ui";X.textAlign="center";
+   X.fillText("◇ "+guard.blocked+" · "+Math.max(0,guard.t).toFixed(1)+"s",W/2,H*.14);X.textAlign="start";
+   for(const b of guard.blips){X.fillStyle="#ff6e8b";X.beginPath();X.arc(b.x,b.y,5,0,6.29);X.fill()}
+   X.strokeStyle="#7ed8ff";X.lineWidth=5;X.lineCap="round";
+   X.beginPath();X.arc(pip.x,pip.y,74,guard.angle-.75,guard.angle+.75);X.stroke();X.lineCap="butt";
+ }
+
+ // snack in flight
+ if(pip.chase&&pip.chase.kind==="snack"){X.fillStyle="#7be0ae";X.font="16px system-ui";X.textAlign="center";X.fillText("✧",pip.chase.x,pip.chase.y+5);X.textAlign="start"}
+
+ const bob=Math.sin(performance.now()*.0022)*5;
+ drawPip(pip.x,pip.y+bob,26+Math.min(8,(SV.bondLevel-1)*1.6));
+
+ for(const r of rings){X.globalAlpha=clamp(r.life/.55,0,1);X.strokeStyle=r.c;X.lineWidth=2;X.beginPath();X.arc(r.x,r.y,r.r,0,6.29);X.stroke()}
+ for(const p of particles){
+   X.globalAlpha=clamp(p.life,0,1);
+   if(p.heart){X.fillStyle=p.c;X.font="13px system-ui";X.textAlign="center";X.fillText("♥",p.x,p.y);X.textAlign="start"}
+   else{X.fillStyle=p.c;X.beginPath();X.arc(p.x,p.y,p.r,0,6.29);X.fill()}
+ }
+ X.globalAlpha=1;
+}
+
+updateHud();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -27,6 +27,7 @@ jobs:
       - name: Verify cumulative audio and current systems
         run: |
           test -f index.html
+          test -f pip.html
           for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
@@ -65,6 +66,7 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
+          cp pip.html _site/
           cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
