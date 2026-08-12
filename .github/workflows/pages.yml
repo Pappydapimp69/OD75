@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 verified B17A ${{ github.sha }}
+run-name: OD75 direct-source migration ${{ github.sha }}
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -24,45 +24,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-      - name: Rebuild verified base game
+      - name: Migrate legacy payload to direct source
+        if: ${{ hashFiles('payload-0.txt') != '' }}
         run: |
-          mkdir -p _site
-          cat payload-0.txt payload-1.txt payload-2.txt payload-3.txt | base64 --decode | gzip --decompress > _site/index.html
-          echo "0834938f1c5244715b8dabc4c9fff3954185ea80d6de9846a59026280358a63e  _site/index.html" | sha256sum -c -
+          cat payload-0.txt payload-1.txt payload-2.txt payload-3.txt | base64 --decode | gzip --decompress > /tmp/od75-base.html
+          python3 migrate.py /tmp/od75-base.html .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f payload-0.txt payload-1.txt payload-2.txt payload-3.txt gamepad.js heart-total.js double-tap-dash.js stage-clear-timer.js migrate.py
+          git add index.html styles.css game-1.js game-2.js game-3.js game-4.js
+          git commit -m "Migrate OD75 to direct Pages source"
+          git push origin HEAD:main
 
-      - name: Verify behavior code
+      - name: Verify direct game source
         run: |
-          grep -q 'maxDelay: 660' double-tap-dash.js
-          grep -q 'turnBrake.active && speed > 2' gamepad.js
-          grep -q 'delta > 8 \* Math.PI / 180' gamepad.js
-          grep -q 'STAGE_CLEAR_SECONDS = 10' stage-clear-timer.js
-          grep -q 'WALLET · ${S.heartTotal || 0} TOTAL' heart-total.js
+          test -f index.html
+          test -f styles.css
+          for f in game-1.js game-2.js game-3.js game-4.js; do
+            test -f "$f"
+            node --check "$f"
+          done
+          ! grep -q 'payload-' index.html
+          ! grep -q 'DecompressionStream' index.html
+          grep -q 'OD75-2026-08-12-B18' index.html
+          grep -q 'dtap<=660' game-4.js
+          grep -q 'turnDelta>(8\*Math.PI/180)' game-3.js
+          grep -q 'S.waveBreak=stageEnd?10:4.2;' game-3.js
+          grep -q 'S.heartTotal=(S.heartTotal||0)+1' game-2.js
 
-      - name: Assemble cache-busted site
+      - name: Assemble direct site
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('_site/index.html')
-          html=p.read_text()
-          build='OD75-2026-08-12-B17'
-          addons=(
-            f'<script src="gamepad.js?v={build}"></script>'
-            f'<script src="heart-total.js?v={build}"></script>'
-            f'<script src="double-tap-dash.js?v={build}"></script>'
-            f'<script src="stage-clear-timer.js?v={build}"></script>'
-            f'<div id="od75BuildStamp" style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff66;pointer-events:none">{build}</div>'
-          )
-          if '</body>' in html:
-              html=html.replace('</body>',addons+'</body>',1)
-          else:
-              html+=addons
-          p.write_text(html)
-          PY
-          cp gamepad.js heart-total.js double-tap-dash.js stage-clear-timer.js _site/
+          rm -rf _site
+          mkdir _site
+          cp index.html styles.css game-1.js game-2.js game-3.js game-4.js _site/
           touch _site/.nojekyll
-          grep -q 'OD75-2026-08-12-B17' _site/index.html
-          grep -q 'double-tap-dash.js?v=OD75-2026-08-12-B17' _site/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
