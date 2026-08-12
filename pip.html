@@ -302,7 +302,7 @@ function journal(txt){
 
 // --------------------------------------------------------------- pip
 const pip={x:0,y:0,tx:0,ty:0,angle:0,happy:0,blink:0,scale:1,
- chase:null,eating:0,wanderCd:2,sleeping:false,zzCd:0};
+ chase:null,eating:0,wanderCd:2,sleeping:false,zzCd:0,flashT:0};
 function isNight(){const h=new Date().getHours();return h>=21||h<7}
 // toy ball: flingable, bounces, Pip chases and bats it back
 const ball={x:0,y:0,vx:0,vy:0,r:11,held:false,lastBat:0,lastXp:0};
@@ -320,7 +320,7 @@ function drawPip(px,py,r){
  halo.addColorStop(0,"#ffd36f2e");halo.addColorStop(1,"#ffd36f00");
  X.fillStyle=halo;X.beginPath();X.arc(0,0,r*2.6,0,6.29);X.fill();
  X.rotate(pip.angle*.35);
- X.fillStyle=pip.eating>0?"#fff0a8":"#ffd36f";
+ X.fillStyle=pip.flashT>0?"#ffffff":pip.eating>0?"#fff0a8":"#ffd36f";
  X.beginPath();
  for(let i=0;i<10;i++){
    const a=-Math.PI/2+i*Math.PI/5,rr=i%2===0?r:r*.46,
@@ -434,7 +434,7 @@ function petLine(){
 let wish=null;
 $("actWish").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
  spendEnergy(DRILL_COST);mode="wish";updateHud();
- wish={t:30,score:0,combo:0,stars:[],spawnCd:0};
+ wish={t:30,score:0,combo:0,comboT:0,bestCombo:0,stars:[],spawnCd:0};
  say("wish stars! tap one and I'll zip to it ✦",2800);
 });
 function wishTap(p){
@@ -445,21 +445,25 @@ function wishTap(p){
 }
 function wishTick(dt){
  wish.t-=dt;wish.spawnCd-=dt;
+ wish.comboT=Math.max(0,wish.comboT-dt);
+ if(wish.comboT<=0)wish.combo=0;
  if(wish.spawnCd<=0){
-   wish.spawnCd=.75+Math.random()*.55;
+   wish.spawnCd=(wish.t<10?.55:.75)+Math.random()*.55; // late-run ramp
    const edge=Math.random()<.5;
    wish.stars.push({x:edge?(Math.random()<.5?-14:W+14):Math.random()*W,y:edge?Math.random()*H*.7+H*.1:(Math.random()<.5?60:H*.8),
-     vx:(Math.random()-.5)*70,vy:(Math.random()-.5)*40,life:6,claimed:false});
+     vx:(Math.random()-.5)*70,vy:(Math.random()-.5)*40,life:wish.t<10?4:6,claimed:false});
  }
  for(const s of wish.stars){s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt}
  wish.stars=wish.stars.filter(s=>s.life>0&&!s.done);
  if(wish.t<=0){
-   const sc=wish.score;SV.totals.wishes++;SV.best.wish=Math.max(SV.best.wish,sc);
+   const sc=wish.score,newBest=sc>SV.best.wish;
+   SV.totals.wishes++;SV.best.wish=Math.max(SV.best.wish,sc);
    let statLine="";
    if(sc>=10&&SV.love<10){SV.love++;statLine=" Pip's Loving grew to "+SV.love+".";}
-   journal("Wish Chase: caught "+sc+" wish stars."+statLine);
-   endMinigame(sc>=14?"S":sc>=10?"A":sc>=6?"B":"C","WISH CHASE",
-     sc+" wish stars caught","Pip zipped after every single one you called."+statLine,10+sc*2);
+   journal("Wish Chase: caught "+sc+" wish stars (best combo ×"+wish.bestCombo+")."+statLine);
+   if(newBest){particle(pip.x,pip.y,"#ffd36f",34,200);sfx.levelup()}
+   endMinigame(sc>=14?"S":sc>=10?"A":sc>=6?"B":"C",(newBest?"NEW BEST ✦ · ":"")+"WISH CHASE",
+     sc+" wish stars · best combo ×"+wish.bestCombo,"Pip zipped after every single one you called."+statLine,10+sc*2+wish.bestCombo);
    wish=null;
  }
 }
@@ -468,14 +472,21 @@ function wishTick(dt){
 let hype=null;
 $("actHype").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
  spendEnergy(DRILL_COST);mode="hype";updateHud();
- hype={round:0,rounds:8,r:0,speed:0,hits:0,perfects:0,state:"wait",wait:.8,flash:0};
+ hype={round:0,rounds:8,r:0,speed:0,hits:0,perfects:0,streak:0,bestStreak:0,state:"wait",wait:.8,flash:0};
  say("hype drill — tap exactly when the ring hugs me ✦",2800);
 });
 function hypeTap(){
  if(!hype||hype.state!=="ring")return;
- const target=64,d=Math.abs(hype.r-target);
- if(d<10){hype.hits++;hype.perfects+=d<4?1:0;hype.flash=.3;particle(pip.x,pip.y,d<4?"#ffd36f":"#b388ff",14,130);ring(pip.x,pip.y,"#b388ff",100);sfx.good();announce(d<4?"PERFECT":"GOOD",500)}
- else{sfx.miss();announce("EARLY",400)}
+ const target=64,band=hype.round>=7?8:10,d=Math.abs(hype.r-target);
+ if(d<band){
+   const perfect=d<4;
+   hype.hits++;hype.perfects+=perfect?1:0;
+   hype.streak++;hype.bestStreak=Math.max(hype.bestStreak,hype.streak);
+   hype.flash=.3;particle(pip.x,pip.y,perfect?"#ffd36f":"#b388ff",14,130);ring(pip.x,pip.y,"#b388ff",100);sfx.good();
+   if(perfect)pip.flashT=.09; // white hit-flash: earned events only
+   announce(perfect&&hype.streak>=3?"PERFECT ×"+hype.streak:perfect?"PERFECT":"GOOD",500);
+ }
+ else{hype.streak=0;sfx.miss();announce("EARLY",400)}
  hype.state="wait";hype.wait=.55;
 }
 function hypeTick(dt){
@@ -484,19 +495,21 @@ function hypeTick(dt){
    hype.wait-=dt;
    if(hype.wait<=0){
      if(hype.round>=hype.rounds){
-       const sc=hype.hits;SV.totals.hypes++;SV.best.hype=Math.max(SV.best.hype,sc);
+       const sc=hype.hits,newBest=sc>SV.best.hype;
+       SV.totals.hypes++;SV.best.hype=Math.max(SV.best.hype,sc);
        let statLine="";
        if(sc>=6&&SV.support<10){SV.support++;statLine=" Pip's Supportive grew to "+SV.support+".";}
-       journal("Hype Drill: "+sc+"/8 rings ("+hype.perfects+" perfect)."+statLine);
-       endMinigame(sc>=8?"S":sc>=6?"A":sc>=4?"B":"C","HYPE DRILL",
-         sc+"/8 rings · "+hype.perfects+" perfect","Timing is a love language, apparently."+statLine,8+sc*3);
+       journal("Hype Drill: "+sc+"/8 rings ("+hype.perfects+" perfect, streak "+hype.bestStreak+")."+statLine);
+       if(newBest){particle(pip.x,pip.y,"#b388ff",34,200);sfx.levelup()}
+       endMinigame(sc>=8?"S":sc>=6?"A":sc>=4?"B":"C",(newBest?"NEW BEST ✦ · ":"")+"HYPE DRILL",
+         sc+"/8 rings · "+hype.perfects+" perfect · streak "+hype.bestStreak,"Timing is a love language, apparently."+statLine,8+sc*3+hype.bestStreak);
        hype=null;return;
      }
      hype.round++;hype.state="ring";hype.r=Math.min(W,H)*.42;hype.speed=(hype.r-64)/(1.5-hype.round*.06);
    }
  } else {
    hype.r-=hype.speed*dt;
-   if(hype.r<48){sfx.miss();announce("MISS",400);hype.state="wait";hype.wait=.55}
+   if(hype.r<48){hype.streak=0;sfx.miss();announce("MISS",400);hype.state="wait";hype.wait=.55}
  }
 }
 
@@ -504,7 +517,7 @@ function hypeTick(dt){
 let guard=null;
 $("actGuard").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
  spendEnergy(DRILL_COST);mode="guard";updateHud();
- guard={t:25,blocked:0,leaked:0,angle:0,blips:[],spawnCd:1};
+ guard={t:25,blocked:0,leaked:0,streak:0,bestStreak:0,angle:0,blips:[],spawnCd:1};
  say("guard drill — hold your shield between me and the sparks ◇",3000);
 });
 function guardPointer(p){if(guard)guard.angle=Math.atan2(p.y-pip.y,p.x-pip.x)}
@@ -512,8 +525,11 @@ function guardTick(dt){
  guard.t-=dt;guard.spawnCd-=dt;
  if(guard.spawnCd<=0){
    guard.spawnCd=Math.max(.55,1.15-(25-guard.t)*.02);
-   const a=Math.random()*6.28,d=Math.min(W,H)*.5;
-   guard.blips.push({x:pip.x+Math.cos(a)*d,y:pip.y+Math.sin(a)*d,sp:85+Math.random()*45});
+   const n=(guard.t<10&&Math.random()<.35)?2:1; // late-run pressure
+   for(let k=0;k<n;k++){
+     const a=Math.random()*6.28,d=Math.min(W,H)*.5;
+     guard.blips.push({x:pip.x+Math.cos(a)*d,y:pip.y+Math.sin(a)*d,sp:85+Math.random()*45});
+   }
  }
  for(const b of guard.blips){
    const dx=pip.x-b.x,dy=pip.y-b.y,d=hyp(dx,dy)||1;
@@ -522,18 +538,24 @@ function guardTick(dt){
      const ba=Math.atan2(b.y-pip.y,b.x-pip.x);
      let diff=Math.abs(ba-guard.angle);diff=Math.min(diff,6.283-diff);
      b.done=true;
-     if(diff<.75){guard.blocked++;particle(b.x,b.y,"#7ed8ff",10,110);ring(b.x,b.y,"#7ed8ff",44);sfx.good()}
-     else{guard.leaked++;particle(pip.x,pip.y,"#ff6e8b",8,90);sfx.miss();pip.happy=0}
+     if(diff<.75){
+       guard.blocked++;guard.streak++;guard.bestStreak=Math.max(guard.bestStreak,guard.streak);
+       particle(b.x,b.y,"#7ed8ff",10,110);ring(b.x,b.y,"#7ed8ff",44);sfx.good();
+       if(guard.streak>0&&guard.streak%8===0)announce("◇ WALL ×"+guard.streak,600);
+     }
+     else{guard.leaked++;guard.streak=0;particle(pip.x,pip.y,"#ff6e8b",8,90);sfx.miss();pip.happy=0}
    }
  }
  guard.blips=guard.blips.filter(b=>!b.done);
  if(guard.t<=0){
-   const sc=guard.blocked;SV.totals.guards++;SV.best.guard=Math.max(SV.best.guard,sc);
+   const sc=guard.blocked,newBest=sc>SV.best.guard;
+   SV.totals.guards++;SV.best.guard=Math.max(SV.best.guard,sc);
    let statLine="";
    if(sc>=12&&guard.leaked<=4&&SV.compassion<10){SV.compassion++;statLine=" Pip's Compassionate grew to "+SV.compassion+".";}
-   journal("Guard Drill: deflected "+sc+", leaked "+guard.leaked+"."+statLine);
-   endMinigame(sc>=18&&guard.leaked<=2?"S":sc>=12?"A":sc>=7?"B":"C","GUARD DRILL",
-     sc+" deflected · "+guard.leaked+" got through","Pip watched you stand guard the whole time."+statLine,8+sc*2);
+   journal("Guard Drill: deflected "+sc+", leaked "+guard.leaked+" (streak "+guard.bestStreak+")."+statLine);
+   if(newBest){particle(pip.x,pip.y,"#7ed8ff",34,200);sfx.levelup()}
+   endMinigame(sc>=18&&guard.leaked<=2?"S":sc>=12?"A":sc>=7?"B":"C",(newBest?"NEW BEST ✦ · ":"")+"GUARD DRILL",
+     sc+" deflected · "+guard.leaked+" through · streak "+guard.bestStreak,"Pip watched you stand guard the whole time."+statLine,8+sc*2+guard.bestStreak);
    guard=null;
  }
 }
@@ -615,6 +637,7 @@ function frame(now){
  pip.angle+=dt*(pip.sleeping?.5:pip.happy>0?3.4:2.2);
  pip.happy=Math.max(0,pip.happy-dt);
  pip.eating=Math.max(0,pip.eating-dt);
+ pip.flashT=Math.max(0,pip.flashT-dt);
  blinkCd-=dt;pip.blink=Math.max(0,pip.blink-dt);
  if(blinkCd<=0){blinkCd=2.4+Math.random()*3;pip.blink=.12}
 
@@ -631,7 +654,12 @@ function frame(now){
        say(["mmmm stardust","crunchy ✦","I was SO hungry, how did you know"][Math.floor(Math.random()*3)],2400);
        journal("Shared a stardust snack.");persist();
      }
-     if(t.kind==="wish"&&t.star){t.star.done=true;wish.score++;wish.combo++;particle(pip.x,pip.y,"#ffd36f",12,120);sfx.star();announce("✦ "+wish.score,420)}
+     if(t.kind==="wish"&&t.star){
+       t.star.done=true;wish.score++;
+       wish.combo++;wish.comboT=2.5;wish.bestCombo=Math.max(wish.bestCombo,wish.combo);
+       particle(pip.x,pip.y,"#ffd36f",12,120);sfx.star();
+       announce(wish.combo>=3?"✦ "+wish.score+"  ×"+wish.combo:"✦ "+wish.score,420);
+     }
      pip.chase=null;
    }
  } else if(mode==="room"&&pip.sleeping){
