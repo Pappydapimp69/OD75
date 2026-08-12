@@ -33,7 +33,7 @@ jobs:
           grep -Fq 'OD75-2026-08-12-B21-STARDRIVE' index.html
           grep -Fq 'game.js?v=B21-STARDRIVE' index.html
           grep -Fq 'function triggerOverdrive()' b21-*.js
-          grep -Fq 'if(k=="e")triggerOverdrive()' b21-*.js
+          grep -Fq 'if(k==="e")triggerOverdrive()' b21-*.js
           grep -Fq 'OVER_ORDER=["beam","storm","guardian","nova","gravity","pip"]' b21-*.js
           grep -Fq 'BOSS_STAR_THRESHOLDS=[4,11,20,32,47,65]' b21-*.js
           grep -Fq 'function openOverdriveStep()' b21-*.js
