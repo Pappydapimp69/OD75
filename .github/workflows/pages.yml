@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Rare Reward Beacons B48 ${{ github.sha }}
+run-name: OD75 Pip Presence B49 ${{ github.sha }}
 
 on:
   push:
@@ -24,38 +24,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify B48 rare reward beacons and current systems
+      - name: Verify B49 Pip presence and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'const B47_CURRENCY_HUD_IDLE_SECONDS=1.4' b21-34.js
           grep -Fq 'const B48_BEACON_MARGIN=46' b21-35.js
-          grep -Fq 'const B48_BEACON_LIMIT=4' b21-35.js
-          grep -Fq 'function rareRewardTargetsB48()' b21-35.js
-          grep -Fq 'function beaconEdgePointB48' b21-35.js
-          grep -Fq 'musicNoteDrops' b21-35.js
-          grep -Fq 'prismSeedDrops' b21-35.js
-          grep -Fq 'drawRareRewardBeaconsB48' b21-35.js
+          grep -Fq 'const B49_RETURN_PULSE_SECONDS=.85' b21-36.js
+          grep -Fq 'PIP FETCHING ♥' b21-36.js
+          grep -Fq 'COMBAT BONUSES PAUSED' b21-36.js
+          grep -Fq 'BONUSES ONLINE ✦' b21-36.js
+          grep -Fq 'before!=="orbit"&&after==="orbit"' b21-36.js
+          grep -Fq 'drawPipPresenceB49' b21-36.js
       - name: Assemble direct site
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
           s=Path('_site/game.js').read_text()
-          for marker in ['const B48_BEACON_MARGIN=46','function rareRewardTargetsB48()','function drawRareRewardBeaconsB48()']:
+          for marker in ['const B49_RETURN_PULSE_SECONDS=.85','function pipAwayB49()','function drawPipPresenceB49()']:
               assert marker in s, marker
-          assert s.rfind('draw=function()') > s.find('// B48 Rare reward beacons')
-          assert s.rfind('drawRareRewardBeaconsB48()') > s.find('// B48 Rare reward beacons')
+          assert s.rfind('update=function(dt)') > s.find('// B49 Pip presence clarity')
+          assert s.rfind('draw=function()') > s.find('// B49 Pip presence clarity')
+          assert s.rfind('drawPipPresenceB49()') > s.rfind('drawRareRewardBeaconsB48()')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B48-RARE-REWARD-BEACONS/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B48-RARE-REWARD-BEACONS/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B48-RARE-REWARD-BEACONS' _site/index.html
-          grep -Fq 'game.js?v=B48-RARE-REWARD-BEACONS' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B49-PIP-PRESENCE/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B49-PIP-PRESENCE/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B49-PIP-PRESENCE' _site/index.html
+          grep -Fq 'game.js?v=B49-PIP-PRESENCE' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
