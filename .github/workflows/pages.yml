@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 direct-source migration ${{ github.sha }}
+run-name: OD75 direct B18 ${{ github.sha }}
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -24,20 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Migrate legacy payload to direct source
-        if: ${{ hashFiles('payload-0.txt') != '' }}
-        run: |
-          cat payload-0.txt payload-1.txt payload-2.txt payload-3.txt | base64 --decode | gzip --decompress > /tmp/od75-base.html
-          python3 migrate.py /tmp/od75-base.html .
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -f payload-0.txt payload-1.txt payload-2.txt payload-3.txt gamepad.js heart-total.js double-tap-dash.js stage-clear-timer.js migrate.py
-          git add index.html styles.css game-1.js game-2.js game-3.js game-4.js
-          git commit -m "Migrate OD75 to direct Pages source"
-          git push origin HEAD:main
 
       - name: Verify direct game source
         run: |
@@ -49,11 +35,11 @@ jobs:
           done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -q 'OD75-2026-08-12-B18' index.html
-          grep -q 'dtap<=660' game-4.js
-          grep -q 'turnDelta>(8\*Math.PI/180)' game-3.js
-          grep -q 'S.waveBreak=stageEnd?10:4.2;' game-3.js
-          grep -q 'S.heartTotal=(S.heartTotal||0)+1' game-2.js
+          grep -Fq 'OD75-2026-08-12-B18' index.html
+          grep -Fq 'dtap<=660' game-*.js
+          grep -Fq 'turnDelta>(8*Math.PI/180)' game-*.js
+          grep -Fq 'S.waveBreak=stageEnd?10:4.2;' game-*.js
+          grep -Fq 'S.heartTotal=(S.heartTotal||0)+1' game-*.js
 
       - name: Assemble direct site
         run: |
