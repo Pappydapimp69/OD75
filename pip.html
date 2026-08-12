@@ -37,6 +37,7 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 #actWish{border-color:#ffd36f66}#actWish:not(:disabled){box-shadow:0 0 0 5px #ffd36f0d}
 #actHype{border-color:#b388ff66}#actHype:not(:disabled){box-shadow:0 0 0 5px #b388ff0d}
 #actGuard{border-color:#7ed8ff66}#actGuard:not(:disabled){box-shadow:0 0 0 5px #7ed8ff0d}
+.tb{display:inline-block;font-size:11px;opacity:.85;letter-spacing:.06em}
 #actShop{border-color:#ffd36f55}
 #actLog{border-color:#ff6e8b55}
 .upgrade{border:1px solid var(--line);background:#ffffff06;border-radius:14px;padding:12px;text-align:left;cursor:pointer}
@@ -92,9 +93,9 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 <div id="announce"></div>
 <div class="bottom">
   <button id="actFeed" class="act" type="button"><small>✧</small>FEED</button>
-  <button id="actWish" class="act" type="button"><small>✦</small>WISH<br>CHASE</button>
-  <button id="actHype" class="act" type="button"><small>◎</small>HYPE<br>DRILL</button>
-  <button id="actGuard" class="act" type="button"><small>◇</small>GUARD<br>DRILL</button>
+  <button id="actWish" class="act" type="button"><small>✦</small>WISH<br><span id="t_wish" class="tb">T1</span></button>
+  <button id="actHype" class="act" type="button"><small>◎</small>HYPE<br><span id="t_hype" class="tb">T1</span></button>
+  <button id="actGuard" class="act" type="button"><small>◇</small>GUARD<br><span id="t_guard" class="tb">T1</span></button>
   <button id="actShop" class="act" type="button"><small>✵</small>DECOR</button>
   <button id="actLog" class="act" type="button"><small>♥</small>LOG</button>
 </div>
@@ -146,6 +147,14 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
   <button id="closeSettings" class="primary">Done</button>
 </div></div>
 
+<div id="pauseCard" class="modal hidden"><div class="card">
+  <div class="kicker">PAUSED</div>
+  <h2 style="margin:6px 0">Take your time ✦</h2>
+  <p class="small">Esc resumes. Pip will wait — it always does.</p>
+  <button id="btnResume" class="primary" style="margin-bottom:8px">Resume</button>
+  <button id="btnQuitDrill" class="primary">Leave the drill</button>
+</div></div>
+
 <div id="result" class="modal hidden"><div class="card">
   <div class="kicker" id="resultKicker">DRILL COMPLETE</div>
   <div id="grade">A</div>
@@ -155,7 +164,7 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 </div></div>
 </div>
 <div id="flash"></div>
-<div style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff55;pointer-events:none">PIPROOM-2026-08-12-L12</div>
+<div style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff55;pointer-events:none">PIPROOM-2026-08-12-L13F</div>
 
 <script>
 "use strict";
@@ -217,6 +226,7 @@ function pipBondName(level){
 
 function freshSave(){return{v:1,bondLevel:1,bondXP:0,love:0,compassion:0,support:0,
  energy:80,snacks:3,fed:75,affection:70,dust:0,decos:[],keeps:[],sCount:0,
+ tiers:{wish:0,hype:0,guard:0},
  prefs:{ts:100,motion:"auto"},lastMs:Date.now(),
  totals:{feeds:0,pets:0,wishes:0,hypes:0,guards:0},
  best:{wish:0,hype:0,guard:0},journal:[],welcomed:0}}
@@ -234,6 +244,8 @@ function loadSave(){
      decos:Array.isArray(v.decos)?v.decos.filter(d=>typeof d==="string").slice(0,24):[],
      keeps:Array.isArray(v.keeps)?v.keeps.filter(d=>typeof d==="string").slice(0,64):[],
      sCount:num(v.sCount,0,1e6,0),
+     tiers:{wish:num((v.tiers||{}).wish,0,10,0),hype:num((v.tiers||{}).hype,0,10,0),
+            guard:num((v.tiers||{}).guard,0,10,0)},
      prefs:{ts:[100,115,130].indexOf((v.prefs||{}).ts)>=0?v.prefs.ts:100,
             motion:(v.prefs||{}).motion==="less"?"less":"auto"},
      lastMs:num(v.lastMs,0,4102444800000,Date.now()),
@@ -251,6 +263,11 @@ SV.decos=SV.decos||[];SV.keeps=SV.keeps||[];SV.journal=SV.journal||[];
 if(!Number.isFinite(SV.dust))SV.dust=0;
 if(!Number.isFinite(SV.sCount))SV.sCount=0;
 if(!SV.prefs||[100,115,130].indexOf(SV.prefs.ts)<0)SV.prefs={ts:100,motion:"auto"};
+SV.tiers=SV.tiers||{wish:0,hype:0,guard:0};
+// migrate pre-tier saves: an existing stat point implies that tier was cleared
+SV.tiers.wish=Math.max(SV.tiers.wish|0,SV.love|0);
+SV.tiers.hype=Math.max(SV.tiers.hype|0,SV.support|0);
+SV.tiers.guard=Math.max(SV.tiers.guard|0,SV.compassion|0);
 // hot paths (petting, drills) call persist() often — debounce the actual
 // storage write, but flush synchronously when the tab hides or unloads
 // (mobile browsers reclaim tabs without firing beforeunload)
@@ -352,6 +369,7 @@ for(let i=0;i<90;i++)stars.push({x:Math.random(),y:Math.random(),r:Math.random()
 const PARTICLE_BUDGET=220;
 function particle(x,y,c,n=10,sp=90){if(reducedMotion())n=Math.ceil(n/3);for(let i=0;i<n;i++){const a=Math.random()*6.28,s=sp*(.4+Math.random()*.8);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:.6+Math.random()*.5,r:1.5+Math.random()*2})}
  if(particles.length>PARTICLE_BUDGET)particles.splice(0,particles.length-PARTICLE_BUDGET)}
+function ring2(x,y,c,r=70){rings.push({x,y,c,r:8,max:r,life:.55})}
 function ring(x,y,c,r=70){rings.push({x,y,c,r:8,max:r,life:.55})}
 function heartPop(x,y){particles.push({x,y,vx:(Math.random()-.5)*30,vy:-55-Math.random()*40,c:"#ff9fba",life:1,r:0,heart:true})}
 
@@ -503,6 +521,7 @@ function updateHud(){
  $("affBar").style.width=(SV.affection/NEED_MAX*100)+"%";
  const tired=SV.energy<DRILL_COST||pip.sleeping;
  $("actWish").disabled=tired||mode!=="room";$("actHype").disabled=tired||mode!=="room";$("actGuard").disabled=tired||mode!=="room";
+ for(const d of ["wish","hype","guard"]){const el=$("t_"+d);if(el)el.textContent="T"+playingTier(d)}
  $("actFeed").disabled=SV.snacks<=0||mode!=="room"||pip.sleeping;
  $("mood").textContent="✦ "+mood();
 }
@@ -594,7 +613,7 @@ C.addEventListener("pointerdown",e=>{
    if(pip.sleeping){wakeNow(true);return}
    petting=true;C.setPointerCapture(e.pointerId)}
  if(mode==="wish")wishTap(p);
- if(mode==="hype")hypeTap();
+ if(mode==="hype"){if(hype)hype.held=true;hypeResolve("tap")}
  if(mode==="guard")guardPointer(p);
 });
 C.addEventListener("pointermove",e=>{
@@ -607,141 +626,369 @@ C.addEventListener("pointermove",e=>{
  if(mode==="guard")guardPointer(p);
  pointer=p;
 });
-C.addEventListener("pointerup",()=>{ball.held=false;if(petting){petting=false;persist();say(petLine(),2600)}});
+C.addEventListener("pointerup",()=>{ball.held=false;
+ if(mode==="hype"&&hype){hype.held=false;hypeResolve("release")}
+if(petting){petting=false;persist();say(petLine(),2600)}});
 let pointer={x:0,y:0};
 function petLine(){
  const l=["hehe — again?","that's the spot ✦","I love hanging out with you","best. day.","you always find me"];
  return l[Math.floor(Math.random()*l.length)];
 }
 
-// ------------------------------------------------------ minigame: wish
+// ==================================================== drills: tier ladder
+// Ten skill tiers per drill. Clearing tier N the first time awards that
+// drill's stat point, so progress is gated by SKILL, not by a clock.
+// Curves validated for smoothness (a step function is monotonic too) before
+// any of this code existed — see scratchpad/tiers.js.
+const TIER_MAX=10;
+function wishTier(t){
+ const time=34-t*.6, every=1.05-t*.03;
+ const spawns=time/every;
+ return{goal:6+t, time, spawnEvery:every, starLife:6.6-t*.17,
+  // a share of the board you may let go: tightens as a RATIO, so a faster
+  // board can never make the miss cap unreachable by construction
+  maxMiss:Math.max(5,Math.round(spawns*(.35-t*.011))), queueMax:3,
+  fading:t>=3, shy:t>=5, heavy:t>=7};
+}
+function hypeTier(t){return{
+ rounds:8+t, bandMs:150-t*6.5, speedMul:1+t*.055,
+ concurrent:t>=7?3:t>=4?2:1, lives:3+Math.floor(t/4),
+ holds:t>=4, doubles:t>=6, accuracy:.6+t*.012}}
+function guardTier(t){
+ const time=26+t, every=1.22-t*.036;
+ const hearts=t>=3, heavy=t>=6, splitter=t>=9;
+ const pool=3+(hearts?1:0)+(heavy?1:0)+(splitter?1:0);
+ const blockable=(3+(heavy?1:0)+(splitter?2:0))/pool;   // a splitter yields 2 sparks
+ const supply=(time/every)*blockable;
+ return{time, spawnEvery:every, speed:84+t*4.5, arc:.80-t*.017,
+  needBlocks:Math.round(supply*.55), maxLeak:Math.max(2,6-Math.floor(t/3)),
+  hearts, heavy, splitter};
+}
+
+const DRILLS={
+ wish:{stat:"love",  label:"WISH CHASE", cfg:wishTier,  color:"#ffd36f"},
+ hype:{stat:"support",label:"HYPE DRILL", cfg:hypeTier,  color:"#b388ff"},
+ guard:{stat:"compassion",label:"GUARD DRILL",cfg:guardTier,color:"#7ed8ff"},
+};
+function clearedTier(d){return clamp(SV.tiers[d]|0,0,TIER_MAX)}
+function playingTier(d){return Math.min(TIER_MAX,clearedTier(d)+1)}
+function tierGoalText(d,t){
+ const c=DRILLS[d].cfg(t);
+ if(d==="wish")return c.goal+" stars in "+Math.round(c.time)+"s · max "+c.maxMiss+" missed";
+ if(d==="hype")return c.rounds+" rings · "+Math.round(c.accuracy*100)+"% needed · "+c.concurrent+" at once";
+ return c.needBlocks+" blocks in "+c.time+"s · max "+c.maxLeak+" through";
+}
+// first clear of a tier grants the stat point for that tier
+function awardTier(d,t){
+ if(t<=clearedTier(d))return "";
+ SV.tiers[d]=t;
+ const stat=DRILLS[d].stat;
+ SV[stat]=Math.max(SV[stat]|0,t);
+ return " Pip's "+(stat==="love"?"Loving":stat==="support"?"Supportive":"Compassionate")+" grew to "+SV[stat]+".";
+}
+
+let paused=false;
+function togglePause(){
+ if(mode==="room")return;
+ paused=!paused;
+ $("pauseCard").classList.toggle("hidden",!paused);
+}
+function abandonDrill(){
+ paused=false;$("pauseCard").classList.add("hidden");
+ wish=null;hype=null;guard=null;mode="room";
+ pip.chase=null;pip.tx=pipHome().x;pip.ty=pipHome().y;
+ updateHud();
+}
+
+function startDrill(d){
+ if(mode!=="room"||SV.energy<DRILL_COST||pip.sleeping)return;
+ spendEnergy(DRILL_COST);
+ const t=playingTier(d);
+ mode=d;paused=false;
+ if(d==="wish")wish={t:0,cfg:wishTier(t),tier:t,score:0,misses:0,combo:0,comboT:0,bestCombo:0,stars:[],queue:[],spawnCd:.4,dwell:0};
+ if(d==="hype"){const hc=hypeTier(t);hype={cfg:hc,tier:t,round:0,hits:0,perfects:0,streak:0,bestStreak:0,lives:hc.lives,rings:[],spawnCd:.9,held:false}}
+ if(d==="guard")guard={t:0,cfg:guardTier(t),tier:t,blocks:0,leaks:0,heartsSaved:0,heartsHit:0,streak:0,bestStreak:0,angle:-Math.PI/2,blips:[],spawnCd:.8};
+ announce("TIER "+t,1200);
+ say(tierGoalText(d,t),3600);
+ updateHud();
+}
+$("actWish").addEventListener("click",()=>startDrill("wish"));
+$("actHype").addEventListener("click",()=>startDrill("hype"));
+$("actGuard").addEventListener("click",()=>startDrill("guard"));
+
+// ------------------------------------------- WISH: routing under decay
+// You don't steer Pip — you QUEUE targets and Pip flies the route you chose.
 let wish=null;
-$("actWish").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
- spendEnergy(DRILL_COST);mode="wish";updateHud();
- wish={t:30,score:0,combo:0,comboT:0,bestCombo:0,stars:[],spawnCd:0};
- say("wish stars! tap one and I'll zip to it ✦",2800);
-});
+const WISH_KINDS={
+ normal:{c:"#ffd36f",pts:1,decay:1,  spikes:5},
+ fading:{c:"#ff9fba",pts:2,decay:2.1,spikes:4},   // worth more, dies fast
+ shy:   {c:"#9adcf0",pts:2,decay:1,  spikes:6},   // drifts away when neared
+ heavy: {c:"#c9f3ff",pts:3,decay:.7, spikes:8},   // must be held on 0.6s
+};
+function wishSpawn(){
+ const c=wish.cfg,pool=["normal","normal"];
+ if(c.fading)pool.push("fading");
+ if(c.shy)pool.push("shy");
+ if(c.heavy)pool.push("heavy");
+ const kind=pool[Math.floor(Math.random()*pool.length)];
+ const m=52;
+ wish.stars.push({
+  kind,x:m+Math.random()*(W-m*2),y:H*.18+Math.random()*(H*.55),
+  vx:(Math.random()-.5)*38,vy:(Math.random()-.5)*26,
+  life:c.starLife/WISH_KINDS[kind].decay,maxLife:c.starLife/WISH_KINDS[kind].decay,
+  queued:false,done:false});
+}
 function wishTap(p){
- if(!wish)return;
- let best=null,bd=54;
- for(const s of wish.stars){const d=hyp(p.x-s.x,p.y-s.y);if(d<bd){bd=d;best=s}}
- if(best&&!best.claimed){best.claimed=true;pip.chase={x:best.x,y:best.y,kind:"wish",star:best}}
+ if(!wish||paused)return;
+ let best=null,bd=46;
+ for(const s of wish.stars){
+  if(s.queued||s.done)continue;
+  const d=hyp(p.x-s.x,p.y-s.y);
+  if(d<bd){bd=d;best=s}
+ }
+ if(!best){sfx.miss();return}
+ if(wish.queue.length>=wish.cfg.queueMax){flash("Queue is full — "+wish.cfg.queueMax+" max");return}
+ best.queued=true;wish.queue.push(best);sfx.pet();
+ ring(best.x,best.y,"#ffd36f",34);
 }
 function wishTick(dt){
- wish.t-=dt;wish.spawnCd-=dt;
+ const c=wish.cfg;
+ wish.t+=dt;wish.spawnCd-=dt;
  wish.comboT=Math.max(0,wish.comboT-dt);
  if(wish.comboT<=0)wish.combo=0;
- if(wish.spawnCd<=0){
-   wish.spawnCd=(wish.t<10?.55:.75)+Math.random()*.55; // late-run ramp
-   const edge=Math.random()<.5;
-   wish.stars.push({x:edge?(Math.random()<.5?-14:W+14):Math.random()*W,y:edge?Math.random()*H*.7+H*.1:(Math.random()<.5?60:H*.8),
-     vx:(Math.random()-.5)*70,vy:(Math.random()-.5)*40,life:wish.t<10?4:6,claimed:false});
+ if(wish.spawnCd<=0){wish.spawnCd=c.spawnEvery;wishSpawn()}
+ for(const s of wish.stars){
+  if(s.done)continue;
+  s.life-=dt;
+  s.x+=s.vx*dt;s.y+=s.vy*dt;
+  if(s.x<40||s.x>W-40)s.vx*=-1;
+  if(s.y<H*.16||s.y>H*.76)s.vy*=-1;
+  if(s.kind==="shy"){ // drifts away from an approaching Pip (wired: shy only)
+   const d=hyp(s.x-pip.x,s.y-pip.y);
+   if(d<150){const u=(s.x-pip.x)/(d||1),v=(s.y-pip.y)/(d||1);s.x+=u*72*dt;s.y+=v*72*dt}
+  }
+  if(s.life<=0){
+   s.done=true;
+   if(!s.queued){wish.misses++;wish.combo=0;particle(s.x,s.y,"#5a6070",5,50)}
+  }
  }
- for(const s of wish.stars){s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt}
- wish.stars=wish.stars.filter(s=>s.life>0&&!s.done);
- if(wish.t<=0){
-   const sc=wish.score,newBest=sc>SV.best.wish;
-   SV.totals.wishes++;SV.best.wish=Math.max(SV.best.wish,sc);
-   let statLine="";
-   if(sc>=10&&SV.love<10){SV.love++;statLine=" Pip's Loving grew to "+SV.love+".";}
-   journal("Wish Chase: caught "+sc+" wish stars (best combo ×"+wish.bestCombo+")."+statLine);
-   if(newBest){particle(pip.x,pip.y,"#ffd36f",34,200);sfx.levelup()}
-   endMinigame(sc>=14?"S":sc>=10?"A":sc>=6?"B":"C",(newBest?"NEW BEST ✦ · ":"")+"WISH CHASE",
-     sc+" wish stars · best combo ×"+wish.bestCombo,"Pip zipped after every single one you called."+statLine,10+sc*2+wish.bestCombo);
-   wish=null;
+ // fly the queued route in order
+ const target=wish.queue[0];
+ if(target&&!target.done){
+  pip.chase=null;
+  const dx=target.x-pip.x,dy=target.y-pip.y,d=hyp(dx,dy)||1;
+  const reach=WISH_KINDS[target.kind].pts>0;
+  if(d>14){pip.x+=dx/d*Math.min(d,330*dt);pip.y+=dy/d*Math.min(d,330*dt);wish.dwell=0}
+  else{
+   wish.dwell+=dt;
+   const need=target.kind==="heavy"?.6:0;  // wired: heavy costs dwell time
+   if(wish.dwell>=need){
+    target.done=true;wish.queue.shift();wish.dwell=0;
+    const k=WISH_KINDS[target.kind];
+    wish.score+=k.pts;
+    wish.combo++;wish.comboT=2.6;wish.bestCombo=Math.max(wish.bestCombo,wish.combo);
+    particle(target.x,target.y,k.c,10+k.pts*3,110);sfx.star();pip.happy=1.6;
+    announce(wish.combo>=3?"✦ "+wish.score+"  ×"+wish.combo:"✦ "+wish.score,420);
+   }
+  }
+ } else if(target&&target.done){wish.queue.shift()}
+ else{ // idle drift home between routes
+  const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*1.6);pip.y+=(h.y-pip.y)*Math.min(1,dt*1.6);
  }
+ wish.stars=wish.stars.filter(s=>!s.done||s.queued);
+ wish.stars=wish.stars.filter(s=>!(s.done&&!wish.queue.includes(s)));
+ if(wish.misses>c.maxMiss)return wishEnd(false);
+ if(wish.t>=c.time)return wishEnd(wish.score>=c.goal);
+}
+function wishEnd(won){
+ const c=wish.cfg,t=wish.tier,sc=wish.score;
+ try{window.__wishDiag={score:sc,goal:c.goal,misses:wish.misses,maxMiss:c.maxMiss,elapsed:+wish.t.toFixed(1),time:+c.time.toFixed(1),endedOnMisses:wish.misses>c.maxMiss}}catch(_){}
+ SV.totals.wishes++;SV.best.wish=Math.max(SV.best.wish,sc);
+ const statLine=won?awardTier("wish",t):"";
+ journal("Wish Chase T"+t+": "+sc+" pts, "+wish.misses+" missed"+(won?" — CLEARED":"")+".");
+ const grade=!won?"—":sc>=c.goal+6?"S":sc>=c.goal+3?"A":"B";
+ endMinigame(grade,(won?"TIER "+t+" CLEARED · ":"TIER "+t+" · ")+"WISH CHASE",
+  sc+" pts · best route ×"+wish.bestCombo,
+  won?"You read the whole board and picked the right order."+statLine
+     :"Needed "+c.goal+" pts with "+c.maxMiss+" or fewer missed. Try that route again ✦",
+  won?10+t*3+wish.bestCombo:4);
+ wish=null;
 }
 
-// ------------------------------------------------------ minigame: hype
+// ------------------------------------------------- HYPE: rhythm precision
 let hype=null;
-$("actHype").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
- spendEnergy(DRILL_COST);mode="hype";updateHud();
- hype={round:0,rounds:8,r:0,speed:0,hits:0,perfects:0,streak:0,bestStreak:0,state:"wait",wait:.8,flash:0};
- say("hype drill — tap exactly when the ring hugs me ✦",2800);
-});
-function hypeTap(){
- if(!hype||hype.state!=="ring")return;
- const target=64,band=hype.round>=7?8:10,d=Math.abs(hype.r-target);
- if(d<band){
-   const perfect=d<4;
-   hype.hits++;hype.perfects+=perfect?1:0;
-   hype.streak++;hype.bestStreak=Math.max(hype.bestStreak,hype.streak);
-   hype.flash=.3;particle(pip.x,pip.y,perfect?"#ffd36f":"#b388ff",14,130);ring(pip.x,pip.y,"#b388ff",100);sfx.good();
-   if(perfect)pip.flashT=.09; // white hit-flash: earned events only
-   announce(perfect&&hype.streak>=3?"PERFECT ×"+hype.streak:perfect?"PERFECT":"GOOD",500);
+function hypeSpawn(){
+ const c=hype.cfg;
+ const types=["tap","tap"];
+ if(c.holds)types.push("hold");
+ if(c.doubles)types.push("double");
+ const type=types[Math.floor(Math.random()*types.length)];
+ hype.round++;
+ hype.rings.push({r:Math.min(W,H)*.44,type,taps:0,heldT:0,dead:false,
+  speed:(Math.min(W,H)*.44-64)/(1.55/c.speedMul)});
+}
+function hypeBand(ring){return Math.abs(ring.r-64)}
+// the hit window is defined in TIME and converted to pixels from the ring's
+// own speed — a pixel-defined band shrinks below one frame of travel at high
+// tiers and the window is quantised out of existence
+function hypeBandPx(ring){return Math.max(7,ring.speed*(hype.cfg.bandMs/1000))}
+function hypeResolve(kind){ // kind: "tap" | "release"
+ if(!hype||paused)return;
+ const c=hype.cfg;
+ let ring=null,bd=1e9;
+ for(const r of hype.rings){if(r.dead)continue;const d=hypeBand(r);if(d<bd){bd=d;ring=r}}
+ if(!ring)return;
+ const bandPx=hypeBandPx(ring);
+ const inBand=bd<bandPx;
+ // a pointerup always follows a pointerdown, so a release must never be
+ // treated as an input for tap/double rings — otherwise every single tap
+ // also resolves (and usually kills) the NEXT ring in flight
+ if(kind==="release"&&ring.type!=="hold")return;
+ if(ring.type==="hold"&&kind==="tap")return;
+ if(ring.type==="double"&&kind==="tap"&&inBand){
+  ring.taps++;
+  if(ring.taps<2){particle(pip.x,pip.y,"#b388ff",6,70);sfx.pet();return}
  }
- else{hype.streak=0;sfx.miss();announce("EARLY",400)}
- hype.state="wait";hype.wait=.55;
+ if(inBand){
+  const perfect=bd<bandPx*.42;
+  ring.dead=true;hype.hits++;if(perfect)hype.perfects++;
+  hype.streak++;hype.bestStreak=Math.max(hype.bestStreak,hype.streak);
+  particle(pip.x,pip.y,perfect?"#ffd36f":"#b388ff",14,130);ring2(pip.x,pip.y,"#b388ff",100);
+  sfx.good();
+  if(perfect)pip.flashT=.09;   // loud channel only on an earned event
+  announce(perfect&&hype.streak>=3?"PERFECT ×"+hype.streak:perfect?"PERFECT":"GOOD",480);
+ } else {
+  ring.dead=true;hype.streak=0;hype.lives--;
+  sfx.miss();announce(bd>bandPx?"EARLY":"MISS",420);
+ }
 }
 function hypeTick(dt){
- hype.flash=Math.max(0,hype.flash-dt);
- if(hype.state==="wait"){
-   hype.wait-=dt;
-   if(hype.wait<=0){
-     if(hype.round>=hype.rounds){
-       const sc=hype.hits,newBest=sc>SV.best.hype;
-       SV.totals.hypes++;SV.best.hype=Math.max(SV.best.hype,sc);
-       let statLine="";
-       if(sc>=6&&SV.support<10){SV.support++;statLine=" Pip's Supportive grew to "+SV.support+".";}
-       journal("Hype Drill: "+sc+"/8 rings ("+hype.perfects+" perfect, streak "+hype.bestStreak+")."+statLine);
-       if(newBest){particle(pip.x,pip.y,"#b388ff",34,200);sfx.levelup()}
-       endMinigame(sc>=8?"S":sc>=6?"A":sc>=4?"B":"C",(newBest?"NEW BEST ✦ · ":"")+"HYPE DRILL",
-         sc+"/8 rings · "+hype.perfects+" perfect · streak "+hype.bestStreak,"Timing is a love language, apparently."+statLine,8+sc*3+hype.bestStreak);
-       hype=null;return;
-     }
-     hype.round++;hype.state="ring";hype.r=Math.min(W,H)*.42;hype.speed=(hype.r-64)/(1.5-hype.round*.06);
-   }
- } else {
-   hype.r-=hype.speed*dt;
-   if(hype.r<48){hype.streak=0;sfx.miss();announce("MISS",400);hype.state="wait";hype.wait=.55}
+ const c=hype.cfg;
+ hype.spawnCd-=dt;
+ const alive=hype.rings.filter(r=>!r.dead).length;
+ if(hype.spawnCd<=0&&alive<c.concurrent&&hype.round<c.rounds){
+  hype.spawnCd=Math.max(.42,1.0/c.speedMul);hypeSpawn();
  }
+ for(const r of hype.rings){
+  if(r.dead)continue;
+  r.r-=r.speed*dt;
+  if(r.type==="hold"&&hype.held&&hypeBand(r)<hypeBandPx(r))r.heldT+=dt;
+  if(r.r<44){ // passed through without a resolve
+   r.dead=true;hype.streak=0;hype.lives--;sfx.miss();announce("MISS",420);
+  }
+ }
+ hype.rings=hype.rings.filter(r=>!r.dead||r.r>40);
+ const finished=hype.round>=c.rounds&&hype.rings.every(r=>r.dead);
+ if(hype.lives<=0)return hypeEnd(false);
+ if(finished)return hypeEnd(hype.hits/c.rounds>=c.accuracy);
+}
+function hypeEnd(won){
+ const c=hype.cfg,t=hype.tier,sc=hype.hits;
+ try{window.__hypeDiag={hits:sc,rounds:c.rounds,need:Math.ceil(c.accuracy*c.rounds),lives:hype.lives,spawned:hype.round,bandMs:c.bandMs}}catch(_){}
+ SV.totals.hypes++;SV.best.hype=Math.max(SV.best.hype,sc);
+ const statLine=won?awardTier("hype",t):"";
+ journal("Hype Drill T"+t+": "+sc+"/"+c.rounds+", "+hype.perfects+" perfect"+(won?" — CLEARED":"")+".");
+ const acc=sc/c.rounds;
+ const grade=!won?"—":acc>=.95?"S":acc>=.8?"A":"B";
+ endMinigame(grade,(won?"TIER "+t+" CLEARED · ":"TIER "+t+" · ")+"HYPE DRILL",
+  sc+"/"+c.rounds+" rings · "+hype.perfects+" perfect · streak "+hype.bestStreak,
+  won?"Timing is a love language, apparently."+statLine
+     :"Needed "+Math.round(c.accuracy*100)+"% with 3 lives. The rhythm is learnable ✦",
+  won?8+t*3+hype.bestStreak:4);
+ hype=null;
 }
 
-// ----------------------------------------------------- minigame: guard
+// ------------------------- GUARD: reflex + discrimination (block vs let pass)
+// Threat identity is carried by SHAPE and LUMINANCE, never hue alone — a
+// hue-only block/don't-block signal is unreadable for a real share of players.
 let guard=null;
-$("actGuard").addEventListener("click",()=>{if(mode!=="room"||SV.energy<DRILL_COST)return;
- spendEnergy(DRILL_COST);mode="guard";updateHud();
- guard={t:25,blocked:0,leaked:0,streak:0,bestStreak:0,angle:0,blips:[],spawnCd:1};
- say("guard drill — hold your shield between me and the sparks ◇",3000);
-});
-function guardPointer(p){if(guard)guard.angle=Math.atan2(p.y-pip.y,p.x-pip.x)}
+const GUARD_KINDS={
+ spark:   {block:true, c:"#ff6e8b",shape:"spike",  hp:1},
+ heavy:   {block:true, c:"#ffd36f",shape:"hex",    hp:2},
+ splitter:{block:true, c:"#b388ff",shape:"diamond",hp:1},
+ heart:   {block:false,c:"#ffc2d2",shape:"heart",  hp:1},
+};
+function guardSpawn(kind,fromA){
+ const c=guard.cfg;
+ const a=fromA!==undefined?fromA:Math.random()*6.283;
+ const d=Math.min(W,H)*.52;
+ guard.blips.push({kind,x:pip.x+Math.cos(a)*d,y:pip.y+Math.sin(a)*d,
+  sp:c.speed*(kind==="heavy"?.78:1),hp:GUARD_KINDS[kind].hp,
+  hitCd:0,done:false,split:false});
+}
+function guardPointer(p){if(guard&&!paused)guard.angle=Math.atan2(p.y-pip.y,p.x-pip.x)}
 function guardTick(dt){
- guard.t-=dt;guard.spawnCd-=dt;
+ const c=guard.cfg;
+ guard.t+=dt;guard.spawnCd-=dt;
  if(guard.spawnCd<=0){
-   guard.spawnCd=Math.max(.55,1.15-(25-guard.t)*.02);
-   const n=(guard.t<10&&Math.random()<.35)?2:1; // late-run pressure
-   for(let k=0;k<n;k++){
-     const a=Math.random()*6.28,d=Math.min(W,H)*.5;
-     guard.blips.push({x:pip.x+Math.cos(a)*d,y:pip.y+Math.sin(a)*d,sp:85+Math.random()*45});
-   }
+  guard.spawnCd=c.spawnEvery;
+  const pool=["spark","spark","spark"];
+  if(c.hearts)pool.push("heart");                // wired: hearts from T3
+  if(c.heavy)pool.push("heavy");                 // wired: heavy from T6
+  if(c.splitter)pool.push("splitter");           // wired: splitter from T9
+  guardSpawn(pool[Math.floor(Math.random()*pool.length)]);
  }
  for(const b of guard.blips){
-   const dx=pip.x-b.x,dy=pip.y-b.y,d=hyp(dx,dy)||1;
-   b.x+=dx/d*b.sp*dt;b.y+=dy/d*b.sp*dt;
-   if(d<74&&!b.done){
-     const ba=Math.atan2(b.y-pip.y,b.x-pip.x);
-     let diff=Math.abs(ba-guard.angle);diff=Math.min(diff,6.283-diff);
-     b.done=true;
-     if(diff<.75){
-       guard.blocked++;guard.streak++;guard.bestStreak=Math.max(guard.bestStreak,guard.streak);
-       particle(b.x,b.y,"#7ed8ff",10,110);ring(b.x,b.y,"#7ed8ff",44);sfx.good();
-       if(guard.streak>0&&guard.streak%8===0)announce("◇ WALL ×"+guard.streak,600);
-     }
-     else{guard.leaked++;guard.streak=0;particle(pip.x,pip.y,"#ff6e8b",8,90);sfx.miss();pip.happy=0}
+  if(b.done)continue;
+  b.hitCd=Math.max(0,b.hitCd-dt);
+  const dx=pip.x-b.x,dy=pip.y-b.y,d=hyp(dx,dy)||1;
+  b.x+=dx/d*b.sp*dt;b.y+=dy/d*b.sp*dt;
+  // splitter breaks into two sparks partway in (wired: splitter only)
+  if(b.kind==="splitter"&&!b.split&&d<Math.min(W,H)*.3){
+   b.split=true;b.done=true;
+   const base=Math.atan2(b.y-pip.y,b.x-pip.x);
+   guardSpawn("spark",base-.34);guardSpawn("spark",base+.34);
+   particle(b.x,b.y,"#b388ff",8,80);
+   continue;
+  }
+  const shielded=(()=>{
+   let diff=Math.abs(Math.atan2(b.y-pip.y,b.x-pip.x)-guard.angle);
+   diff=Math.min(diff,6.283-diff);
+   return diff<c.arc;
+  })();
+  if(d<80&&shielded&&b.hitCd<=0){
+   const k=GUARD_KINDS[b.kind];
+   if(k.block){
+    b.hp--;b.hitCd=.22;
+    if(b.hp<=0){
+     b.done=true;guard.blocks++;guard.streak++;
+     guard.bestStreak=Math.max(guard.bestStreak,guard.streak);
+     particle(b.x,b.y,"#7ed8ff",10,110);ring2(b.x,b.y,"#7ed8ff",42);sfx.good();
+     if(guard.streak&&guard.streak%8===0)announce("◇ WALL ×"+guard.streak,600);
+    } else {
+     particle(b.x,b.y,"#ffd36f",5,70);sfx.pet();  // heavy needs a second hit
+     const push=26;b.x-=dx/d*push;b.y-=dy/d*push;
+    }
+   } else { // blocked a heart — Pip wanted that
+    b.done=true;guard.heartsHit++;guard.streak=0;
+    sfx.miss();announce("THAT WAS A HEART",700);pip.happy=0;
+    particle(b.x,b.y,"#5a6070",6,60);
    }
+   continue;
+  }
+  if(d<24){ // reached Pip
+   b.done=true;
+   const k=GUARD_KINDS[b.kind];
+   if(k.block){guard.leaks++;guard.streak=0;particle(pip.x,pip.y,"#ff6e8b",8,90);sfx.miss()}
+   else{guard.heartsSaved++;pip.happy=2.4;heartPop(pip.x,pip.y-20);sfx.pet()}
+  }
  }
  guard.blips=guard.blips.filter(b=>!b.done);
- if(guard.t<=0){
-   const sc=guard.blocked,newBest=sc>SV.best.guard;
-   SV.totals.guards++;SV.best.guard=Math.max(SV.best.guard,sc);
-   let statLine="";
-   if(sc>=12&&guard.leaked<=4&&SV.compassion<10){SV.compassion++;statLine=" Pip's Compassionate grew to "+SV.compassion+".";}
-   journal("Guard Drill: deflected "+sc+", leaked "+guard.leaked+" (streak "+guard.bestStreak+")."+statLine);
-   if(newBest){particle(pip.x,pip.y,"#7ed8ff",34,200);sfx.levelup()}
-   endMinigame(sc>=18&&guard.leaked<=2?"S":sc>=12?"A":sc>=7?"B":"C",(newBest?"NEW BEST ✦ · ":"")+"GUARD DRILL",
-     sc+" deflected · "+guard.leaked+" through · streak "+guard.bestStreak,"Pip watched you stand guard the whole time."+statLine,8+sc*2+guard.bestStreak);
-   guard=null;
- }
+ if(guard.leaks>c.maxLeak)return guardEnd(false);
+ if(guard.t>=c.time)return guardEnd(guard.blocks>=c.needBlocks&&guard.leaks<=c.maxLeak&&guard.heartsHit<=2);
+}
+function guardEnd(won){
+ const c=guard.cfg,t=guard.tier;
+ SV.totals.guards++;SV.best.guard=Math.max(SV.best.guard,guard.blocks);
+ const statLine=won?awardTier("guard",t):"";
+ journal("Guard Drill T"+t+": "+guard.blocks+" blocked, "+guard.leaks+" through, "+guard.heartsHit+" hearts hit"+(won?" — CLEARED":"")+".");
+ const grade=!won?"—":guard.leaks===0&&guard.heartsHit===0?"S":guard.leaks<=1?"A":"B";
+ endMinigame(grade,(won?"TIER "+t+" CLEARED · ":"TIER "+t+" · ")+"GUARD DRILL",
+  guard.blocks+" blocked · "+guard.leaks+" through"+(c.hearts?" · "+guard.heartsSaved+" hearts let in":""),
+  won?"You stood guard and still knew what to let through."+statLine
+     :"Needed "+c.needBlocks+" blocks, "+c.maxLeak+" or fewer through"+(c.hearts?", and hearts must reach Pip":"")+" ✦",
+  won?8+t*3+guard.bestStreak:4);
+ guard=null;
 }
 
 function endMinigame(grade,kicker,title,text,xp){
@@ -761,6 +1008,8 @@ function endMinigame(grade,kicker,title,text,xp){
  persist();updateHud();
 }
 $("closeResult").addEventListener("click",()=>{$("result").classList.add("hidden");updateHud()});
+$("btnResume").addEventListener("click",togglePause);
+$("btnQuitDrill").addEventListener("click",abandonDrill);
 
 // ---------------------------------------------------------------- log
 $("actLog").addEventListener("click",()=>{
@@ -827,18 +1076,22 @@ $("begin").addEventListener("click",()=>{
 if(SV.welcomed){$("welcome").querySelector(".logo").innerHTML="PIP'S<br>ROOM";$("begin").textContent="I'm home ✦"}
 
 // keyboard
+document.addEventListener("keyup",e=>{
+ if(e.key===" "&&mode==="hype"&&hype){hype.held=false;hypeResolve("release")}
+});
 document.addEventListener("keydown",e=>{
- if(e.key===" "&&mode==="hype"){hypeTap();e.preventDefault()}
+ if(e.key===" "&&mode==="hype"){if(hype)hype.held=true;hypeResolve("tap");e.preventDefault()}
  if((e.key===" "||e.key==="Enter")&&mode==="wish"&&wish){
    let best=null,bd=1e9;
-   for(const st of wish.stars){if(st.claimed)continue;const d=hyp(st.x-pip.x,st.y-pip.y);if(d<bd){bd=d;best=st}}
-   if(best){best.claimed=true;pip.chase={x:best.x,y:best.y,kind:"wish",star:best}}
+   for(const st of wish.stars){if(st.queued||st.done)continue;const d=hyp(st.x-pip.x,st.y-pip.y);if(d<bd){bd=d;best=st}}
+   if(best)wishTap({x:best.x,y:best.y});
    e.preventDefault();
  }
  if(mode==="guard"&&guard&&(e.key==="ArrowLeft"||e.key==="a"))
-   {guard.angle-=.4;e.preventDefault()}
+   {guard.angle-=.32;e.preventDefault()}
  if(mode==="guard"&&guard&&(e.key==="ArrowRight"||e.key==="d"))
-   {guard.angle+=.4;e.preventDefault()}
+   {guard.angle+=.32;e.preventDefault()}
+ if(e.key==="Escape"&&mode!=="room"){togglePause();e.preventDefault();return}
  if(e.key.toLowerCase()==="f")$("actFeed").click();
  if(e.key==="Escape"){$("log").classList.add("hidden");$("result").classList.add("hidden");$("shop").classList.add("hidden");$("settings").classList.add("hidden")}
 });
@@ -920,7 +1173,12 @@ function frame(now){
    if(petting){pip.tx=pip.x;pip.ty=pip.y}
    pip.x+=(pip.tx-pip.x)*Math.min(1,dt*2.2);
    pip.y+=(pip.ty-pip.y)*Math.min(1,dt*2.2);
- } else {const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*3);pip.y+=(h.y-pip.y)*Math.min(1,dt*3)}
+ } else if(mode!=="wish"){
+   // hype/guard keep Pip centred; WISH must not be pulled home — the drill
+   // owns Pip's position there, and two writers on one variable means the
+   // drill's routing silently loses every frame.
+   const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*3);pip.y+=(h.y-pip.y)*Math.min(1,dt*3);
+ }
 
  // toy ball physics — 2 sub-steps so a fast fling can't tunnel through Pip
  if(!ball.held&&mode==="room"){
@@ -949,9 +1207,11 @@ function frame(now){
    const bsp=hyp(ball.vx,ball.vy);
    if(!pip.sleeping&&!pip.chase&&!petting&&bsp>120){pip.tx=ball.x;pip.ty=ball.y;pip.wanderCd=Math.max(pip.wanderCd,.8)}
  }
- if(mode==="wish"&&wish)wishTick(dt);
- if(mode==="hype"&&hype)hypeTick(dt);
- if(mode==="guard"&&guard)guardTick(dt);
+ if(!paused){
+   if(mode==="wish"&&wish)wishTick(dt);
+   if(mode==="hype"&&hype)hypeTick(dt);
+   if(mode==="guard"&&guard)guardTick(dt);
+ }
 
  // fx
  for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=(p.heart?-8:130)*dt;p.life-=dt}
@@ -982,37 +1242,103 @@ function draw(){
  g.addColorStop(0,"#7ed8ff10");g.addColorStop(1,"#7ed8ff00");
  X.fillStyle=g;X.fillRect(0,0,W,H);
 
+ // ------------------------------------------------------- drill rendering
  if(mode==="wish"&&wish){
-   X.fillStyle="#ffd36f";X.font="700 17px Inter,system-ui";X.textAlign="center";
-   X.fillText("✦ "+wish.score+"   ·   "+Math.max(0,wish.t).toFixed(1)+"s",W/2,H*.14);
+   const c=wish.cfg;
+   X.textAlign="center";
+   X.fillStyle="#ffd36f";X.font="700 17px Inter,system-ui";
+   X.fillText("✦ "+wish.score+"/"+c.goal+"   ·   "+Math.max(0,c.time-wish.t).toFixed(1)+"s",W/2,H*.11);
+   X.fillStyle=wish.misses>c.maxMiss-2?"#ff6e8b":"#9aa3b5";X.font="12px Inter,system-ui";
+   X.fillText("missed "+wish.misses+"/"+c.maxMiss+"  ·  tap stars to queue the route ("+wish.queue.length+"/"+c.queueMax+")",W/2,H*.11+20);
+   // the queued route, drawn as the path Pip will actually fly
+   if(wish.queue.length){
+     X.strokeStyle="#ffd36f66";X.lineWidth=1.5;X.setLineDash([5,5]);
+     X.beginPath();X.moveTo(pip.x,pip.y);
+     for(const s of wish.queue)X.lineTo(s.x,s.y);
+     X.stroke();X.setLineDash([]);
+   }
    for(const s of wish.stars){
-     X.save();X.translate(s.x,s.y);X.rotate(performance.now()*.002);
-     X.fillStyle=s.claimed?"#fff0a8":"#ffd36f";
-     X.globalAlpha=clamp(s.life,0,1);
+     if(s.done)continue;
+     const k=WISH_KINDS[s.kind];
+     X.save();X.translate(s.x,s.y);X.rotate(performance.now()*.0016);
+     X.globalAlpha=clamp(s.life/Math.max(.001,s.maxLife)*1.4,.25,1);
+     X.fillStyle=k.c;
      X.beginPath();
-     for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2===0?9:4;i?X.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):X.moveTo(Math.cos(a)*rr,Math.sin(a)*rr)}
-     X.closePath();X.fill();X.restore();
+     const n=k.spikes,rr=s.kind==="heavy"?12:10;
+     for(let i=0;i<n*2;i++){
+       const a=-Math.PI/2+i*Math.PI/n,r2=i%2===0?rr:rr*.44;
+       i?X.lineTo(Math.cos(a)*r2,Math.sin(a)*r2):X.moveTo(Math.cos(a)*r2,Math.sin(a)*r2);
+     }
+     X.closePath();X.fill();
+     if(s.queued){X.strokeStyle="#ffffff";X.lineWidth=2;X.globalAlpha=.9;X.beginPath();X.arc(0,0,rr+6,0,6.29);X.stroke()}
+     X.restore();
    }
    X.globalAlpha=1;X.textAlign="start";
  }
  if(mode==="hype"&&hype){
-   X.fillStyle="#b388ff";X.font="700 17px Inter,system-ui";X.textAlign="center";
-   X.fillText("ROUND "+hype.round+"/8 · "+hype.hits+" HIT",W/2,H*.14);X.textAlign="start";
-   if(hype.state==="ring"){
-     X.strokeStyle=Math.abs(hype.r-64)<10?"#ffd36f":"#b388ff";X.lineWidth=3;
-     X.beginPath();X.arc(pip.x,pip.y,hype.r,0,6.29);X.stroke();
-     X.globalAlpha=.35;X.strokeStyle="#ffffff";X.lineWidth=1;
-     X.beginPath();X.arc(pip.x,pip.y,64,0,6.29);X.stroke();X.globalAlpha=1;
+   const c=hype.cfg;
+   X.textAlign="center";
+   X.fillStyle="#b388ff";X.font="700 17px Inter,system-ui";
+   X.fillText("ROUND "+Math.min(hype.round,c.rounds)+"/"+c.rounds+"  ·  "+hype.hits+" hit",W/2,H*.11);
+   X.fillStyle="#9aa3b5";X.font="12px Inter,system-ui";
+   X.fillText("♥".repeat(Math.max(0,hype.lives))+"   tap when a ring hugs Pip",W/2,H*.11+20);
+   // the target band, always visible so the timing is learnable
+   X.globalAlpha=.3;X.strokeStyle="#ffffff";X.lineWidth=1;
+   X.beginPath();X.arc(pip.x,pip.y,64,0,6.29);X.stroke();X.globalAlpha=1;
+   for(const r of hype.rings){
+     if(r.dead)continue;
+     const near=hypeBand(r)<hypeBandPx(r);
+     X.strokeStyle=near?"#ffd36f":r.type==="hold"?"#7be0ae":r.type==="double"?"#ff9fba":"#b388ff";
+     X.lineWidth=r.type==="hold"?5:3;
+     X.beginPath();X.arc(pip.x,pip.y,Math.max(4,r.r),0,6.29);X.stroke();
+     if(r.type!=="tap"){
+       X.fillStyle=X.strokeStyle;X.font="700 11px Inter,system-ui";
+       X.fillText(r.type==="hold"?"HOLD":"×"+(2-r.taps),pip.x,pip.y-Math.max(4,r.r)-7);
+     }
    }
+   X.textAlign="start";
  }
  if(mode==="guard"&&guard){
-   X.fillStyle="#7ed8ff";X.font="700 17px Inter,system-ui";X.textAlign="center";
-   X.fillText("◇ "+guard.blocked+" · "+Math.max(0,guard.t).toFixed(1)+"s",W/2,H*.14);X.textAlign="start";
-   for(const b of guard.blips){X.fillStyle="#ff6e8b";X.beginPath();X.arc(b.x,b.y,5,0,6.29);X.fill()}
-   X.strokeStyle="#7ed8ff";X.lineWidth=5;X.lineCap="round";
-   X.beginPath();X.arc(pip.x,pip.y,74,guard.angle-.75,guard.angle+.75);X.stroke();X.lineCap="butt";
+   const c=guard.cfg;
+   X.textAlign="center";
+   X.fillStyle="#7ed8ff";X.font="700 17px Inter,system-ui";
+   X.fillText("◇ "+guard.blocks+"/"+c.needBlocks+"   ·   "+Math.max(0,c.time-guard.t).toFixed(1)+"s",W/2,H*.11);
+   X.fillStyle=guard.leaks>=c.maxLeak?"#ff6e8b":"#9aa3b5";X.font="12px Inter,system-ui";
+   X.fillText("through "+guard.leaks+"/"+c.maxLeak+(c.hearts?"   ·   let ♥ hearts reach Pip":""),W/2,H*.11+20);
+   // shield arc
+   X.strokeStyle="#7ed8ff";X.lineWidth=6;X.lineCap="round";
+   X.beginPath();X.arc(pip.x,pip.y,74,guard.angle-c.arc,guard.angle+c.arc);X.stroke();
+   X.lineCap="butt";X.lineWidth=1;
+   for(const b of guard.blips){
+     if(b.done)continue;
+     const k=GUARD_KINDS[b.kind];
+     X.save();X.translate(b.x,b.y);
+     // SHAPE carries the block/don't-block decision; hue and brightness only
+     // reinforce it (hue-alone is unreadable for a real share of players)
+     X.fillStyle=k.c;
+     if(k.shape==="heart"){
+       X.globalAlpha=1;X.font="900 20px system-ui";X.textAlign="center";
+       X.fillText("♥",0,7);
+       X.strokeStyle="#ffffff";X.lineWidth=1.5;X.globalAlpha=.75;
+       X.beginPath();X.arc(0,0,15,0,6.29);X.stroke();   // halo = "let it through"
+     } else if(k.shape==="spike"){
+       X.beginPath();X.moveTo(0,-9);X.lineTo(7,7);X.lineTo(-7,7);X.closePath();X.fill();
+     } else if(k.shape==="hex"){
+       X.beginPath();
+       for(let i=0;i<6;i++){const a=i*Math.PI/3,r2=11;i?X.lineTo(Math.cos(a)*r2,Math.sin(a)*r2):X.moveTo(Math.cos(a)*r2,Math.sin(a)*r2)}
+       X.closePath();X.fill();
+       X.fillStyle="#000000";X.globalAlpha=.55;X.font="700 10px Inter,system-ui";X.textAlign="center";
+       X.fillText(String(b.hp),0,4);
+     } else {
+       X.beginPath();X.moveTo(0,-10);X.lineTo(9,0);X.lineTo(0,10);X.lineTo(-9,0);X.closePath();X.fill();
+     }
+     X.restore();
+   }
+   X.globalAlpha=1;X.textAlign="start";
  }
-
+ if(paused){
+   X.fillStyle="#030509cc";X.fillRect(0,0,W,H);
+ }
  // snack in flight
  if(pip.chase&&pip.chase.kind==="snack"){X.fillStyle="#7be0ae";X.font="16px system-ui";X.textAlign="center";X.fillText("✧",pip.chase.x,pip.chase.y+5);X.textAlign="start"}
 
@@ -1059,6 +1385,9 @@ function draw(){
  X.globalAlpha=1;
 }
 
+window.__pip={get mode(){return mode},get wish(){return wish},get hype(){return hype},
+ get guard(){return guard},get sv(){return SV},get pip(){return pip},
+ tiers:{wish:wishTier,hype:hypeTier,guard:guardTier},start:startDrill};
 updateHud();
 applyPrefs();
 requestAnimationFrame(frame);
