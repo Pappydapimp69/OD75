@@ -146,7 +146,7 @@ function resize(){
  C.style.width=W+"px";C.style.height=H+"px";
  X.setTransform(DPR,0,0,DPR,0,0);
 }
-window.addEventListener("resize",resize);resize();
+window.addEventListener("resize",()=>{resize();if(typeof ball!=="undefined"&&!ball.held&&hyp(ball.vx,ball.vy)<5)ballHome()});resize();
 
 // ------------------------------------------------------------ storage
 // Every access guarded: sandboxed hosts can throw on touch, not just parse.
@@ -296,11 +296,14 @@ function journal(txt){
 const pip={x:0,y:0,tx:0,ty:0,angle:0,happy:0,blink:0,scale:1,
  chase:null,eating:0,wanderCd:2,sleeping:false,zzCd:0};
 function isNight(){const h=new Date().getHours();return h>=21||h<7}
+// toy ball: flingable, bounces, Pip chases and bats it back
+const ball={x:0,y:0,vx:0,vy:0,r:11,held:false,lastBat:0,lastXp:0};
+function ballHome(){ball.x=W*.28;ball.y=H*.74;ball.vx=0;ball.vy=0}
 function sleepNow(){if(pip.sleeping)return;pip.sleeping=true;pip.chase=null;say("getting sleepy... don't go far, okay","",0)||say("getting sleepy... don't go far, okay",2600);updateHud()}
 function wakeNow(gentle){if(!pip.sleeping)return;pip.sleeping=false;pip.blink=.3;
  say(gentle?"mmh... oh!! you're here ✦":"okay!! I'm up, I'm up ✦",2800);updateHud()}
 function pipHome(){return{x:W*.5,y:H*.47}}
-pip.x=pipHome().x;pip.y=pipHome().y;pip.tx=pip.x;pip.ty=pip.y;
+pip.x=pipHome().x;pip.y=pipHome().y;pip.tx=pip.x;pip.ty=pip.y;ballHome();
 
 function drawPip(px,py,r){
  X.save();X.translate(px,py);
@@ -390,7 +393,8 @@ let petting=false,petAccum=0;
 function pointerPos(e){const r=C.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 C.addEventListener("pointerdown",e=>{
  const p=pointerPos(e);
- if(mode==="room"&&hyp(p.x-pip.x,p.y-pip.y)<58){
+ if(mode==="room"&&hyp(p.x-ball.x,p.y-ball.y)<30){ball.held=true;ball.vx=0;ball.vy=0;C.setPointerCapture(e.pointerId)}
+ else if(mode==="room"&&hyp(p.x-pip.x,p.y-pip.y)<58){
    if(pip.sleeping){wakeNow(true);return}
    petting=true;C.setPointerCapture(e.pointerId)}
  if(mode==="wish")wishTap(p);
@@ -399,6 +403,7 @@ C.addEventListener("pointerdown",e=>{
 });
 C.addEventListener("pointermove",e=>{
  const p=pointerPos(e);
+ if(ball.held){ball.vx=(p.x-ball.x)*16;ball.vy=(p.y-ball.y)*16;ball.x=p.x;ball.y=p.y}
  if(petting&&mode==="room"){
    petAccum+=1;
    if(petAccum%7===0){heartPop(pip.x+(Math.random()-.5)*40,pip.y-20);sfx.pet();pip.happy=2.5;SV.totals.pets++;gainXP(1,true)}
@@ -406,7 +411,7 @@ C.addEventListener("pointermove",e=>{
  if(mode==="guard")guardPointer(p);
  pointer=p;
 });
-C.addEventListener("pointerup",()=>{if(petting){petting=false;persist();say(petLine(),2600)}});
+C.addEventListener("pointerup",()=>{ball.held=false;if(petting){petting=false;persist();say(petLine(),2600)}});
 let pointer={x:0,y:0};
 function petLine(){
  const l=["hehe — again?","that's the spot ✦","I love hanging out with you","best. day.","you always find me"];
@@ -621,6 +626,33 @@ function frame(now){
    pip.y+=(pip.ty-pip.y)*Math.min(1,dt*2.2);
  } else {const h=pipHome();pip.x+=(h.x-pip.x)*Math.min(1,dt*3);pip.y+=(h.y-pip.y)*Math.min(1,dt*3)}
 
+ // toy ball physics — 2 sub-steps so a fast fling can't tunnel through Pip
+ if(!ball.held&&mode==="room"){
+   const cap=900,sp0=hyp(ball.vx,ball.vy);
+   if(sp0>cap){ball.vx*=cap/sp0;ball.vy*=cap/sp0}
+   for(let sub=0;sub<2;sub++){
+     const h=dt/2;
+     ball.vy+=220*h;ball.vx*=Math.pow(.45,h);ball.vy*=Math.pow(.45,h);
+     ball.x+=ball.vx*h;ball.y+=ball.vy*h;
+     const floor=H*.88;
+     if(ball.y>floor){ball.y=floor;ball.vy=-Math.abs(ball.vy)*.62;if(Math.abs(ball.vy)<26)ball.vy=0}
+     if(ball.x<ball.r+4){ball.x=ball.r+4;ball.vx=Math.abs(ball.vx)*.7}
+     if(ball.x>W-ball.r-4){ball.x=W-ball.r-4;ball.vx=-Math.abs(ball.vx)*.7}
+     if(ball.y<ball.r+70){ball.y=ball.r+70;ball.vy=Math.abs(ball.vy)*.7}
+     const d=hyp(ball.x-pip.x,ball.y-pip.y);
+     if(d<ball.r+20&&performance.now()-ball.lastBat>350){
+       ball.lastBat=performance.now();
+       const ux=(ball.x-pip.x)/(d||1),uy=(ball.y-pip.y)/(d||1);
+       const kick=260+Math.random()*180;
+       ball.vx=ux*kick;ball.vy=uy*kick-90;
+       pip.happy=2.4;sfx.star();particle(ball.x,ball.y,"#7ed8ff",8,90);
+       if(performance.now()-ball.lastXp>6000){ball.lastXp=performance.now();gainXP(2,true);heartPop(pip.x,pip.y-24)}
+     }
+   }
+   // pip chases a lively ball
+   const bsp=hyp(ball.vx,ball.vy);
+   if(!pip.sleeping&&!pip.chase&&!petting&&bsp>120){pip.tx=ball.x;pip.ty=ball.y;pip.wanderCd=Math.max(pip.wanderCd,.8)}
+ }
  if(mode==="wish"&&wish)wishTick(dt);
  if(mode==="hype"&&hype)hypeTick(dt);
  if(mode==="guard"&&guard)guardTick(dt);
@@ -688,6 +720,11 @@ function draw(){
  // snack in flight
  if(pip.chase&&pip.chase.kind==="snack"){X.fillStyle="#7be0ae";X.font="16px system-ui";X.textAlign="center";X.fillText("✧",pip.chase.x,pip.chase.y+5);X.textAlign="start"}
 
+ if(mode==="room"){
+   X.fillStyle="#163a4e";X.beginPath();X.arc(ball.x,ball.y,ball.r,0,6.29);X.fill();
+   X.strokeStyle="#7ed8ff";X.lineWidth=1.5;X.beginPath();X.arc(ball.x,ball.y,ball.r,0,6.29);X.stroke();
+   X.fillStyle="#9ae6ff";X.font="11px system-ui";X.textAlign="center";X.fillText("✦",ball.x,ball.y+4);X.textAlign="start";
+ }
  const bob=Math.sin(performance.now()*.0022)*5;
  drawPip(pip.x,pip.y+bob,26+Math.min(8,(SV.bondLevel-1)*1.6));
 
