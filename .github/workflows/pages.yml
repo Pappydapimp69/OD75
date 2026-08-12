@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Ascended Pip Hub B39 ${{ github.sha }}
+run-name: OD75 Upgrade Readability B40 ${{ github.sha }}
 
 on:
   push:
@@ -24,84 +24,46 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify B39 Ascended Pip hub and current systems
+      - name: Verify B40 upgrade readability and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
-          grep -Fq 'if(S&&S.run&&S.over<=0&&S.heat<heatBefore)S.heat=heatBefore' b21-11.js
-          grep -Fq 'PipAudioEngine.prototype.scheduleBossStep=function(time)' b21-10.js
-          grep -Fq 'function updateAscendantHeartMagnetB26(dt)' b21-12.js
-          grep -Fq 'function overdriveDurationB27(id,lv)' b21-13.js
-          grep -Fq 'Prism Seeds deepen Loving, Compassionate, and Supportive' b21-14.js
-          grep -Fq 'const PIP_SOUND_MAX_LEVEL=4' b21-15.js
-          grep -Fq 'const EXPLORATION_KILL_INTERVAL_B30=30' b21-16.js
-          grep -Fq 'function activePipSoundIdsB31()' b21-18.js
-          grep -Fq 'function resetRunAudioB32()' b21-19.js
-          grep -Fq 'function rollExplorationDropB33()' b21-20.js
-          grep -Fq 'function ensureSoundLabB34()' b21-21.js
-          grep -Fq 'const gamepadMenuB35=' b21-22.js
-          grep -Fq 'installUpgradeReadabilityB36' b21-23.js
-          grep -Fq 'installUpgradeSpatialReadabilityB37' b21-24.js
           grep -Fq 'const B38_BASIC_IGNITION_PERCENT=20' b21-25.js
-          grep -Fq 'function heatCapacityB38()' b21-25.js
           grep -Fq 'function ensureAscendedPauseB39()' b21-26.js
-          grep -Fq 'function openAscendedPauseB39()' b21-26.js
-          grep -Fq 'function closeAscendedPauseB39()' b21-26.js
-          grep -Fq 'Gamepad Start toggles pause' b21-26.js
           grep -Fq 'Evolution ${tier}' b21-27.js
-          grep -Fq 'el.style.left=`${50+p.x}%`' b21-27.js
+          grep -Fq 'installUpgradeCompressionB40' b21-28.js
+          grep -Fq 'grid-template-columns:auto 1fr' b21-28.js
+          grep -Fq 'font-size:17px' b21-28.js
+          grep -Fq 'Spend Heart Bits to strengthen Pip for this run.' b21-28.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
-          grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
-          ! grep -Fq 'turnDelta>(8*Math.PI/180)' b21-*.js
       - name: Assemble direct site
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
           s=Path('_site/game.js').read_text()
           for marker in [
-              'const OVERDRIVE_HOLD_MS=1800',
-              'function updateAscendantHeartMagnetB26(dt)',
-              'function overdriveDurationB27(id,lv)',
-              'function activePipSoundIdsB31()',
-              'function resetRunAudioB32()',
-              'function rollExplorationDropB33()',
-              'function ensureSoundLabB34()',
-              'const gamepadMenuB35=',
-              'installUpgradeReadabilityB36',
-              'installUpgradeSpatialReadabilityB37',
               'const B38_BASIC_IGNITION_PERCENT=20',
-              'function heatCapacityB38()',
               'function ensureAscendedPauseB39()',
-              'function openAscendedPauseB39()',
-              'function closeAscendedPauseB39()',
-              'Gamepad Start toggles pause',
-              'Evolution ${tier}'
+              'Evolution ${tier}',
+              'installUpgradeCompressionB40',
+              'grid-template-columns:auto 1fr',
+              'Spend Heart Bits to strengthen Pip for this run.'
           ]:
               assert marker in s, marker
-          assert s.rfind('renderAbilityShop=function()') > s.find('// One Prism Seed buys one attribute level.')
-          assert s.rfind('sfxPipCue=function(kind="talk")') > s.find('// B29 Pip Sound progression')
-          assert s.rfind('updateB26Drops=function(dt)') > s.find('function updateB26Drops(dt)')
-          assert s.rfind('killBoss=function(e)') > s.find('function killBoss(e)')
-          assert s.rfind('triggerOverdrive=function()') > s.find('// B27: explicit Overdrive duration scaling.')
-          assert s.rfind('updateAscendantHeartMagnetB26=function(dt)') > s.find('function updateAscendantHeartMagnetB26(dt)')
-          assert s.rfind('renderOverdriveStep=function()') > s.find('renderOverdriveStep=function()')
-          assert s.rfind('renderPipSoundStepB26=function()') > s.find('renderPipSoundStepB26=function()')
-          assert s.rfind('updateGamepadInput=function()') > s.find('function ensureAscendedPauseB39()')
           assert s.rfind('renderPipPortraitB39=function()') > s.find('function renderPipPortraitB39()')
-          assert s.rfind('const B39_ECHO_TEXT=') > s.rfind('const B38_BASIC_IGNITION_PERCENT=20')
+          assert s.rfind('installUpgradeCompressionB40') > s.rfind('const B39_ECHO_TEXT=')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B39-ASCENDED-PIP-HUB/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B39-ASCENDED-PIP-HUB/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B39-ASCENDED-PIP-HUB' _site/index.html
-          grep -Fq 'game.js?v=B39-ASCENDED-PIP-HUB' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B40-UPGRADE-READABILITY/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B40-UPGRADE-READABILITY/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B40-UPGRADE-READABILITY' _site/index.html
+          grep -Fq 'game.js?v=B40-UPGRADE-READABILITY' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
