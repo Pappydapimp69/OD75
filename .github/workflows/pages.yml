@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Spatial Readability B37 ${{ github.sha }}
+run-name: OD75 Overdrive Synthesis B38 ${{ github.sha }}
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify spatial readability and current systems
+      - name: Verify B38 Overdrive synthesis and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const OVERDRIVE_HOLD_MS=1800' b21-09.js
@@ -45,10 +45,12 @@ jobs:
           grep -Fq 'const gamepadMenuB35=' b21-22.js
           grep -Fq 'installUpgradeReadabilityB36' b21-23.js
           grep -Fq 'installUpgradeSpatialReadabilityB37' b21-24.js
-          grep -Fq 'width:min(860px,97vw)' b21-24.js
-          grep -Fq '#stageUp .overgrid{grid-template-columns:repeat(3,minmax(0,1fr))}' b21-24.js
-          grep -Fq '#stageUp #pipSoundGrid{grid-template-columns:repeat(3,minmax(0,1fr))}' b21-24.js
-          grep -Fq '#stageUp #pipSoundGrid,#stageUp .overgrid{grid-template-columns:repeat(2,minmax(0,1fr))}' b21-24.js
+          grep -Fq 'const B38_BASIC_IGNITION_PERCENT=20' b21-25.js
+          grep -Fq 'const B38_DRAIN_ENERGY_PER_SEC=' b21-25.js
+          grep -Fq 'function heatCapacityB38()' b21-25.js
+          grep -Fq 'SYNTHESIS · ${echoes}/5 Echoes' b21-25.js
+          grep -Fq 'Sound Resonance inside Pip Ascendant' b21-25.js
+          grep -Fq 'updateAscendantHeartMagnetB26=function(dt)' b21-25.js
           grep -Fq 'dtap<=660' b21-*.js
           grep -Fq 'touchLike&&joy.active&&e.pointerId!==joy.id' b21-*.js
           grep -Fq 'turnRate=(720-(400*speedRatio))*Math.PI/180' b21-*.js
@@ -57,7 +59,7 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -73,10 +75,11 @@ jobs:
               'const gamepadMenuB35=',
               'installUpgradeReadabilityB36',
               'installUpgradeSpatialReadabilityB37',
-              'width:min(860px,97vw)',
-              '#stageUp .overgrid{grid-template-columns:repeat(3,minmax(0,1fr))}',
-              '#stageUp #pipSoundGrid{grid-template-columns:repeat(3,minmax(0,1fr))}',
-              '#stageUp #pipSoundGrid,#stageUp .overgrid{grid-template-columns:repeat(2,minmax(0,1fr))}'
+              'const B38_BASIC_IGNITION_PERCENT=20',
+              'function heatCapacityB38()',
+              'const B38_DRAIN_ENERGY_PER_SEC=',
+              'SYNTHESIS · ${echoes}/5 Echoes',
+              'Sound Resonance inside Pip Ascendant'
           ]:
               assert marker in s, marker
           assert s.rfind('renderAbilityShop=function()') > s.find('// One Prism Seed buys one attribute level.')
@@ -84,15 +87,18 @@ jobs:
           assert s.rfind('updateB26Drops=function(dt)') > s.find('function updateB26Drops(dt)')
           assert s.rfind('killBoss=function(e)') > s.find('function killBoss(e)')
           assert s.rfind('triggerOverdrive=function()') > s.find('function triggerOverdrive()')
-          assert s.rfind('rollExplorationDropB30=function()') > s.find('function rollExplorationDropB30()')
-          assert s.rfind('openAudioStep=function()') > s.find('function openAudioStep()')
-          assert s.rfind('updateGamepadInput=function()') > s.find('function updateGamepadInput()')
-          assert s.rfind('installUpgradeSpatialReadabilityB37') > s.rfind('installUpgradeReadabilityB36')
+          assert s.rfind('triggerOverdrive=function()') > s.find('// B27: explicit Overdrive duration scaling.')
+          assert s.rfind('updateAscendantHeartMagnetB26=function(dt)') > s.find('function updateAscendantHeartMagnetB26(dt)')
+          assert s.rfind('renderOverdriveStep=function()') > s.find('renderOverdriveStep=function()')
+          assert s.rfind('renderPipSoundStepB26=function()') > s.find('renderPipSoundStepB26=function()')
+          assert s.rfind('updateGamepadInput=function()') > s.find('const gamepadMenuB35=')
+          assert s.rfind('updateUI=function()') > s.find('function updateUI()')
+          assert s.rfind('const B38_BASIC_IGNITION_PERCENT=20') > s.rfind('installUpgradeSpatialReadabilityB37')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B37-SPATIAL-READABILITY/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B37-SPATIAL-READABILITY/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B37-SPATIAL-READABILITY' _site/index.html
-          grep -Fq 'game.js?v=B37-SPATIAL-READABILITY' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B38-OVERDRIVE-SYNTHESIS/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B38-OVERDRIVE-SYNTHESIS/g' _site/index.html
+          grep -Fq 'OD75-2026-08-12-B38-OVERDRIVE-SYNTHESIS' _site/index.html
+          grep -Fq 'game.js?v=B38-OVERDRIVE-SYNTHESIS' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
