@@ -3,12 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>OVERDRIVE 75 · OD75-2026-08-12-B18</title>
-<link rel="stylesheet" href="styles.css?v=B18">
+<title>OVERDRIVE 75 · OD75-2026-08-12-B19-HYBRID</title>
+<link rel="stylesheet" href="styles.css?v=B19-HYBRID">
+<style>
+#joyViz{position:fixed;z-index:14;width:110px;height:110px;border:1px solid #9ae6ff42;border-radius:50%;background:#0a25321f;box-shadow:inset 0 0 20px #7ed8ff12,0 0 20px #0004;pointer-events:none;display:none;transform:translate(-50%,-50%);backdrop-filter:blur(1px)}
+#joyViz.on{display:block}
+#joyViz i{position:absolute;left:50%;top:50%;width:34px;height:34px;border-radius:50%;background:#9ae6ff55;border:1px solid #c9f3ff88;box-shadow:0 0 14px #7ed8ff33;transform:translate(-50%,-50%);will-change:transform}
+</style>
 </head>
 <body>
 <div id="app">
 <canvas id="c"></canvas>
+<div id="joyViz" aria-hidden="true"><i></i></div>
 
 <div class="top">
   <span id="time" class="pill">75.0</span>
@@ -46,9 +52,9 @@
     <div class="logo">OVER<br>DRIVE 75</div>
     <p><b>Goal:</b> clear each wave, collect Heart Bits, and grow Pip.</p>
     <div class="rules">
-      <div class="rule"><b>MOVE</b><span class="small">Touch · WASD/arrows · left stick/D-pad</span></div>
+      <div class="rule"><b>MOVE</b><span class="small">Touch the lower-left area to spawn a compact floating stick. Small turns keep momentum; harder turns scrub speed smoothly. WASD/arrows and gamepad also work.</span></div>
       <div class="rule"><b>AUTO-FIRE</b><span class="small">Aims and shoots for you</span></div>
-      <div class="rule"><b>DASH</b><span class="small">On-screen button · Space · A/Cross</span></div>
+      <div class="rule"><b>DASH</b><span class="small">Double-tap or double-click anywhere to dash toward that point. Space, DASH, or gamepad A/B/X/RB also work.</span></div>
     </div>
     <button id="begin" class="startBtn">Start run · A/Cross</button>
   </div>
@@ -130,9 +136,10 @@
 </div>
 </div>
 
-<script src="game-1.js?v=B18"></script>
-<script src="game-2.js?v=B18"></script>
-<script src="game-3.js?v=B18"></script>
-<script src="game-4.js?v=B18"></script>
-<div id="od75BuildStamp" style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff66;pointer-events:none">OD75-2026-08-12-B18</div></body>
+<script src="game-1.js?v=B19-HYBRID"></script>
+<script src="game-2.js?v=B19-HYBRID"></script>
+<script src="game-3.js?v=B19-HYBRID"></script>
+<script src="game-4.js?v=B19-HYBRID"></script>
+
+<div id="od75BuildStamp" style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff66;pointer-events:none">OD75-2026-08-12-B19-HYBRID</div></body>
 </html>
