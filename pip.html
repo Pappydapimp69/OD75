@@ -33,7 +33,14 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 #actWish{border-color:#ffd36f66}#actWish:not(:disabled){box-shadow:0 0 0 5px #ffd36f0d}
 #actHype{border-color:#b388ff66}#actHype:not(:disabled){box-shadow:0 0 0 5px #b388ff0d}
 #actGuard{border-color:#7ed8ff66}#actGuard:not(:disabled){box-shadow:0 0 0 5px #7ed8ff0d}
+#actShop{border-color:#ffd36f55}
 #actLog{border-color:#ff6e8b55}
+.upgrade{border:1px solid var(--line);background:#ffffff06;border-radius:14px;padding:12px;text-align:left;cursor:pointer}
+.upgrade:disabled{cursor:default;opacity:.6}
+.upgrade:not(:disabled):hover{border-color:#ffd36f}
+.upgrade b{display:block;font-size:14px;margin-bottom:4px}
+.upgrade .heart{font-size:21px;margin-bottom:5px}
+.shopgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:11px 0}
 #speech{position:absolute;z-index:9;left:50%;top:20%;transform:translateX(-50%);max-width:min(88vw,520px);text-align:center;font-size:16px;color:#ffe7a3;border:1px solid #ffd36f38;background:#151008d9;backdrop-filter:blur(7px);border-radius:14px;padding:8px 13px;pointer-events:none;opacity:0;transition:opacity .4s ease,transform .4s ease}
 #speech.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
 #announce{position:absolute;z-index:9;left:50%;top:13%;transform:translate(-50%,-6px);font-weight:950;font-size:clamp(22px,6vw,50px);letter-spacing:-.04em;text-shadow:0 5px 30px #000;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}
@@ -64,6 +71,7 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
 <div class="top">
   <span id="bond" class="pill">PIP</span>
   <span id="snacks" class="pill">✧ 0</span>
+  <span id="dust" class="pill">✵ 0</span>
   <span id="mood" class="pill">✦ …</span>
   <button id="audioToggle" class="pill" type="button">♫ ON</button>
 </div>
@@ -80,6 +88,7 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
   <button id="actWish" class="act" type="button"><small>✦</small>WISH<br>CHASE</button>
   <button id="actHype" class="act" type="button"><small>◎</small>HYPE<br>DRILL</button>
   <button id="actGuard" class="act" type="button"><small>◇</small>GUARD<br>DRILL</button>
+  <button id="actShop" class="act" type="button"><small>✵</small>DECOR</button>
   <button id="actLog" class="act" type="button"><small>♥</small>LOG</button>
 </div>
 
@@ -102,6 +111,14 @@ canvas{position:absolute;inset:0;display:block;touch-action:none;user-select:non
   <div id="journal"></div>
   <p id="arenaLine" class="small"></p>
   <button id="closeLog" class="primary">Back to Pip</button>
+</div></div>
+
+<div id="shop" class="modal hidden"><div class="card">
+  <div class="kicker">DECORATE · PIP'S ROOM</div>
+  <h2 style="margin:6px 0">Make it yours</h2>
+  <p id="dustBalance" class="small"></p>
+  <div class="shopgrid" id="shopGrid"></div>
+  <button id="closeShop" class="primary">Back to Pip</button>
 </div></div>
 
 <div id="result" class="modal hidden"><div class="card">
@@ -172,7 +189,7 @@ function pipBondName(level){
 }
 
 function freshSave(){return{v:1,bondLevel:1,bondXP:0,love:0,compassion:0,support:0,
- energy:80,snacks:3,fed:75,affection:70,lastMs:Date.now(),
+ energy:80,snacks:3,fed:75,affection:70,dust:0,decos:[],lastMs:Date.now(),
  totals:{feeds:0,pets:0,wishes:0,hypes:0,guards:0},
  best:{wish:0,hype:0,guard:0},journal:[],welcomed:0}}
 function loadSave(){
@@ -185,6 +202,8 @@ function loadSave(){
      love:num(v.love,0,10,0),compassion:num(v.compassion,0,10,0),support:num(v.support,0,10,0),
      energy:num(v.energy,0,ENERGY_MAX,ENERGY_MAX),snacks:num(v.snacks,0,SNACK_MAX,SNACK_MAX),
      fed:num(v.fed,0,NEED_MAX,75),affection:num(v.affection,0,NEED_MAX,70),
+     dust:num(v.dust,0,1e6,0),
+     decos:Array.isArray(v.decos)?v.decos.filter(d=>typeof d==="string").slice(0,24):[],
      lastMs:num(v.lastMs,0,4102444800000,Date.now()),
      totals:{feeds:num(t.feeds,0,1e9,0),pets:num(t.pets,0,1e9,0),wishes:num(t.wishes,0,1e9,0),hypes:num(t.hypes,0,1e9,0),guards:num(t.guards,0,1e9,0)},
      best:{wish:num(b.wish,0,1e6,0),hype:num(b.hype,0,1e6,0),guard:num(b.guard,0,1e6,0)},
@@ -339,6 +358,12 @@ function drawPip(px,py,r){
  if(pip.happy>0)X.arc(0,e*.8,e*1.5,.15,Math.PI-.15);
  else X.arc(0,e*1.6,e*1.1,Math.PI*1.15,Math.PI*1.85,true);
  X.stroke();
+ if(ownsDeco("bow")){
+   X.fillStyle="#ff9fba";
+   X.beginPath();X.moveTo(-r*.15,-r*.95);X.lineTo(-r*.62,-r*1.28);X.lineTo(-r*.5,-r*.72);X.closePath();X.fill();
+   X.beginPath();X.moveTo(r*.15,-r*.95);X.lineTo(r*.62,-r*1.28);X.lineTo(r*.5,-r*.72);X.closePath();X.fill();
+   X.beginPath();X.arc(0,-r*.98,r*.14,0,6.29);X.fill();
+ }
  X.restore();
  if(SV.bondLevel>=4){
    const hx=px+Math.cos(-pip.angle*1.7)*(r+13),hy=py+Math.sin(-pip.angle*1.7)*(r+13);
@@ -367,6 +392,7 @@ function gainXP(n,quiet){
 function updateHud(){
  $("bond").innerHTML="<b>PIP · "+pipBondName(SV.bondLevel).toUpperCase()+"</b> · LV "+SV.bondLevel;
  $("snacks").textContent="✧ "+SV.snacks+" snacks";
+ $("dust").textContent="✵ "+SV.dust;
  $("xpLabel").textContent="BOND · "+SV.bondXP+"/"+pipNeed(SV.bondLevel)+" XP";
  $("xpBar").style.width=(SV.bondXP/pipNeed(SV.bondLevel)*100)+"%";
  $("energyBar").style.width=(SV.energy/ENERGY_MAX*100)+"%";
@@ -388,6 +414,37 @@ function mood(){
  return"Pip is rooting for you";
 }
 
+// -------------------------------------------------------------- decor
+// canon: the SAVE holds only the unlock flag; the renderer derives the look
+const DECOR=[
+ {id:"poster",name:"OD75 Poster",icon:"▦",cost:8,desc:"A little piece of the arena, for the wall."},
+ {id:"plant",name:"Star-fern",icon:"❋",cost:10,desc:"It grows toward whoever visits most."},
+ {id:"lamp",name:"Glow Lamp",icon:"⌇",cost:12,desc:"Warm light for late-night check-ins."},
+ {id:"garland",name:"Star Garland",icon:"✧",cost:15,desc:"A string of tiny wishes across the ceiling."},
+ {id:"bow",name:"Pip's Bow",icon:"♥",cost:20,need:3,desc:"Pip wears it. Pip loves it. (Bond 3+)"},
+];
+function ownsDeco(id){return SV.decos.indexOf(id)>=0}
+function renderShop(){
+ const grid=$("shopGrid");
+ $("dustBalance").textContent="✵ "+SV.dust+" stardust — earn more in drills";
+ grid.innerHTML="";
+ for(const d of DECOR){
+   const owned=ownsDeco(d.id),locked=d.need&&SV.bondLevel<d.need;
+   const b=document.createElement("button");
+   b.className="upgrade";
+   b.innerHTML="<div class=\"heart\">"+d.icon+"</div><b>"+d.name+(owned?" · OWNED":" · ✵ "+d.cost)+"</b><span class=\"small\">"+d.desc+"</span>";
+   b.disabled=owned||locked||SV.dust<d.cost;
+   if(locked)b.style.opacity=".5";
+   b.addEventListener("click",()=>{
+     if(ownsDeco(d.id)||SV.dust<d.cost)return;
+     SV.dust-=d.cost;SV.decos.push(d.id);
+     journal("Decorated the room: "+d.name+".");
+     say(d.id==="bow"?"a BOW. for ME. I am never taking it off":"our room keeps getting better ✦",3000);
+     sfx.levelup();persist();updateHud();renderShop();
+   });
+   grid.appendChild(b);
+ }
+}
 // ------------------------------------------------------------ actions
 let mode="room"; // room | wish | hype | guard
 function spendEnergy(n){SV.energy=clamp(SV.energy-n,0,ENERGY_MAX);persist();updateHud()}
@@ -561,6 +618,9 @@ function guardTick(dt){
 }
 
 function endMinigame(grade,kicker,title,text,xp){
+ const dustEarn={S:9,A:6,B:4,C:2}[grade]||2;
+ SV.dust+=dustEarn;
+ kicker+=" · +"+dustEarn+" ✵";
  mode="room";
  pip.chase=null;pip.tx=pipHome().x;pip.ty=pipHome().y;
  SV.affection=clamp(SV.affection+12,0,NEED_MAX);
@@ -590,6 +650,8 @@ $("actLog").addEventListener("click",()=>{
  $("log").classList.remove("hidden");
 });
 $("closeLog").addEventListener("click",()=>$("log").classList.add("hidden"));
+$("actShop").addEventListener("click",()=>{renderShop();$("shop").classList.remove("hidden")});
+$("closeShop").addEventListener("click",()=>$("shop").classList.add("hidden"));
 
 // ------------------------------------------------------------- welcome
 $("begin").addEventListener("click",()=>{
@@ -606,7 +668,7 @@ if(SV.welcomed){$("welcome").querySelector(".logo").innerHTML="PIP'S<br>ROOM";$(
 document.addEventListener("keydown",e=>{
  if(e.key===" "&&mode==="hype"){hypeTap();e.preventDefault()}
  if(e.key.toLowerCase()==="f")$("actFeed").click();
- if(e.key==="Escape"){$("log").classList.add("hidden");$("result").classList.add("hidden")}
+ if(e.key==="Escape"){$("log").classList.add("hidden");$("result").classList.add("hidden");$("shop").classList.add("hidden")}
 });
 
 // ---------------------------------------------------------- main loop
@@ -767,6 +829,31 @@ function draw(){
  if(pip.chase&&pip.chase.kind==="snack"){X.fillStyle="#7be0ae";X.font="16px system-ui";X.textAlign="center";X.fillText("✧",pip.chase.x,pip.chase.y+5);X.textAlign="start"}
 
  if(mode==="room"){
+   if(ownsDeco("poster")){
+     X.fillStyle="#0d131d";X.fillRect(W*.08,H*.16,64,44);
+     X.strokeStyle="#39415a";X.strokeRect(W*.08,H*.16,64,44);
+     X.fillStyle="#7ed8ff";X.font="900 11px Inter,system-ui";
+     X.fillText("OVER",W*.08+8,H*.16+18);X.fillText("DRIVE",W*.08+8,H*.16+30);X.fillText("75",W*.08+8,H*.16+41);
+   }
+   if(ownsDeco("plant")){
+     const px2=W*.9,py2=H*.86;
+     X.fillStyle="#3a2a1a";X.fillRect(px2-9,py2-8,18,10);
+     X.strokeStyle="#7be0ae";X.lineWidth=2;
+     for(let i=-2;i<=2;i++){X.beginPath();X.moveTo(px2,py2-8);X.quadraticCurveTo(px2+i*8,py2-26,px2+i*11,py2-30);X.stroke()}
+   }
+   if(ownsDeco("lamp")){
+     const lx=W*.1,ly=H*.86;
+     X.strokeStyle="#39415a";X.lineWidth=3;X.beginPath();X.moveTo(lx,ly);X.lineTo(lx,ly-52);X.stroke();
+     X.fillStyle="#ffd36f";X.beginPath();X.arc(lx,ly-58,7,0,6.29);X.fill();
+     const lg=X.createRadialGradient(lx,ly-58,4,lx,ly-58,70);
+     lg.addColorStop(0,"#ffd36f22");lg.addColorStop(1,"#ffd36f00");
+     X.fillStyle=lg;X.beginPath();X.arc(lx,ly-58,70,0,6.29);X.fill();
+   }
+   if(ownsDeco("garland")){
+     X.strokeStyle="#ffffff18";X.lineWidth=1;X.beginPath();X.moveTo(0,H*.09);X.quadraticCurveTo(W*.5,H*.15,W,H*.09);X.stroke();
+     X.fillStyle="#ffd36f";X.font="9px system-ui";
+     for(let i=1;i<9;i++){const gx=W*i/9,gy=H*.09+Math.sin(i/9*Math.PI)*H*.05;X.fillText("✦",gx,gy+3)}
+   }
    X.fillStyle="#163a4e";X.beginPath();X.arc(ball.x,ball.y,ball.r,0,6.29);X.fill();
    X.strokeStyle="#7ed8ff";X.lineWidth=1.5;X.beginPath();X.arc(ball.x,ball.y,ball.r,0,6.29);X.stroke();
    X.fillStyle="#9ae6ff";X.font="11px system-ui";X.textAlign="center";X.fillText("✦",ball.x,ball.y+4);X.textAlign="start";
