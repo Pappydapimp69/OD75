@@ -67,6 +67,7 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
 .stat span{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 #journal{font-size:14.5px;color:#cdd5e0;line-height:1.7;max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:#ffffff04;margin:10px 0}
 #grade{font-size:52px;font-weight:1000;letter-spacing:-.06em;margin:3px 0}
+#flash{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:40;background:#232b40;border:1px solid #39415a;border-radius:8px;padding:9px 16px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none}
 @media(max-width:560px){.rules{grid-template-columns:1fr}.act{width:76px;height:76px;font-size:11.5px}.act small{font-size:16px}.pill{font-size:12.5px;padding:6px 10px}.gauges{top:96px;grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -153,6 +154,8 @@ body.reduce #announce,body.reduce #speech,body.reduce .gbar i{transition:none}
   <button id="closeResult" class="primary">Back to Pip ✦</button>
 </div></div>
 </div>
+<div id="flash"></div>
+<div style="position:fixed;left:8px;bottom:6px;z-index:9999;font:10px/1 system-ui;color:#ffffff55;pointer-events:none">PIPROOM-2026-08-12-L11B</div>
 
 <script>
 "use strict";
@@ -352,6 +355,14 @@ function particle(x,y,c,n=10,sp=90){if(reducedMotion())n=Math.ceil(n/3);for(let 
 function ring(x,y,c,r=70){rings.push({x,y,c,r:8,max:r,life:.55})}
 function heartPop(x,y){particles.push({x,y,vx:(Math.random()-.5)*30,vy:-55-Math.random()*40,c:"#ff9fba",life:1,r:0,heart:true})}
 
+// --------------------------------------------------------------- toast
+let flashTimer=null;
+function flash(msg){
+ const el=$("flash");if(!el)return;
+ el.textContent=msg;el.style.opacity="1";
+ if(flashTimer)clearTimeout(flashTimer);
+ flashTimer=setTimeout(()=>{el.style.opacity="0"},2000);
+}
 // ------------------------------------------------------- prefs/motion
 function reducedMotion(){
  try{if(SV.prefs.motion==="less")return true;
