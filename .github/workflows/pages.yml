@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Threat Telegraphs B50 ${{ github.sha }}
+run-name: OD75 Pip Bond Heart B51 ${{ github.sha }}
 
 on:
   push:
@@ -24,40 +24,48 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify B50 threat telegraphs and current systems
+      - name: Verify B51 Pip bond heart and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
-          grep -Fq 'const B48_BEACON_MARGIN=46' b21-35.js
-          grep -Fq 'const B49_RETURN_PULSE_SECONDS=.85' b21-36.js
           grep -Fq 'const B50_BOSS_TELEGRAPH_START=.55' b21-37.js
-          grep -Fq 'const B50_CHARGER_TELEGRAPH_WINDOW=.45' b21-37.js
-          grep -Fq 'function bossVolleyIntervalB50' b21-37.js
-          grep -Fq 'VOLLEY' b21-37.js
-          grep -Fq 'CHARGE' b21-37.js
-          grep -Fq 'drawThreatTelegraphsB50' b21-37.js
+          grep -Fq 'const B51_PIP_BOND_SECONDS=1.0' b21-38.js
+          grep -Fq 'drawPipPresenceB49=function(){}' b21-38.js
+          grep -Fq 'S.b51PipBond=1' b21-38.js
+          grep -Fq 'S.b51PipBondVisual' b21-38.js
+          grep -Fq 'S.weaponPower=1+(saved.weaponPower-1)*b' b21-38.js
+          grep -Fq 'shots[i].power*=b' b21-38.js
+          grep -Fq 'function drawPipBondHeartB51()' b21-38.js
+          grep -Fq 'heartPathB51' b21-38.js
       - name: Assemble direct site
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
           s=Path('_site/game.js').read_text()
-          for marker in ['const B50_BOSS_TELEGRAPH_START=.55','function bossVolleyIntervalB50','function drawThreatTelegraphsB50()']:
+          for marker in [
+              'const B50_BOSS_TELEGRAPH_START=.55',
+              'const B51_PIP_BOND_SECONDS=1.0',
+              'drawPipPresenceB49=function(){}',
+              'function pipBondB51()',
+              'function drawPipBondHeartB51()'
+          ]:
               assert marker in s, marker
-          assert s.rfind('draw=function()') > s.find('// B50 Threat telegraphs')
-          assert s.rfind('drawThreatTelegraphsB50()') > s.rfind('drawPipPresenceB49()')
-          assert '1.55-(e?.bossStage||1)*.022' in s
-          assert 'spread=.82' in s
+          assert s.rfind('pipWithPlayer=function()') > s.find('function pipWithPlayer()')
+          assert s.rfind('update=function(dt)') > s.find('// B51 Pip bond meter')
+          assert s.rfind('attack=function()') > s.find('// B51 Pip bond meter')
+          assert s.rfind('draw=function()') > s.find('// B51 Pip bond meter')
+          assert s.rfind('drawPipBondHeartB51()') > s.rfind('drawThreatTelegraphsB50()')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-12-B50-THREAT-TELEGRAPHS/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B50-THREAT-TELEGRAPHS/g' _site/index.html
-          grep -Fq 'OD75-2026-08-12-B50-THREAT-TELEGRAPHS' _site/index.html
-          grep -Fq 'game.js?v=B50-THREAT-TELEGRAPHS' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-14-B51-PIP-BOND-HEART/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B51-PIP-BOND-HEART/g' _site/index.html
+          grep -Fq 'OD75-2026-08-14-B51-PIP-BOND-HEART' _site/index.html
+          grep -Fq 'game.js?v=B51-PIP-BOND-HEART' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
