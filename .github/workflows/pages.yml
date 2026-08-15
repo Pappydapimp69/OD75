@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Sound Lab Input Parity B54 ${{ github.sha }}
+run-name: OD75 Committed Charger Lanes B55 ${{ github.sha }}
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Verify B54 Sound Lab input parity and current systems
+      - name: Verify B55 committed charger lanes and current systems
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const B50_BOSS_TELEGRAPH_START=.55' b21-37.js
@@ -53,11 +53,16 @@ jobs:
           grep -Fq 'beginSoundLabHoldB45(btn,syntheticSoundLabHoldEventB54("keyboard"))' b21-41.js
           grep -Fq 'pressGamepadMenuA_B35=function()' b21-41.js
           grep -Fq 'soundLabHold.pointerId==="gamepad"' b21-41.js
+          grep -Fq 'const B55_CHARGER_COMMIT_WINDOW=.22' b21-42.js
+          grep -Fq 'function lockChargerLaneB55(e)' b21-42.js
+          grep -Fq 'e.vx=Math.cos(a)*340' b21-42.js
+          grep -Fq 'function drawCommittedChargerLanesB55()' b21-42.js
+          grep -Fq 'drawThreatTelegraphsB50=function()' b21-42.js
       - name: Assemble direct site
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -76,7 +81,9 @@ jobs:
               'beginSoundLabHoldB45=function(btn,e)',
               'renderAudioChoicesB41=function()',
               'function startKeyboardSoundLabHoldB54(e)',
-              'pressGamepadMenuA_B35=function()'
+              'pressGamepadMenuA_B35=function()',
+              'const B55_CHARGER_COMMIT_WINDOW=.22',
+              'function drawCommittedChargerLanesB55()'
           ]:
               assert marker in s, marker
           assert s.rfind('pipWithPlayer=function()') > s.find('function pipWithPlayer()')
@@ -92,11 +99,13 @@ jobs:
           assert 'PAIRS ONLY' not in s[s.find('// B53 Sound Lab usability'):]
           assert s.rfind('pressGamepadMenuA_B35=function()') > s.find('// B54 Sound Lab input parity')
           assert s.rfind('releaseGamepadMenuA_B35=function()') > s.find('// B54 Sound Lab input parity')
+          assert s.rfind('updateEnemy=function(e,dt)') > s.find('// B55 Committed charger lanes')
+          assert s.rfind('drawThreatTelegraphsB50=function()') > s.find('// B55 Committed charger lanes')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-15-B54-SOUND-LAB-INPUT/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B54-SOUND-LAB-INPUT/g' _site/index.html
-          grep -Fq 'OD75-2026-08-15-B54-SOUND-LAB-INPUT' _site/index.html
-          grep -Fq 'game.js?v=B54-SOUND-LAB-INPUT' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-08-15-B55-COMMITTED-CHARGERS/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B55-COMMITTED-CHARGERS/g' _site/index.html
+          grep -Fq 'OD75-2026-08-15-B55-COMMITTED-CHARGERS' _site/index.html
+          grep -Fq 'game.js?v=B55-COMMITTED-CHARGERS' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
