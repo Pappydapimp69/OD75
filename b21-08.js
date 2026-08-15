@@ -39,7 +39,7 @@ function draw(){
    X.globalAlpha=1;
  }
  X.globalAlpha=S.invuln>0?(.45+.45*Math.sin(S.t*25)):1;X.fillStyle=S.over>0?COLORS.gold:COLORS.player;X.beginPath();X.arc(P.x,P.y,P.r+(S.dashTime>0?3:0),0,Math.PI*2);X.fill();X.strokeStyle="#fff";X.lineWidth=2;X.beginPath();X.moveTo(P.x,P.y);X.lineTo(P.x+P.faceX*18,P.y+P.faceY*18);X.stroke();X.globalAlpha=1;
- if(!pipWithPlayer()){X.save();X.globalAlpha=.22;X.strokeStyle="#ffb7c9";X.lineWidth=1.5;X.setLineDash([4,6]);X.beginPath();X.moveTo(P.x,P.y);X.lineTo(P.pipX,P.pipY);X.stroke();X.setLineDash([]);X.restore()}
+ if(!pipWithPlayer()&&!S?.b52HeartOnlyBond){X.save();X.globalAlpha=.22;X.strokeStyle="#ffb7c9";X.lineWidth=1.5;X.setLineDash([4,6]);X.beginPath();X.moveTo(P.x,P.y);X.lineTo(P.pipX,P.pipY);X.stroke();X.setLineDash([]);X.restore()}
  const px=P.pipX,py=P.pipY;
  if(pipWithPlayer()&&(S.pipRelayBuff>0||S.supportRush>0)){X.strokeStyle=S.pipRelayBuff>0?"#ffd36f88":"#d9c8ff88";X.lineWidth=1.5;X.beginPath();X.arc(px,py,13+Math.sin(S.t*9)*2,0,Math.PI*2);X.stroke()}
  X.save();X.translate(px,py);X.rotate(P.pipAngle*.35);X.fillStyle=!pipWithPlayer()?"#ffb7c9":S.over>0?"#fff0a8":"#ffd36f";X.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2===0?((S.over>0?9:7)+Math.min(3,(S.pipLevel-1)*.4)):3.2;const xx=Math.cos(a)*r,yy=Math.sin(a)*r;i?X.lineTo(xx,yy):X.moveTo(xx,yy)}X.closePath();X.fill();X.rotate(-P.pipAngle*.35);X.fillStyle="#47340d";X.beginPath();X.arc(-2,-1,1,0,Math.PI*2);X.arc(2,-1,1,0,Math.PI*2);X.fill();if(S.pipHappy>0){X.strokeStyle="#47340d";X.lineWidth=1;X.beginPath();X.arc(0,1,2.4,0,Math.PI);X.stroke()}X.restore();
