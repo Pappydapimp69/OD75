@@ -1,0 +1,12 @@
+{
+  "name": "od75",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node tests/verify-b59.cjs",
+    "dev": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}
