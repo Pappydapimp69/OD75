@@ -14,7 +14,7 @@ function update(dt){
  let dx=gamepad.dx,dy=gamepad.dy;const keyboardActive=keys.has("ArrowLeft")||keys.has("a")||keys.has("ArrowRight")||keys.has("d")||keys.has("ArrowUp")||keys.has("w")||keys.has("ArrowDown")||keys.has("s");if(keys.has("ArrowLeft")||keys.has("a"))dx--;if(keys.has("ArrowRight")||keys.has("d"))dx++;if(keys.has("ArrowUp")||keys.has("w"))dy--;if(keys.has("ArrowDown")||keys.has("s"))dy++;if(joy.active){dx+=joy.dx;dy+=joy.dy}
  let l=hyp(dx,dy),inputActive=l>.12;const gamepadStrength=clamp(hyp(gamepad.dx,gamepad.dy),0,1),touchStrength=joy.active?clamp(hyp(joy.dx,joy.dy),0,1):0,inputStrength=inputActive?(keyboardActive?1:Math.max(gamepadStrength,touchStrength,clamp(l,0,1))):0;if(inputActive){dx/=l;dy/=l;P.faceX=dx;P.faceY=dy}
  if(S.dashTime<=0){
-   const maxSpeed=205+((S.over>0&&S.overType==="pip")?Math.min(28,(S.pipSupport||0)*5):0);
+   const maxSpeed=playerSpeedB61()+((S.over>0&&S.overType==="pip")?Math.min(28,(S.pipSupport||0)*5):0);
    if(inputActive){
      const targetSpeed=maxSpeed*inputStrength;let speedNow=hyp(P.vx,P.vy);const accel=125+((S.over>0&&S.overType==="pip")?Math.min(18,(S.pipSupport||0)*3):0);
      if(speedNow<2){speedNow=Math.min(targetSpeed,speedNow+accel*dt);P.vx=dx*speedNow;P.vy=dy*speedNow}

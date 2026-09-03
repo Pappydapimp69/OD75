@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Heart Transport B60 ${{ github.sha }}
+run-name: OD75 Movement Settings B61 ${{ github.sha }}
 
 on:
   push:
@@ -33,10 +33,10 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-fund --no-audit
           npm test
-      - name: Verify B60 transport and previous build contracts
+      - name: Verify B61 settings and previous build contracts
         run: |
           test -f index.html
-          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js b21-43.js b21-44.js b21-45.js b21-46.js b21-47.js b21-48.js b21-49.js b21-50.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js b21-43.js b21-44.js b21-45.js b21-46.js b21-47.js b21-48.js b21-49.js b21-50.js b21-51.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const B50_BOSS_TELEGRAPH_START=.55' b21-37.js
@@ -84,7 +84,7 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js b21-43.js b21-44.js b21-45.js b21-46.js b21-47.js b21-48.js b21-49.js b21-50.js > _site/game.js
+          cat b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js b21-43.js b21-44.js b21-45.js b21-46.js b21-47.js b21-48.js b21-49.js b21-50.js b21-51.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -143,11 +143,13 @@ jobs:
           assert s.index('// B60 Heart transport') > s.index('// B59 Presentation')
           assert s.index('// B60 Audible mix') > s.index('// B60 Heart transport')
           assert 'function updatePipTransportB60(dt)' in s
+          assert s.index('// B61 Saved movement tuning') > s.index('// B60 Audible mix')
+          assert 'function swiftSpeedB61(' in s and 'const maxSpeed=playerSpeedB61()' in s
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-03-B60-HEART-TRANSPORT/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B60-HEART-TRANSPORT/g' _site/index.html
-          grep -Fq 'OD75-2026-09-03-B60-HEART-TRANSPORT' _site/index.html
-          grep -Fq 'game.js?v=B60-HEART-TRANSPORT' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-03-B61-MOVEMENT-SETTINGS/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B61-MOVEMENT-SETTINGS/g' _site/index.html
+          grep -Fq 'OD75-2026-09-03-B61-MOVEMENT-SETTINGS' _site/index.html
+          grep -Fq 'game.js?v=B61-MOVEMENT-SETTINGS' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6

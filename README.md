@@ -2,6 +2,20 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B61: Movement settings
+
+Open **Game settings** on the main screen or **Settings** in the Pip pause menu.
+Adjust Pip's starting speed, Swift's flat and percentage increases and upgrade
+pattern, the speed remaining at full cargo, and the player's normal top speed.
+The table previews every Swift level before you press **Apply settings**.
+Changes apply to the current run and save on this browser/device.
+
+Use the **140 / +10 / 1% / 35% preset** to try alternating Swift growth, or
+**Load B60 defaults** to restore the original movement. Press Apply after either.
+With a controller, Y/Triangle opens main-screen settings; up/down selects controls,
+left/right adjusts values, A selects buttons, and B/Start closes the menu.
+See [the B61 blueprint](docs/B61-settings.md).
+
 ## B60: Heart transport
 
 Pip carries hearts home in a loose cluster. Each heart weighs 3; starting
