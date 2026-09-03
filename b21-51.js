@@ -27,7 +27,9 @@ function swiftSpeedB61(level,config=settingsB61){
 function playerSpeedB61(){return settingsB61.playerSpeed}
 const applyPipPowerBeforeB61=applyPipPower;
 applyPipPower=function(){applyPipPowerBeforeB61();S.pipMoveSpeed=swiftSpeedB61(S.pipSpeedLv||0)};
-carrySpeedB60=function(){return S.pipMoveSpeed*(1-(1-settingsB61.fullSpeed/100)*clamp(cargoWeightB60()/S.pipCarryCapacity,0,1))};
+// B62 Loneliness multiplies the final cargo-adjusted speed only at an empty heart.
+const B62_LONELY_SPEED_FACTOR=.9;
+carrySpeedB60=function(){return S.pipMoveSpeed*(1-(1-settingsB61.fullSpeed/100)*clamp(cargoWeightB60()/S.pipCarryCapacity,0,1))*(pipBondB51()===0?B62_LONELY_SPEED_FACTOR:1)};
 function applySettingsB61(raw){
   const valid=validateSettingsB61(raw);if(!valid)return {ok:false,message:"Enter numbers within the ranges shown."};
   settingsB61=valid;applyPipPower();
@@ -49,7 +51,7 @@ const renderAscendedPauseBeforeB61=renderAscendedPauseB39;
 renderAscendedPauseB39=function(){
   renderAscendedPauseBeforeB61();
   const rows=$("b39CoreList")?.querySelectorAll('.b39-row')||[];
-  for(const row of rows)if(row.textContent.includes("Heart transport"))row.outerHTML=rowB39("Heart transport",`${Math.round(S.pipDetectRange)}px sense · ${cargoWeightB60()}/${S.pipCarryCapacity} weight. Full load retains ${settingsB61.fullSpeed}% flight speed. Meet Pip within 30px to bank his cargo.`,"CARGO");
+  for(const row of rows)if(row.textContent.includes("Heart transport"))row.outerHTML=rowB39("Heart transport",`${Math.round(S.pipDetectRange)}px sense · ${cargoWeightB60()}/${S.pipCarryCapacity} weight. Full load retains ${settingsB61.fullSpeed}% flight speed. Empty heart: Pip is lonely and moves another 10% slower. Meet Pip within 30px to bank his cargo.`,"CARGO");
 };
 let mainSettingsOpenB61=false;
 function settingsVisibleB61(){return mainSettingsOpenB61||(b39Pause.open&&!$("settingsPaneB61").hidden)}
@@ -100,6 +102,7 @@ function tabKeyB61(key){
   const tabs=document.createElement('div');tabs.className='b61Tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Pause pages');tabs.innerHTML='<button type="button" id="buildTabB61" role="tab" aria-selected="true" aria-controls="buildPaneB61">Pip build</button><button type="button" id="settingsTabB61" role="tab" aria-selected="false" aria-controls="settingsPaneB61" tabindex="-1">Settings</button>';content.before(tabs);
   for(const name of ['build','settings'])$(name+'TabB61').addEventListener('click',()=>selectPauseTabB61(name));
   modal.setAttribute('aria-modal','true');
+  const lonelyNote=document.createElement('p');lonelyNote.id='lonelyNoteB62';lonelyNote.textContent='Preview assumes a charged heart meter. At zero, Pip feels lonely and moves another 10% slower, after cargo slowdown. Recharging the heart removes this penalty.';form.appendChild(lonelyNote);
   card.querySelector('.b39-footer .small').textContent='D-pad: move / adjust · A: select · Esc / B / Start: resume';
   form.addEventListener('input',()=>{$("settingsStatusB61").textContent='Unsaved changes. Press Apply to use them.';previewSettingsB61()});
   form.addEventListener('submit',e=>{e.preventDefault();const result=applySettingsB61(readSettingsFormB61());$("settingsStatusB61").textContent=result.message;previewSettingsB61()});

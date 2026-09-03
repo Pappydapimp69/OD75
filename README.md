@@ -2,6 +2,13 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B62: Lonely Pip
+
+When Pip's heart meter is empty, he moves 10% slower after cargo slowdown.
+The penalty applies while gathering and returning, and disappears as soon as
+the meter has charge again. For example, 35% full-load speed becomes 31.5%
+while lonely. Your saved movement settings remain in effect.
+
 ## B61: Movement settings
 
 Open **Game settings** on the main screen or **Settings** in the Pip pause menu.

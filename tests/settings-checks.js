@@ -77,6 +77,39 @@ function runSettingsChecksB61(){
       const serial=S.b59.dashSerial;press(1);updateGamepadInput();assert(!b39Pause.open&&S.b59.dashSerial===serial,'B resume became dash');release(1);
     }finally{if(descriptor)Object.defineProperty(navigator,'getGamepads',descriptor);else delete navigator.getGamepads;reset()}
   });
+  test('Loneliness starts only at zero and multiplies every cargo load after Swift tuning',()=>{
+    for(const config of [B61_DEFAULTS,preset]){
+      applySettingsB61(config);S.pipSpeedLv=4;applyPipPower();
+      for(const count of [0,1,3,4]){
+        transportB60().cargo=Array.from({length:count},()=>heartFixtureB60());
+        const normal=swiftSpeedB61(4)*(1-(1-config.fullSpeed/100)*Math.min(count*3/10,1));
+        for(const bond of [1,.5,.00001,0]){S.b51PipBond=bond;assert(near(carrySpeedB60(),normal*(bond===0?.9:1)),'wrong load/bond speed')}
+        S.b51PipBond=.001;assert(near(carrySpeedB60(),normal),'penalty survived recovery');
+      }
+    }
+  });
+  test('Lonely gather and return movement use the penalty through the complete update chain',()=>{
+    applySettingsB61(preset);
+    for(const state of ['collect','return']){
+      transportFixtureB60();S.b51PipBond=0;S.pipState=state;
+      transportB60().cargo=Array.from({length:3},()=>heartFixtureB60());
+      const target=heartFixtureB60(500);heartBits=[target];S.pipTarget=target;
+      const before=P.pipX,speed=140*(1-.65*.9)*.9;update(.02);
+      assert(near(P.pipX-before,(state==='collect'?1:-1)*speed*.02),'actual '+state+' displacement ignored loneliness');
+    }
+  });
+  test('Reunion clears loneliness immediately without compounding or changing base speeds',()=>{
+    applySettingsB61(preset);S.b51PipBond=0;transportB60().cargo=[heartFixtureB60()];P.x=P.pipX-20;
+    update(.02);assert(pipBondB51()===1&&S.pipState==='orbit'&&cargoWeightB60()===0,'reunion did not restore heart');
+    assert(carrySpeedB60()===140&&S.pipMoveSpeed===140&&playerSpeedB61()===205,'speed was permanently reduced');
+    for(let i=0;i<5;i++){S.b51PipBond=0;assert(carrySpeedB60()===126,'penalty compounded');S.b51PipBond=1;assert(carrySpeedB60()===140,'penalty stuck')}
+  });
+  test('Pause freezes a lonely cargo trip and inspection explains the speed penalty',()=>{
+    S.b51PipBond=0;S.pipState='return';transportB60().cargo=[heartFixtureB60()];openAscendedPauseB39();
+    const before=JSON.stringify([P.pipX,P.pipY,S.t,cargoWeightB60(),pipBondB51(),carrySpeedB60()]);stepB59(.5);
+    assert(JSON.stringify([P.pipX,P.pipY,S.t,cargoWeightB60(),pipBondB51(),carrySpeedB60()])===before,'pause advanced lonely trip');
+    assert($('b39CoreList').textContent.includes('another 10% slower')&&$('lonelyNoteB62').textContent.includes('after cargo slowdown'),'inspection missing penalty');closeAscendedPauseB39();
+  });
   applySettingsB61(saved);if(stored===null)localStorage.removeItem(B61_SETTINGS_KEY);else localStorage.setItem(B61_SETTINGS_KEY,stored);
   reset();S.audioEnabled=false;return results;
 }
