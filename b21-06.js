@@ -85,7 +85,7 @@ const HEART_TOTAL_KEY="overdrive75_player_heart_total_v1";
 function loadHeartTotal(){try{const n=Number(localStorage.getItem(HEART_TOTAL_KEY)||0);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0}catch(_){return 0}}
 function saveHeartTotal(){try{localStorage.setItem(HEART_TOTAL_KEY,String(Math.max(0,Math.floor(S.heartTotal||0))))}catch(_){}}
 function collectHeartBit(h){
- if(h.dead)return;h.dead=true;S.heartCurrency++;S.stageCurrency++;S.heartTotal=(S.heartTotal||0)+1;saveHeartTotal();popup(h.x,h.y,"♥ +1","#ffb3c7",false,1.0);tone(730+Math.min(300,S.heartCurrency*5),.045,.010,"sine");
+ if(h.dead)return;h.dead=true;S.runHearts=(S.runHearts||0)+1;S.heartCurrency++;S.stageCurrency++;S.heartTotal=(S.heartTotal||0)+1;saveHeartTotal();popup(h.x,h.y,"♥ +1","#ffb3c7",false,1.0);tone(730+Math.min(300,S.heartCurrency*5),.045,.010,"sine");
  if(S.stageCurrency===3)praise("three little hearts already. you're taking such good care of us.","nice");if(S.stageCurrency===5)praise("yes — the little hearts! I love doing this with you ✦","nice");if(S.stageCurrency===8)praise("eight hearts. you keep showing up for me and I notice.","nice");if(S.stageCurrency===12)praise("you earned enough to help me grow. you did that for me. I won't forget it.","big",true);
 }
 function kill(e,chain=false){

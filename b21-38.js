@@ -21,7 +21,7 @@ update=function(dt){
     S.b51PipBond=1;
     S.b51PipBondVisual=Math.min(1,(Number.isFinite(S.b51PipBondVisual)?S.b51PipBondVisual:1)+step);
   }else{
-    S.b51PipBond=Math.max(0,(Number.isFinite(S.b51PipBond)?S.b51PipBond:1)-step);
+    S.b51PipBond=Math.max(0,(Number.isFinite(S.b51PipBond)?S.b51PipBond:1)-Math.max(0,dt||0)/heartSecondsB63());
     S.b51PipBondVisual=S.b51PipBond;
   }
 };
@@ -53,7 +53,7 @@ attack=function(){
 // Autonomous Pip shots also lose power smoothly while the bond drains.
 const updatePipCombatBeforeB51=updatePipCombat;
 updatePipCombat=function(dt){
-  const start=shots.length,b=pipBondB51();
+  const start=shots.length,b=supportEmergencyB63()?1:pipBondB51();
   updatePipCombatBeforeB51(dt);
   if(b>=.999)return;
   for(let i=start;i<shots.length;i++)if(shots[i]?.source==="pip")shots[i].power*=b;

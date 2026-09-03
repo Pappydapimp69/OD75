@@ -53,7 +53,7 @@ qaButtonB59("Ascend",()=>{
 });
 qaButtonB59("Run checks",()=>{
   qaFrozenB59=false;const saved={...settingsB61};applySettingsB61(B61_DEFAULTS);
-  const results=[...runPartnershipChecksB59(),...runTransportChecksB60(),...runSettingsChecksB61()];applySettingsB61(saved);
+  const results=[...runPartnershipChecksB59(),...runTransportChecksB60(),...runSettingsChecksB61(),...runSurvivalChecksB63()];applySettingsB61(saved);
   $("qaResults").textContent=results.map(r=>`${r.ok?"PASS":"FAIL"} ${r.name}${r.error?": "+r.error:""}`).join("\n")+`\n${results.filter(r=>r.ok).length}/${results.length} passed`;
   qaStatusB59();
 });

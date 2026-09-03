@@ -2,6 +2,19 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B63: Partnership survival
+
+Compassion adds 0.5 seconds of heart-meter duration per level instead of reducing
+shield recharge delay. Supportive Pip drops cargo and immediately flies back
+when shields fall below 2, using learned Pip attacks at orbit strength during
+the return. He stays with you until shields recover to 2. Dropped hearts can be
+recovered; they are not banked automatically. The 10% empty-heart speed penalty remains.
+
+Stages 1–3 keep opening difficulty. Stages 4–10 gain one difficulty tier per
+20 hearts banked this run, capped at tier 10. Spending hearts does not reduce
+difficulty, and unbanked cargo does not increase it. Stage 11 onward resumes
+the original stage/wave/boss scaling. See [the B63 blueprint](docs/B63-partnership-difficulty.md).
+
 ## B62: Lonely Pip
 
 When Pip's heart meter is empty, he moves 10% slower after cargo slowdown.

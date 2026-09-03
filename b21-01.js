@@ -76,7 +76,7 @@ function applyPipPower(){
  S.attackRange=Math.min(430,Math.min(W,H)*.55+(lv-1)*12+(S.pipPowerLv||0)*7);
  S.weaponPower=1+Math.min(1,(lv-1)*.14)+(S.pipPowerLv||0)*.11;
  S.projectileSize=6+Math.min(3,(lv-1)*.35)+Math.min(2,(S.pipPowerLv||0)*.15);
- S.shieldRegenDelay=Math.max(1.55,4.0-(S.pipCompassion||0)*.28-(S.pipGuardLv||0)*.20);
+ S.shieldRegenDelay=Math.max(1.55,4.0-(S.pipGuardLv||0)*.20);
  S.shieldRegenRate=Math.max(3.1,5.5-(S.pipGuardLv||0)*.18);
  S.supportPower=1+(S.pipSupport||0)*.07+(S.pipGuardLv||0)*.025;
  S.loveWishBonus=Math.min(.24,(S.pipLove||0)*.025+(S.pipRangeLv||0)*.004);
@@ -130,7 +130,7 @@ function reset(){
     pipHitCount:0,pipVolleyCount:0,pipShotCd:.8,pipConstellationCd:4,pipRelayBuff:0,supportRush:0,
     guardianCharges:0,lovePulsePending:0,
     audioUnlocks:new Set(pip.audio||[]),audioEnabled:true,audioChoices:[],stageGrowthChoice:null,
-    heartCurrency:0,heartTotal:loadHeartTotal(),stageCurrency:0,upgradeCost:12,
+    heartCurrency:0,runHearts:0,heartTotal:loadHeartTotal(),stageCurrency:0,upgradeCost:12,
     weaponPower:1,projectileSize:6,supportPower:1,loveWishBonus:0,
     pipState:"orbit",pipTarget:null,pipDetectRange:41,pipMoveSpeed:285,pipSoundCd:0,
     health:100,maxHealth:100,shields:3,maxShields:3,shieldRegenDelay:4.0,shieldRegenRate:5.5,shieldRegenClock:0,

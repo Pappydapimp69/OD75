@@ -8,7 +8,7 @@ http.createServer((req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1:8175');
   if (url.pathname === '/qa.js') {
     res.setHeader('Content-Type', 'text/javascript');
-    res.end(['partnership-checks.js', 'transport-checks.js', 'settings-checks.js', 'browser-qa.js', 'audio-qa.js'].map(file => fs.readFileSync(path.join(root, 'tests', file), 'utf8')).join('\n')); return;
+    res.end(['partnership-checks.js', 'transport-checks.js', 'settings-checks.js', 'survival-checks.js', 'browser-qa.js', 'audio-qa.js'].map(file => fs.readFileSync(path.join(root, 'tests', file), 'utf8')).join('\n')); return;
   }
   const target = url.pathname === '/' || url.pathname === '/qa' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
   const file = path.resolve(site, target);

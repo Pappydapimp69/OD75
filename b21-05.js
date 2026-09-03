@@ -1,7 +1,7 @@
 function startBossBattle(){
  const p=bossData();S.bossKey=p.key;S.bossActive=true;S.bossQueued=false;S.bossDefeated=false;S.bossMidPraise=false;S.bossName=p.name;S.waveState="boss";S.spawn=999;shots=[];enemyShots=[];S.bossStartedAt=S.stageTime;resetGuardianCharges();
- const threat=1+S.bossCount;const hp=Math.round(54+S.stage*7+threat*18);S.bossMaxHp=hp;const a=rr(0,Math.PI*2),dist=Math.max(210,Math.min(W,H)*.38);
- enemies.push({type:"boss",bossStage:Math.max(1,S.stage+S.bossCount*2),bossKey:p.key,x:P.x+Math.cos(a)*dist,y:P.y+Math.sin(a)*dist,r:30,hp,maxHp:hp,dead:false,age:0,flash:0,attackClock:1.05,volleyCount:0,orbitAngle:a});
+ const threat=1+difficultyBossCountB63();const hp=Math.round(54+difficultyStageB63()*7+threat*18);S.bossMaxHp=hp;const a=rr(0,Math.PI*2),dist=Math.max(210,Math.min(W,H)*.38);
+ enemies.push({type:"boss",bossStage:Math.max(1,difficultyStageB63()+difficultyBossCountB63()*2),bossKey:p.key,x:P.x+Math.cos(a)*dist,y:P.y+Math.sin(a)*dist,r:30,hp,maxHp:hp,dead:false,age:0,flash:0,attackClock:1.05,volleyCount:0,orbitAngle:a});
  announce("BOSS · "+p.name,1200);showPipMessage(p.intro,true);sfxBossRoar();if(audioEngine){audioEngine.setTempo(p.bpm);audioEngine.step=0;audioEngine.nextStepTime=audioCtx?audioCtx.currentTime+.05:0}
 }
 function killBoss(e){
@@ -59,14 +59,14 @@ function beginWaveBreak(){
  gainPipXP(12+S.wave*3,"wave clear");
 }
 function difficulty(){
- const w=Math.max(1,S.wave);
- const stageSpike=S.stage>=5?.16+Math.min(.34,(S.stage-5)*.045):0;
+ const w=difficultyWaveB63();
+ const stage=difficultyStageB63(),stageSpike=stage>=5?.16+Math.min(.34,(stage-5)*.045):0;
  return 0.88+Math.min(1.1,(w-1)*.12)+stageSpike;
 }
 function enemyCap(){
  const portrait=H>W;
  const base=portrait?8:11;
- return Math.min(portrait?15:18,base+Math.floor((S.wave-1)*1.5));
+ return Math.min(portrait?15:18,base+Math.floor((difficultyWaveB63()-1)*1.5));
 }
 function spawnEnemy(type){
  let side=Math.floor(rr(0,4)),m=52,x,y;
@@ -75,13 +75,13 @@ function spawnEnemy(type){
  else if(side===1){x=right+m;y=rr(top,bottom)}
  else if(side===2){x=rr(left,right);y=bottom+m}
  else{x=left-m;y=rr(top,bottom)}
- const hpTier=S.stage>=5?Math.min(5,1+Math.floor((S.stage-5)/2)):0;
- if(type==="chaser")enemies.push({type,x,y,r:12,hp:2+hpTier,speed:rr(58,82)+(S.stage>=5?5:0),dead:false,age:0,flash:0});
+ const stage=difficultyStageB63(),hpTier=stage>=5?Math.min(5,1+Math.floor((stage-5)/2)):0;
+ if(type==="chaser")enemies.push({type,x,y,r:12,hp:2+hpTier,speed:rr(58,82)+(stage>=5?5:0),dead:false,age:0,flash:0});
  if(type==="charger")enemies.push({type,x,y,r:14,hp:3+hpTier,speed:0,dead:false,age:0,state:"aim",aim:rr(.65,1.0),vx:0,vy:0,flash:0});
- if(type==="core")enemies.push({type,x,y,r:15,hp:1+Math.floor(hpTier/2),speed:rr(30,46)+(S.stage>=5?3:0),dead:false,age:0,pulse:rr(0,10),flash:0});
+ if(type==="core")enemies.push({type,x,y,r:15,hp:1+Math.floor(hpTier/2),speed:rr(30,46)+(stage>=5?3:0),dead:false,age:0,pulse:rr(0,10),flash:0});
 }
 function chooseSpawn(){
- const r=rnd(),w=S.wave;
+ const r=rnd(),w=difficultyWaveB63();
  if(w===1)return r<.84?"chaser":"core";
  if(w===2)return r<.66?"chaser":r<.88?"core":"charger";
  if(w===3)return r<.56?"chaser":r<.78?"core":"charger";
@@ -97,7 +97,7 @@ function spawnLogic(dt){
  const gap=clamp(.68/d,.24,.74);
  S.spawn=gap*rr(.82,1.12);
  spawnEnemy(chooseSpawn());
- if(S.wave>=3&&rnd()<.075*d&&enemies.filter(e=>!e.dead).length<enemyCap())spawnEnemy(rnd()<.64?"chaser":"charger");
+ if(difficultyWaveB63()>=3&&rnd()<.075*d&&enemies.filter(e=>!e.dead).length<enemyCap())spawnEnemy(rnd()<.64?"chaser":"charger");
 }
 function pipWithPlayer(){
  return S.pipState==="orbit";
@@ -144,7 +144,7 @@ function lovePulse(x,y){
 function warmReturnVolley(){if(S.pipLove<3||!pipWithPlayer())return;const target=nearestEnemyFrom(P.pipX,P.pipY,470);if(!target)return;const bonus=1+Math.max(0,S.pipLove-3)*.12;[-.13,0,.13].forEach(a=>pushPipShot(P.pipX,P.pipY,target,.62*bonus,a))}
 function updatePipCombat(dt){
  S.pipShotCd=Math.max(0,S.pipShotCd-dt);S.pipConstellationCd=Math.max(0,S.pipConstellationCd-dt);S.pipRelayBuff=Math.max(0,S.pipRelayBuff-dt);S.supportRush=Math.max(0,S.supportRush-dt);
- if(!pipWithPlayer()||!(S.waveState==="active"||S.waveState==="boss"))return;
+ if((!pipWithPlayer()&&!supportEmergencyB63())||!(S.waveState==="active"||S.waveState==="boss"))return;
  const starLv=bossPowerLevel("starshot");if(starLv>0&&S.pipShotCd<=0){const target=nearestEnemyFrom(P.pipX,P.pipY,510);if(target){pushPipShot(P.pipX,P.pipY,target,.62+starLv*.24);S.pipShotCd=Math.max(.62,1.45-(starLv-1)*.12)}}
  const constLv=bossPowerLevel("constellation");if(constLv>0&&S.pipConstellationCd<=0){const count=6+Math.min(6,(constLv-1)*2);for(let i=0;i<count;i++){const a=i/count*Math.PI*2+P.pipAngle*.4;shots.push({x:P.pipX,y:P.pipY,vx:Math.cos(a)*430,vy:Math.sin(a)*430,r:4.5,life:.72,power:.46+constLv*.13,source:"pip"})}ring(P.pipX,P.pipY,"#ffd36f",72);S.pipConstellationCd=Math.max(5,10-constLv);sfxPipCue("heart")}
 }
