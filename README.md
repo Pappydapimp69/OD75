@@ -2,6 +2,22 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B60: Heart transport
+
+Pip carries hearts home in a loose cluster. Each heart weighs 3; starting
+capacity is 10, and the last pickup may go slightly over. Full cargo halves
+his flight speed. Move within 30px of Pip to bank his hearts early.
+
+Heart Sense adds 2 capacity each level. Its range grows by 8px per level through
+level 10, then 2px per level, capped at 200px. Swift Pip controls flight speed.
+Heart Relay now lasts 0.5 seconds plus 0.1 per extra level, with an eight-second
+trigger cooldown and a real delivery required.
+
+Spend multiple Prism Seeds before choosing Continue. Sound Lab mixes now have
+distinct recurring music parts in waves and boss fights, with free auditions.
+Mix purchases automatically audition the changed part when audio is enabled.
+See [the B60 blueprint](docs/B60-heart-transport.md).
+
 ## B59: Pip partnership
 
 Raise Pip's emotional traits with Prism Seeds to develop three combat instincts:

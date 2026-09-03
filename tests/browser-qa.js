@@ -52,9 +52,26 @@ qaButtonB59("Ascend",()=>{
   $("qaTrait").value="mixed";qaEncounterB59();S.pipCompassion=4;S.overType="pip";S.overLevels.pip=1;S.heat=100;triggerOverdrive();
 });
 qaButtonB59("Run checks",()=>{
-  qaFrozenB59=false;const results=runPartnershipChecksB59();
+  qaFrozenB59=false;const results=[...runPartnershipChecksB59(),...runTransportChecksB60()];
   $("qaResults").textContent=results.map(r=>`${r.ok?"PASS":"FAIL"} ${r.name}${r.error?": "+r.error:""}`).join("\n")+`\n${results.filter(r=>r.ok).length}/${results.length} passed`;
   qaStatusB59();
 });
 qaButtonB59("Hide QA",()=>qaPanelB59.style.display="none");
 setInterval(qaStatusB59,200);
+qaButtonB59("Cargo trip",()=>{
+  transportFixtureB60();P.pipX=24;S.pipState="orbit";S.pipRangeLv=10;applyPipPower();
+  heartBits=Array.from({length:13},(_,i)=>heartFixtureB60(100+(i%4)*15,Math.floor(i/4)*12));
+  qaFrozenB59=true;qaStatusB59();
+});
+qaButtonB59("Full cargo",()=>{
+  transportFixtureB60();transportB60().cargo=Array.from({length:4},()=>heartFixtureB60());S.pipState="return";P.pipX=170;
+  qaFrozenB59=true;qaStatusB59();
+});
+qaButtonB59("Meet Pip",()=>{P.x=P.pipX-20;P.y=P.pipY;qaUpdateB59(.02);qaStatusB59()});
+qaButtonB59("Hold Heart Mix",()=>{
+  const button=$("audioChoice0");button.focus();
+  window.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));
+  setTimeout(()=>window.dispatchEvent(new KeyboardEvent("keyup",{key:"Enter",bubbles:true,cancelable:true})),SOUNDLAB_HOLD_MS+150);
+});
+const qaCargoB60=document.createElement("pre");qaCargoB60.id="qaCargoB60";qaCargoB60.style.whiteSpace="pre-wrap";qaPanelB59.appendChild(qaCargoB60);
+setInterval(()=>{if(S?.b60)qaCargoB60.textContent=`Cargo ${S.b60.cargo.length} · weight ${cargoWeightB60()}/${S.pipCarryCapacity} · speed ${carrySpeedB60().toFixed(1)}\nBank ${S.heartCurrency} · Ground ${heartBits.length} · Relay ${S.pipRelayBuff.toFixed(2)} / CD ${S.b60.relayCd.toFixed(2)}\nAudio ${audioCtx?.state||"none"} · music voices ${audioEngine?.b60MusicVoices?.size||0} · sfx ${audioEngine?.voices?.size||0}`},200);

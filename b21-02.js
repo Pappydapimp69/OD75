@@ -77,9 +77,10 @@ class PipAudioEngine{
      return false;
    }
    const token={nodes};
-   this.voices.add(token);
+   const registry=this.voices;
+   registry.add(token);
    endNode.onended=()=>{
-     this.voices.delete(token);
+     registry.delete(token);
      for(const n of nodes){try{n.disconnect()}catch(_){} }
    };
    return true;
@@ -216,14 +217,14 @@ class PipAudioEngine{
    const motif=[7,null,9,7,4,null,2,4,7,null,11,9,7,4,null,2];
    const note=motif[i];
    if(note!=null&&!resting&&(i%2===0||over))this.pluck(root+12+note,time,.18,over?.040:.029,i<8?-.2:.2);
-   if(hasAudio("melody")&&!resting){
+   if(!this.b60Arrangement&&hasAudio("melody")&&!resting){
      const counter=[null,12,null,11,9,null,7,null,null,9,null,7,4,null,2,null][i];
      if(counter!=null)this.fmBell(MIDI_FREQ(root+12+counter),time,.30,.022,.36,this.music);
    }
-   if(hasAudio("harmony")&&i===0)this.padChord([chord[1]+12,chord[2]+12,chord[0]+26],time,1.35,.011);
-   if(hasAudio("bass")&&!resting&&(i===3||i===6||i===11||i===14))this.bass(root-12+(i===14?7:0),time,.16,.025);
-   if(hasAudio("bells")&&(phrase===15||phrase===31||phrase===47||phrase===63))this.fmBell(MIDI_FREQ(root+31),time,.52,.025,.55,this.music);
-   if(hasAudio("heartbeat")&&!resting&&(i===0||i===2))this.kick(time,i===0?.028:.016);
+   if(!this.b60Arrangement&&hasAudio("harmony")&&i===0)this.padChord([chord[1]+12,chord[2]+12,chord[0]+26],time,1.35,.011);
+   if(!this.b60Arrangement&&hasAudio("bass")&&!resting&&(i===3||i===6||i===11||i===14))this.bass(root-12+(i===14?7:0),time,.16,.025);
+   if(!this.b60Arrangement&&hasAudio("bells")&&(phrase===15||phrase===31||phrase===47||phrase===63))this.fmBell(MIDI_FREQ(root+31),time,.52,.025,.55,this.music);
+   if(!this.b60Arrangement&&hasAudio("heartbeat")&&!resting&&(i===0||i===2))this.kick(time,i===0?.028:.016);
    if(hard&&!resting&&(i===2||i===6||i===10||i===14))this.hat(time,.011);
    if(hard&&!resting&&i===12)this.bass(root-5,time,.18,.024);
    if(over&&!resting&&i%2===1)this.pluck(root+24+[0,2,4,7][i%4],time,.10,.019,rr(-.5,.5));

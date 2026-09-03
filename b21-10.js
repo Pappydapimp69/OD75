@@ -57,22 +57,22 @@ PipAudioEngine.prototype.scheduleBossStep=function(time){
  }
 
  // Previously these five unlocks disappeared during bosses. They now mutate the boss arrangement.
- if(hasAudio("melody")){
+ if(!this.b60Arrangement&&hasAudio("melody")){
    const counter=[12,null,10,12,null,7,10,null,15,null,12,10,null,7,5,null][i];
    if(counter!=null)this.pluck(root+12+counter,time,phase===2?.12:.17,phase===2?.031:.023,i<8?.42:-.42);
  }
- if(hasAudio("harmony")&&(i===0||i===8)){
+ if(!this.b60Arrangement&&hasAudio("harmony")&&(i===0||i===8)){
    const tense=i===0?[root+15,root+19,root+24]:[root+17,root+22,root+27];
    this.padChord(tense,time,phase===2?.82:1.10,phase===2?.017:.013);
  }
- if(hasAudio("bass")&&(i===3||i===7||i===11||i===15)){
+ if(!this.b60Arrangement&&hasAudio("bass")&&(i===3||i===7||i===11||i===15)){
    const fill=i===15?7:(i===7?5:0);
    this.bass(root-12+fill,time,.14,phase===2?.035:.028);
  }
- if(hasAudio("bells")&&(phrase===15||phrase===31||phrase===47||phrase===63)){
+ if(!this.b60Arrangement&&hasAudio("bells")&&(phrase===15||phrase===31||phrase===47||phrase===63)){
    this.fmBell(MIDI_FREQ(root+31+(variant%5)),time,.42,phase===2?.034:.027,.58,this.music);
  }
- if(hasAudio("heartbeat")&&(i===0||i===2)){
+ if(!this.b60Arrangement&&hasAudio("heartbeat")&&(i===0||i===2)){
    this.kick(time,i===0?(phase===2?.043:.034):(phase===2?.027:.020));
  }
 

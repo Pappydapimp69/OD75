@@ -29,7 +29,7 @@ function renderEmotionButtonsB28(){
 renderEmotionButtons=renderEmotionButtonsB28;
 
 choosePipUpgrade=function(kind){
- if(!S.stagePending)return;
+ if(!S.stagePending||$("emotionStep").classList.contains("stagehidden")||!["love","compassion","support"].includes(kind))return;
  if((S.prismSeeds||0)<1){
    showPipMessage("we need a Prism Seed to deepen that part of me. we can keep going without one.",true);
    return;
@@ -60,7 +60,8 @@ choosePipUpgrade=function(kind){
      "big",true
    );
  }else return;
- applyPipPower();savePip();S.stageGrowthChoice=kind;openAbilityStep();
+ applyPipPower();savePip();S.stageGrowthChoice=kind;renderEmotionButtons();
+ $("stageBond").textContent=emotionalBondLine()+`  ♥ ${S.pipLove}  ♡ ${S.pipCompassion}  ✦ ${S.pipSupport}`;
 };
 
 // Restore the four attribute skills to their original Heart Bit economy.
@@ -69,13 +70,10 @@ renderAbilityShop=function(){
  const map={range:"abilityRange",speed:"abilitySpeed",power:"abilityPower",guard:"abilityGuard"};
  for(const [kind,id] of Object.entries(map)){
    const info=PIP_ABILITY_INFO[kind],lv=pipAbilityLevel(kind),btn=$(id);
-   const rangeOverflow=kind==="range"&&lv>=20;
    const maxed=kind!=="range"&&lv>=info.max;
    const cost=pipAbilityCost(kind);
-   if(rangeOverflow){
-     btn.innerHTML=`<div class="heart">➜</div><b>Heart Sense · Lv ${lv} → ${lv+1} · ♥ ${cost}</b><span class="small">Range MAX 200px · Pip speed +1%</span>`;
-   }else{
-     const nextEffect=kind==="range"?(lv+1)%2===1?"RANGE":"SPEED +1%":"";
+   {
+     const nextEffect=kind==="range"?"RANGE + CAPACITY":"";
      btn.innerHTML=`<div class="heart">${info.icon}</div><b>${info.name} · Lv ${lv}${maxed?" MAX":` → ${lv+1}${nextEffect?` · ${nextEffect}`:""} · ♥ ${cost}`}</b><span class="small">${maxed?info.desc:pipAbilityEffectText(kind)}</span>`;
    }
    btn.disabled=maxed||S.heartCurrency<cost;
@@ -102,11 +100,7 @@ buyPipAbility=function(kind){
  else return;
  applyPipPower();savePip();renderAbilityShop();
  const lines={
-   range:(S.pipRangeLv||0)>20
-     ?"my Heart Sense is capped at 200px, so that level made me 1% faster!"
-     :(S.pipRangeLv||0)%2===0
-       ?`my range stayed at ${Math.round(S.pipDetectRange)}px, but I got 1% faster!`
-       :`I can feel the hearts farther away now — ${Math.round(S.pipDetectRange)}px!`,
+   range:`I can sense hearts ${Math.round(S.pipDetectRange)}px away and carry ${S.pipCarryCapacity} weight. meet me halfway when I'm loaded!`,
    speed:"oh! I feel quicker. I'll get back to you faster.",
    power:"my star power is stronger. stay close and I'll make it count.",
    guard:"my glow feels steadier. I'll help your shields come back sooner."

@@ -163,7 +163,7 @@ function runPartnershipChecksB59(){
     assert(S.pipLove===0&&S.pipCompassion===0&&S.pipSupport===0,"trait progression leaked");
   });
   test("Prism purchase learns the signature and pause explains all three",()=>{
-    fixtureB59();S.stagePending=true;S.prismSeeds=1;choosePipUpgrade("love");
+    fixtureB59();openStageUpgrade();S.prismSeeds=1;choosePipUpgrade("love");
     assert(S.prismSeeds===0&&S.pipLove===1,"trait purchase failed");
     assert(emotionalNextText("love").includes("RALLY"),"shop omits new behavior");
     renderAscendedPauseB39();assert(["Rally","Cover","Setup"].every(t=>$("b39CoreList").textContent.includes(t)),"pause omits instincts");

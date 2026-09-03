@@ -69,12 +69,9 @@ function pipBondName(level){
 function applyPipPower(){
  const lv=S.pipLevel||1;
  const senseLv=Math.max(0,S.pipRangeLv||0);
- const cappedSenseLv=Math.min(20,senseLv);
- const rangeSteps=Math.min(10,Math.ceil(Math.min(19,cappedSenseLv)/2));
- const senseSpeedSteps=Math.floor(cappedSenseLv/2)+Math.max(0,senseLv-20);
- S.pipDetectRange=41+(159/10)*rangeSteps;
- if(rangeSteps>=10)S.pipDetectRange=200;
- S.pipMoveSpeed=(285+(S.pipSpeedLv||0)*34)*(1+senseSpeedSteps*.01);
+ S.pipDetectRange=Math.min(200,41+Math.min(10,senseLv)*8+Math.max(0,senseLv-10)*2);
+ S.pipCarryCapacity=10+senseLv*2;
+ S.pipMoveSpeed=285+(S.pipSpeedLv||0)*34;
  S.attackMax=Math.max(.17,.33-(lv-1)*.014-(S.pipPowerLv||0)*.006);
  S.attackRange=Math.min(430,Math.min(W,H)*.55+(lv-1)*12+(S.pipPowerLv||0)*7);
  S.weaponPower=1+Math.min(1,(lv-1)*.14)+(S.pipPowerLv||0)*.11;

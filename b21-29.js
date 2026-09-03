@@ -130,7 +130,7 @@ function ensureSoundLabContinueB41(){
  if(!btn){btn=document.createElement("button");btn.id="continueSoundLabB41";btn.className="primary";btn.type="button";btn.textContent="Continue with current mix";lab.appendChild(btn);btn.addEventListener("click",continueSoundLabB41)}
  const audioTitle=$("audioStep")?.querySelector("h2");if(audioTitle)audioTitle.textContent="Mix Layers ♪";
  const audioCopy=$("audioStep")?.querySelector(":scope > p");if(audioCopy)audioCopy.textContent="Spend Notes + a Mix Choice. New Mix Choices arrive every 5 Pip levels.";
- const intro=lab.querySelector(":scope > p");if(intro)intro.textContent="One Note economy. Pip Sounds grow every Pip level; Mix Layers deepen every 5 Pip levels. Matching themes create Resonance.";
+ const intro=lab.querySelector(":scope > p");if(intro)intro.textContent="Pip Sounds change his voice and cues. Mix Layers add recurring background music. Hold cards to buy; hear mixes below for free.";
 }
 function continueSoundLabB41(){
  if(!S?.stagePending)return;

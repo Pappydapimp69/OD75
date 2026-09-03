@@ -108,14 +108,14 @@ function chooseAudioOptions(){
  if(!picked.length)picked=[{id:"bonus_xp",kind:"bonus",icon:"✦",name:"Memory Encore",desc:"All sounds collected. Pip turns the encore into 60 XP."},{id:"bonus_wish",kind:"bonus",icon:"★",name:"Wish Encore",desc:"All sounds collected. Start the next wave with a Wish Star."},{id:"bonus_heat",kind:"bonus",icon:"♥",name:"Warm Encore",desc:"All sounds collected. Start the next wave with extra HEAT."}];
  while(picked.length<3)picked.push(picked[picked.length-1]);S.audioChoices=picked;$("audioOwned").textContent=audioOwnedLabel();picked.forEach((a,i)=>{$("audioChoice"+i).innerHTML=`<div class="note">${a.icon}</div><b>${a.name}</b><span class="small">${a.desc}</span>`});
 }
-function skipPipUpgrade(){if(!S.stagePending)return;showPipMessage("no emotional upgrade this time? that's okay. I already love being your Pip.",true);openAbilityStep()}
+function skipPipUpgrade(){if(!S.stagePending)return;openAbilityStep()}
 const BOSS_POWER_INFO={
  starshot:{icon:"✦",name:"Starshot",desc:"Pip autonomously fires at enemies while orbiting you.",levelDesc:lv=>`Lv ${lv}: Pip fires every ${Math.max(.62,1.45-(lv-1)*.12).toFixed(2)}s for stronger star damage.`},
  heartmark:{icon:"♥",name:"Heart Mark",desc:"Repeated player hits mark an enemy; marked enemies take extra damage.",levelDesc:lv=>`Lv ${lv}: mark every ${Math.max(3,6-lv)} hits; marked targets take +${25+(lv-1)*10}% damage.`},
  heartburst:{icon:"♡",name:"Heartburst",desc:"Defeating a marked enemy detonates a damaging love pulse.",levelDesc:lv=>`Lv ${lv}: ${105+(lv-1)*15}px burst radius with stronger damage.`},
  guardian:{icon:"◇",name:"Guardian Catch",desc:"Pip intercepts a hit while orbiting you.",levelDesc:lv=>`Lv ${lv}: ${1+Math.floor((lv-1)/2)} protected hit${1+Math.floor((lv-1)/2)===1?"":"s"} per wave.`},
  echo:{icon:"✧",name:"Echo Star",desc:"Pip periodically copies your entire firing volley.",levelDesc:lv=>`Lv ${lv}: copies every ${Math.max(2,5-lv)}th volley.`},
- relay:{icon:"➜",name:"Heart Relay",desc:"When Pip returns with a Heart Bit, you both surge with power.",levelDesc:lv=>`Lv ${lv}: ${4+lv}s return buff with faster fire and stronger attacks.`},
+ relay:{icon:"➜",name:"Heart Relay",desc:"Delivering hearts briefly boosts fire rate and attack power. Triggers once every 8 seconds.",levelDesc:lv=>`Lv ${lv}: ${(.5+Math.max(0,lv-1)*.1).toFixed(1)}s delivery buff · 8s trigger cooldown.`},
  constellation:{icon:"✺",name:"Constellation",desc:"Pip periodically releases a radial starburst while orbiting.",levelDesc:lv=>`Lv ${lv}: ${6+Math.min(6,(lv-1)*2)} stars every ${Math.max(5,10-lv).toFixed(1)}s.`}
 };
 function bossPowerLevel(id){return Math.max(0,(S.pipBossPowers&&S.pipBossPowers[id])||0)}

@@ -118,33 +118,8 @@ function findPipHeartTarget(){
  return best;
 }
 function updatePipCompanion(dt){
- const orbit=pipOrbitPoint();
- if(S.pipState==="orbit"){
-   P.pipX+=(orbit.x-P.pipX)*Math.min(1,dt*12);
-   P.pipY+=(orbit.y-P.pipY)*Math.min(1,dt*12);
-   const target=findPipHeartTarget();
-   if(target){S.pipTarget=target;S.pipState="collect";sfxPipCue("depart");showPipMessage("heart spotted — I'll grab it! stay safe for me.")}
-   return;
- }
- if(S.pipState==="collect"){
-   const h=S.pipTarget;
-   if(!h||h.dead||h.life<=0){S.pipTarget=null;S.pipState="return";return}
-   const dx=h.x-P.pipX,dy=h.y-P.pipY,d=hyp(dx,dy)||1;
-   P.pipX+=dx/d*S.pipMoveSpeed*dt;P.pipY+=dy/d*S.pipMoveSpeed*dt;
-   if(d<12){collectHeartBit(h);if(S.pipLove>=2)S.lovePulsePending++;sfxPipCue("heart");S.pipTarget=null;S.pipState="return"}
-   return;
- }
- const dx=orbit.x-P.pipX,dy=orbit.y-P.pipY,d=hyp(dx,dy)||1;
- P.pipX+=dx/d*S.pipMoveSpeed*dt;P.pipY+=dy/d*S.pipMoveSpeed*dt;
- if(d<14){
-   P.pipX=orbit.x;P.pipY=orbit.y;S.pipState="orbit";sfxPipCue("return");
-   if(S.pipCompassion>=2){S.invuln=Math.max(S.invuln,.55+Math.min(.55,(S.pipCompassion-2)*.12));ring(P.x,P.y,"#7ed8ff",58)}
-   if(S.lovePulsePending>0){lovePulse(P.pipX,P.pipY);S.lovePulsePending=0}
-   warmReturnVolley();
-   const relayLv=bossPowerLevel("relay");
-   if(relayLv>0){S.pipRelayBuff=4+relayLv;popup(P.x,P.y-18,"HEART RELAY","#ffd36f",true,1.0);ring(P.x,P.y,"#ffd36f",72)}
-   showPipMessage("I'm back. bonuses online ✦");
- }
+ // B60 is the movement authority; keep B59's Rally/Setup wrapper around it.
+ updatePipTransportB60(dt);
 }
 function updateCamera(){
  const deadX=W*.15,deadY=H*.15;
