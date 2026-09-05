@@ -111,5 +111,20 @@ function runSurvivalChecksB63(){
     }finally{popup=beforePopup}
     reset();assert(!S.b66EmergencyActive,'cue survived reset');
   });
+  test('Emergency-dropped cargo survives indefinitely until two shields, then expires normally',()=>{
+    S.pipSupport=1;S.shields=2;S.invuln=0;S.pipState='collect';P.pipX=2000;transportB60().cargo=[heartFixtureB60(2000),heartFixtureB60(2000)];
+    hurt();S.shieldRegenClock=-999;assert(heartBits.every(h=>h.b67SafeDrop)&&safeCargoCountB67()===2,'cargo not safeguarded');
+    updateUI();assert($('tip').textContent.includes('CARGO 2 SAFE'),'safe cargo cue missing');
+    stepB59(18);assert(heartBits.length===2&&heartBits.every(h=>h.life>9.9),'cargo expired during emergency');
+    const life=heartBits[0].life;openAscendedPauseB39();stepB59(2);assert(heartBits[0].life===life,'pause changed safe lifetime');closeAscendedPauseB39();
+    S.shields=2;S.pipSupport=0;P.pipX=P.x;heartBits.forEach(h=>{h.x=10000;h.y=0});stepB59(9.8);
+    assert(heartBits.length===2&&heartBits[0].life<.3,'normal countdown did not resume');stepB59(.3);assert(heartBits.length===0,'released cargo did not expire');
+  });
+  test('Ordinary hearts retain normal lifetime and recovered safe cargo banks once',()=>{
+    const ordinary=heartFixtureB60();ordinary.life=.2;heartBits=[ordinary];stepB59(.3);assert(!heartBits.includes(ordinary),'ordinary heart was protected');
+    transportFixtureB60();S.pipSupport=1;S.shields=2;S.invuln=0;transportB60().cargo=[heartFixtureB60()];hurt();
+    const dropped=heartBits[0];S.shields=2;S.pipSupport=0;S.pipState='collect';assert(gatherHeartB60(dropped),'safe cargo not recoverable');deliverCargoB60(false);
+    assert(S.runHearts===1&&S.heartCurrency===1&&dropped.dead,'recovered cargo did not bank once');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
