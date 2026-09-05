@@ -147,5 +147,12 @@ function runSurvivalChecksB63(){
     showPipMessage('lane check');assert($('pipMood').textContent.includes('lane check'),'Pip message content lost');
     S.pipSupport=1;S.shields=1;S.pipState='return';updateUI();assert($('tip').textContent.includes('PIP RETURNING')&&!$('pipMood').textContent.includes('PIP RETURNING'),'combat tip merged into dialogue');
   });
+  test('Heart timer reports the mechanical reserve only while Pip is away',()=>{
+    S.pipCompassion=2;S.b51PipBond=.5;S.b51PipBondVisual=.5;S.pipState='collect';
+    assert(near(pipBondSecondsRemainingB72(),1),'timer ignored bond or Compassion');
+    const beforeFill=X.fillText,seen=[];X.fillText=(text,...args)=>seen.push(String(text));
+    try{drawPipBondTimerB72();assert(seen.includes('1.0s'),'away timer not drawn');seen.length=0;S.pipState='orbit';drawPipBondTimerB72();assert(!seen.length,'orbit timer added permanent clutter')}finally{X.fillText=beforeFill}
+    S.pipState='return';S.b51PipBond=0;assert(pipBondSecondsRemainingB72()===0,'empty timer did not reach zero');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
