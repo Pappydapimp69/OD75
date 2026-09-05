@@ -69,6 +69,10 @@ qaButtonB59("Full cargo",()=>{
   qaFrozenB59=true;qaStatusB59();
 });
 qaButtonB59("Meet Pip",()=>{P.x=P.pipX-20;P.y=P.pipY;qaUpdateB59(.02);qaStatusB59()});
+qaButtonB59("Emergency return",()=>{
+  transportFixtureB60();S.pipSupport=1;S.shields=2;S.invuln=0;S.pipState="collect";
+  transportB60().cargo=[heartFixtureB60(),heartFixtureB60()];hurt();updateUI();qaFrozenB59=true;qaStatusB59();
+});
 qaButtonB59("Hold Heart Mix",()=>{
   const button=$("audioChoice0");button.focus();
   window.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));

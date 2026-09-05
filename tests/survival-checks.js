@@ -99,5 +99,17 @@ function runSurvivalChecksB63(){
     S.stage=11;updateUI();assert($('difficultyHudB65').textContent==='DIFF · STAGE SCALE','legacy HUD wrong');
     reset();assert($('difficultyHudB65').textContent==='DIFF · OPENING','reset HUD stale');
   });
+  test('Supportive emergency announces once, labels return and guard, then clears at two shields',()=>{
+    S.pipSupport=1;S.shields=2;S.invuln=0;S.pipState='collect';transportB60().cargo=[heartFixtureB60(),heartFixtureB60()];
+    const beforePopup=popup,seen=[];popup=(...args)=>seen.push(args);
+    try{
+      hurt();updateUI();assert(seen.some(args=>String(args[2]).includes('CARGO DROPPED ×2'))&&S.b66EmergencyActive,'activation missing');
+      assert($('tip').textContent.includes('PIP RETURNING')&&$('tip').textContent.includes('SHIELDS 1/2'),'return label missing');
+      const count=seen.length;update(.02);update(.02);assert(seen.length===count,'announcement repeated');
+      P.pipX=P.x+10;P.pipY=P.y;update(.02);updateUI();assert($('tip').textContent.includes('PIP GUARDING'),'guard label missing');
+      S.shields=2;update(.02);updateUI();assert(!S.b66EmergencyActive&&!$('tip').textContent.includes('PIP GUARDING'),'cue did not clear');
+    }finally{popup=beforePopup}
+    reset();assert(!S.b66EmergencyActive,'cue survived reset');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
