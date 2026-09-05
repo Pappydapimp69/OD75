@@ -3,7 +3,7 @@ const B60_HEART_WEIGHT=3;
 function transportB60(){return S.b60||(S.b60={cargo:[],relayCd:0,rest:0})}
 function cargoWeightB60(){return transportB60().cargo.length*B60_HEART_WEIGHT}
 function carrySpeedB60(){return S.pipMoveSpeed*(1-.5*clamp(cargoWeightB60()/S.pipCarryCapacity,0,1))}
-function heartRangeB60(lv){return Math.min(200,41+Math.min(10,lv)*8+Math.max(0,lv-10)*2)}
+function heartRangeB60(lv){return Math.min(200,82+Math.min(10,lv)*8+Math.max(0,lv-10)*2)}
 function nextCargoTargetB60(){
   if(cargoWeightB60()>=S.pipCarryCapacity)return null;
   let best=null,distance=S.pipDetectRange;

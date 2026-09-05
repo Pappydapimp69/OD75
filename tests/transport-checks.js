@@ -23,7 +23,7 @@ function runTransportChecksB60(){
   test("Heart Sense grows slower after 10, caps range, and never multiplies Swift",()=>{
     transportFixtureB60();const values=[];
     for(const lv of [0,9,10,11,20,100]){S.pipRangeLv=lv;applyPipPower();values.push(S.pipDetectRange);assert(S.pipMoveSpeed===285,"Sense changes flight speed");assert(S.pipCarryCapacity===10+lv*2,"capacity progression");}
-    assert(values.join() === [41,113,121,123,141,200].join(),"wrong range curve");
+    assert(values.join() === [82,154,162,164,182,200].join(),"wrong range curve");
     S.pipSpeedLv=2;applyPipPower();assert(S.pipMoveSpeed===353,"Swift altered by Sense");
   });
   test("Remote pickups become cargo without crediting currency or lifetime totals",()=>{

@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Partnership Survival B63 ${{ github.sha }}
+run-name: OD75 Range and Difficulty Entry B64 ${{ github.sha }}
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-fund --no-audit
           npm test
-      - name: Verify B63 survival and previous build contracts
+      - name: Verify B64 range and difficulty and previous build contracts
         run: |
           test -f index.html
           for f in b21-01.js b21-02.js b21-03.js b21-04.js b21-05.js b21-06.js b21-07.js b21-08.js b21-09.js b21-10.js b21-11.js b21-12.js b21-13.js b21-14.js b21-15.js b21-16.js b21-17.js b21-18.js b21-19.js b21-20.js b21-21.js b21-22.js b21-23.js b21-24.js b21-25.js b21-26.js b21-27.js b21-28.js b21-29.js b21-30.js b21-31.js b21-32.js b21-33.js b21-34.js b21-35.js b21-36.js b21-37.js b21-38.js b21-39.js b21-40.js b21-41.js b21-42.js b21-43.js b21-44.js b21-45.js b21-46.js b21-47.js b21-48.js b21-49.js b21-50.js b21-51.js b21-52.js; do test -f "$f"; node --check "$f"; done
@@ -148,11 +148,12 @@ jobs:
           assert 'const B62_LONELY_SPEED_FACTOR=.9' in s
           assert s.index('// B63 Partnership survival') > s.index('// B61 Saved movement tuning')
           assert 'runHearts:0' in s and 'function emergencyRecallB63()' in s
+          assert 'pipDetectRange:82' in s and 'earlyRunHearts:0' in s
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-03-B63-PARTNERSHIP-SURVIVAL/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B63-PARTNERSHIP-SURVIVAL/g' _site/index.html
-          grep -Fq 'OD75-2026-09-03-B63-PARTNERSHIP-SURVIVAL' _site/index.html
-          grep -Fq 'game.js?v=B63-PARTNERSHIP-SURVIVAL' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-03-B64-RANGE-DIFFICULTY-ENTRY/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B64-RANGE-DIFFICULTY-ENTRY/g' _site/index.html
+          grep -Fq 'OD75-2026-09-03-B64-RANGE-DIFFICULTY-ENTRY' _site/index.html
+          grep -Fq 'game.js?v=B64-RANGE-DIFFICULTY-ENTRY' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6

@@ -69,7 +69,7 @@ function pipBondName(level){
 function applyPipPower(){
  const lv=S.pipLevel||1;
  const senseLv=Math.max(0,S.pipRangeLv||0);
- S.pipDetectRange=Math.min(200,41+Math.min(10,senseLv)*8+Math.max(0,senseLv-10)*2);
+ S.pipDetectRange=Math.min(200,82+Math.min(10,senseLv)*8+Math.max(0,senseLv-10)*2);
  S.pipCarryCapacity=10+senseLv*2;
  S.pipMoveSpeed=285+(S.pipSpeedLv||0)*34;
  S.attackMax=Math.max(.17,.33-(lv-1)*.014-(S.pipPowerLv||0)*.006);
@@ -130,9 +130,9 @@ function reset(){
     pipHitCount:0,pipVolleyCount:0,pipShotCd:.8,pipConstellationCd:4,pipRelayBuff:0,supportRush:0,
     guardianCharges:0,lovePulsePending:0,
     audioUnlocks:new Set(pip.audio||[]),audioEnabled:true,audioChoices:[],stageGrowthChoice:null,
-    heartCurrency:0,runHearts:0,heartTotal:loadHeartTotal(),stageCurrency:0,upgradeCost:12,
+    heartCurrency:0,runHearts:0,earlyRunHearts:0,heartTotal:loadHeartTotal(),stageCurrency:0,upgradeCost:12,
     weaponPower:1,projectileSize:6,supportPower:1,loveWishBonus:0,
-    pipState:"orbit",pipTarget:null,pipDetectRange:41,pipMoveSpeed:285,pipSoundCd:0,
+    pipState:"orbit",pipTarget:null,pipDetectRange:82,pipMoveSpeed:285,pipSoundCd:0,
     health:100,maxHealth:100,shields:3,maxShields:3,shieldRegenDelay:4.0,shieldRegenRate:5.5,shieldRegenClock:0,
     dashCd:0,dashMax:.72,dashTime:0,attackCd:0,attackMax:.33,attackRange:Math.min(270,Math.max(185,Math.min(W,H)*.55)),invuln:0,spawn:0,phase:0,chains:0,nearMiss:0,
     dashKills:0,dashKillsThisDash:0,wishes:0,praiseCd:0,praiseCount:0,lastPraise:"",pipHappy:0,

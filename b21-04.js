@@ -188,7 +188,7 @@ function advanceToNextStage(){
    openStageUpgrade();
    return;
  }
- S.stage++;S.stageCurrency=0;S.stageTime=0;S.stageEnding=false;S.stageWaveCount=0;S.bossActive=false;S.bossDefeated=false;S.bossName="";S.bossMaxHp=0;S.bossMidPraise=false;S.bossStartedAt=0;S.bossRewardPending=false;S.bossRewardChoices=[];S.stagePraiseMark=30;S.noHitClock=0;S.nextNoHitPraise=16;S.stagePending=false;S.run=true;last=performance.now();if(audioEngine)audioEngine.setTempo(S.stage>=5?124:116);startWave(S.wave+1);
+ S.stage++;if(S.stage===4)S.earlyRunHearts=S.runHearts||0;S.stageCurrency=0;S.stageTime=0;S.stageEnding=false;S.stageWaveCount=0;S.bossActive=false;S.bossDefeated=false;S.bossName="";S.bossMaxHp=0;S.bossMidPraise=false;S.bossStartedAt=0;S.bossRewardPending=false;S.bossRewardChoices=[];S.stagePraiseMark=30;S.noHitClock=0;S.nextNoHitPraise=16;S.stagePending=false;S.run=true;last=performance.now();if(audioEngine)audioEngine.setTempo(S.stage>=5?124:116);startWave(S.wave+1);
 }
 function openStageUpgrade(){
  const bossClear=!!S.bossRewardPending;

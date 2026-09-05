@@ -19,6 +19,15 @@ function runSurvivalChecksB63(){
       assert(waveGoalFor(99)===8+Math.floor((tier-1)*2/3),'wrong heart kill target');
     }
   });
+  test('Stage 4 discounts only opening hearts once, then counts new hearts normally',()=>{
+    S.stage=3;S.wave=9;S.runHearts=60;S.stageEnding=false;advanceToNextStage();
+    assert(S.stage===4&&S.earlyRunHearts===60&&difficultyHeartsB63()===20&&difficultyStageB63()===2,'entry discount wrong');
+    assert(S.waveGoal===waveGoalFor(S.wave),'first wave used undiscounted hearts');
+    S.runHearts+=20;assert(difficultyHeartsB63()===40&&difficultyStageB63()===3,'new hearts discounted');
+    advanceToNextStage();assert(S.earlyRunHearts===60&&difficultyHeartsB63()===40,'discount repeated next stage');
+    S.stage=11;assert(difficultyStageB63()===11,'discount leaked into legacy scaling');
+    reset();assert(S.earlyRunHearts===0&&S.runHearts===0,'discount survived new run');
+  });
   test('Stage 11 restores exact legacy speed, cap, health, wave and boss formulas',()=>{
     for(const stage of [11,13,17,30]){
       S.stage=stage;S.wave=(stage-1)*3+2;S.stageWaveCount=2;S.runHearts=0;S.bossCount=3;

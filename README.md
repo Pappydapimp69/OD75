@@ -11,7 +11,8 @@ the return. He stays with you until shields recover to 2. Dropped hearts can be
 recovered; they are not banked automatically. The 10% empty-heart speed penalty remains.
 
 Stages 1–3 keep opening difficulty. Stages 4–10 gain one difficulty tier per
-20 hearts banked this run, capped at tier 10. Spending hearts does not reduce
+20 difficulty hearts, capped at tier 10. On entering stage 4, hearts banked in
+stages 1–3 count at one-third value; subsequent hearts count normally. Spending hearts does not reduce
 difficulty, and unbanked cargo does not increase it. Stage 11 onward resumes
 the original stage/wave/boss scaling. See [the B63 blueprint](docs/B63-partnership-difficulty.md).
 

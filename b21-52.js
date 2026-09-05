@@ -2,9 +2,10 @@
 const pauseScrollStyleB63=document.createElement('style');
 pauseScrollStyleB63.textContent='#pipPauseB39 .b39-section{overflow:auto;overscroll-behavior:contain}';document.head.appendChild(pauseScrollStyleB63);
 function heartSecondsB63(){return 1+Math.max(0,S?.pipCompassion||0)*.5}
+function difficultyHeartsB63(){const early=S.earlyRunHearts||0;return Math.max(0,(S.runHearts||0)-early+early/3)}
 function difficultyStageB63(){
   if(S.stage<=3)return 1;
-  return S.stage<=10?Math.min(10,1+Math.floor(Math.max(0,S.runHearts||0)/20)):S.stage;
+  return S.stage<=10?Math.min(10,1+Math.floor(difficultyHeartsB63()/20)):S.stage;
 }
 function difficultyWaveB63(){return S.stage<=10?1+(difficultyStageB63()-1)*3:Math.max(1,S.wave)}
 function difficultyBossCountB63(){return S.stage<=10?Math.floor((difficultyStageB63()-1)/3):S.bossCount}
@@ -56,5 +57,5 @@ const pauseBeforeB63=renderAscendedPauseB39;
 renderAscendedPauseB39=function(){
   pauseBeforeB63();
   $('b39CoreList').insertAdjacentHTML('beforeend',rowB39('Heart reserve',`${heartSecondsB63().toFixed(1)} seconds away · +0.5s per Compassion level. Empty heart: current cargo speed × 0.90.`,'BOND'));
-  $('b39CoreList').insertAdjacentHTML('beforeend',rowB39('Run difficulty',`${S.runHearts||0} hearts banked this run · ${S.stage<=3?'Opening difficulty':S.stage<=10?'Heart tier '+difficultyStageB63()+' / 10':'Original stage scaling'}.`,'STAGE'));
+  $('b39CoreList').insertAdjacentHTML('beforeend',rowB39('Run difficulty',`${S.runHearts||0} hearts banked this run · ${S.stage<=3?'Opening difficulty':S.stage<=10?'Heart tier '+difficultyStageB63()+' / 10 ('+difficultyHeartsB63().toFixed(1)+' difficulty hearts)':'Original stage scaling'}.`,'STAGE'));
 };
