@@ -103,7 +103,7 @@ function runSurvivalChecksB63(){
     S.pipSupport=1;S.shields=2;S.invuln=0;S.pipState='collect';transportB60().cargo=[heartFixtureB60(),heartFixtureB60()];
     const beforePopup=popup,seen=[];popup=(...args)=>seen.push(args);
     try{
-      hurt();updateUI();assert(seen.some(args=>String(args[2]).includes('CARGO DROPPED ×2'))&&S.b66EmergencyActive,'activation missing');
+      hurt();updateUI();assert(!seen.some(args=>String(args[2]).includes('CARGO DROPPED'))&&seen.some(args=>String(args[2]).includes('SHIELD BROKE'))&&S.b66EmergencyActive,'activation cues wrong');
       assert($('tip').textContent.includes('PIP RETURNING')&&$('tip').textContent.includes('SHIELDS 1/2'),'return label missing');
       const count=seen.length;update(.02);update(.02);assert(seen.length===count,'announcement repeated');
       P.pipX=P.x+10;P.pipY=P.y;update(.02);updateUI();assert($('tip').textContent.includes('PIP GUARDING'),'guard label missing');

@@ -2,7 +2,6 @@
 function announceEmergencyB66(count){
   if(S.b66EmergencyActive)return;
   S.b66EmergencyActive=true;
-  if(count)popup(P.pipX,P.pipY,`CARGO DROPPED ×${count}`,'#9ee7ff',true,.9);
   partnershipCueB59('support',P.x,P.y,count?`cargo down — I'm coming back. ${count} heart${count===1?'':'s'} can be recovered.`:"I'm coming back. stay with me.");
 }
 const hurtBeforeB66=hurt;

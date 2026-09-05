@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 Mobile Message Lane B70 ${{ github.sha }}
+run-name: OD75 Emergency Declutter B71 ${{ github.sha }}
 
 on:
   push:
@@ -156,10 +156,10 @@ jobs:
           assert s.index('// B69 Compact mobile resource HUD') > s.index('// B68 One visual recovery marker')
           assert s.index('// B70 Give Pip dialogue') > s.index('// B69 Compact mobile resource HUD')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-03-B70-MOBILE-MESSAGE-LANE/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B70-MOBILE-MESSAGE-LANE/g' _site/index.html
-          grep -Fq 'OD75-2026-09-03-B70-MOBILE-MESSAGE-LANE' _site/index.html
-          grep -Fq 'game.js?v=B70-MOBILE-MESSAGE-LANE' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-03-B71-EMERGENCY-DECLUTTER/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B71-EMERGENCY-DECLUTTER/g' _site/index.html
+          grep -Fq 'OD75-2026-09-03-B71-EMERGENCY-DECLUTTER' _site/index.html
+          grep -Fq 'game.js?v=B71-EMERGENCY-DECLUTTER' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6
