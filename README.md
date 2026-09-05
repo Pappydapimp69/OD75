@@ -2,6 +2,14 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B74: Heartfield
+
+Ordinary enemies now drop zero to three heart value while preserving their previous average rewards. Two- and three-heart drops appear as layered clusters. After 2.25 seconds, nearby ordinary drops spiral into heart nodes holding up to eight hearts. Boss rewards remain individual hearts.
+
+Pip picks up singles immediately and mines clusters or nodes one heart at a time. He chooses sources using value, distance and expiration pressure, keeps the existing one-heart cargo overflow, and banks each reunion as one clear delivery. Rally, Supportive emergency return, Ascended Pip, Gravity, Heart Relay, difficulty tiers and protected recovery caches share the same conserved heart accounting.
+
+Open **Advanced Heartfield tuning** in Game Settings or pause Settings to change node radius, settle delay, node capacity and mining interval, or load Sparse, Balanced and Dense presets. See [the B74 blueprint](docs/B74-heartfield.md).
+
 ## B63: Partnership survival
 
 Compassion adds 0.5 seconds of heart-meter duration per level instead of reducing

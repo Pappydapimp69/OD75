@@ -52,3 +52,19 @@ qaButtonB59("Render audio checks",async()=>{
   }catch(e){status.textContent+="\nERROR "+e.stack}
   finally{S=saved;enemies=savedEnemies}
 });
+
+async function renderHeartfieldAudioB74(){
+  const ctx=new OfflineAudioContext(2,Math.ceil(.8*22050),22050),engine=new PipAudioEngine(ctx);installAudioEngineB42(engine);
+  const noise=engine.noiseBuffer.getChannelData(0);let n=741;
+  for(let i=0;i<noise.length;i++){n=(n*1664525+1013904223)>>>0;noise[i]=n/4294967296*2-1}
+  scheduleHeartfieldAudioB74(engine,.05,'form',4);scheduleHeartfieldAudioB74(engine,.31,'mine',5);
+  const original=ctx.currentTime;void original;scheduleHeartfieldAudioB74(engine,.55,'deliver',3);
+  const buffer=await ctx.startRendering(),values=buffer.getChannelData(0);let sum=0,peak=0;
+  for(const value of values){sum+=value*value;peak=Math.max(peak,Math.abs(value))}
+  return {buffer,rms:Math.sqrt(sum/values.length),peak};
+}
+qaButtonB59("Render Heartfield audio",async()=>{
+  qaFrozenB59=true;const status=$("qaResults");status.textContent="Rendering Heartfield production audio…";
+  try{const result=await renderHeartfieldAudioB74(),ok=result.rms>.0005&&result.peak<.98;status.textContent=`${ok?'PASS':'FAIL'} Heartfield audio: RMS ${result.rms.toFixed(4)}, peak ${result.peak.toFixed(3)}`;
+    const player=document.createElement('audio');player.controls=true;player.src=URL.createObjectURL(audioWavB60(result.buffer));player.style.width='260px';qaPanelB59.appendChild(player)}catch(e){status.textContent='ERROR '+e.stack}
+});

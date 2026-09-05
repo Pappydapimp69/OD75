@@ -73,10 +73,18 @@ qaButtonB59("Emergency return",()=>{
   transportFixtureB60();S.pipSupport=1;S.shields=2;S.invuln=0;S.pipState="collect";
   transportB60().cargo=[heartFixtureB60(),heartFixtureB60()];hurt();updateUI();qaFrozenB59=true;qaStatusB59();
 });
+qaButtonB59("Dense Heartfield",()=>{
+  transportFixtureB60();applySettingsB74(B74_DEFAULTS);P.pipX=24;P.pipY=0;S.pipState='orbit';
+  heartBits=Array.from({length:24},(_,i)=>makeHeartSourceB74(i%6===0?3:i%4===0?2:1,90+(i%6)*24,-55+Math.floor(i/6)*34,40));
+  heartBits.forEach(h=>h.b74Age=3);scanHeartNodesB74();for(let i=0;i<18;i++)updateNodeSpiralsB74(.04);qaFrozenB59=true;qaStatusB59();
+});
+qaButtonB59("Mine Heartfield",()=>{
+  qaFrozenB59=false;const source=heartfieldB74().nodes.find(n=>heartValueB74(n)>0)||heartSourcesB74()[0];if(source){P.pipX=source.x-16;P.pipY=source.y;S.pipTarget=source;S.pipState='collect'}qaStatusB59();
+});
 qaButtonB59("Hold Heart Mix",()=>{
   const button=$("audioChoice0");button.focus();
   window.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));
   setTimeout(()=>window.dispatchEvent(new KeyboardEvent("keyup",{key:"Enter",bubbles:true,cancelable:true})),SOUNDLAB_HOLD_MS+150);
 });
 const qaCargoB60=document.createElement("pre");qaCargoB60.id="qaCargoB60";qaCargoB60.style.whiteSpace="pre-wrap";qaPanelB59.appendChild(qaCargoB60);
-setInterval(()=>{if(S?.b60)qaCargoB60.textContent=`Cargo ${S.b60.cargo.length} · weight ${cargoWeightB60()}/${S.pipCarryCapacity} · speed ${carrySpeedB60().toFixed(1)}\nBank ${S.heartCurrency} · Ground ${heartBits.length} · Relay ${S.pipRelayBuff.toFixed(2)} / CD ${S.b60.relayCd.toFixed(2)}\nAudio ${audioCtx?.state||"none"} · music voices ${audioEngine?.b60MusicVoices?.size||0} · sfx ${audioEngine?.voices?.size||0}`},200);
+setInterval(()=>{if(S?.b60)qaCargoB60.textContent=`Cargo ${cargoHeartValueB74()} · weight ${cargoWeightB60()}/${S.pipCarryCapacity} · speed ${carrySpeedB60().toFixed(1)}\nLoose ${looseHeartValueB74()} · nodes ${heartfieldB74().nodes.length}/${nodeHeartValueB74()} · Bank ${S.heartCurrency}\nRelay ${S.pipRelayBuff.toFixed(2)} / CD ${S.b60.relayCd.toFixed(2)} · scan work ${heartfieldB74().scanWork}\nAudio ${audioCtx?.state||"none"} · music voices ${audioEngine?.b60MusicVoices?.size||0} · sfx ${audioEngine?.voices?.size||0}`},200);
