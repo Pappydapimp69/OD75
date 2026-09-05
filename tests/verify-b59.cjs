@@ -18,7 +18,7 @@ win.HTMLCanvasElement.prototype.setPointerCapture = () => {};
 win.HTMLCanvasElement.prototype.releasePointerCapture = () => {};
 win.HTMLCanvasElement.prototype.getBoundingClientRect = () => ({x:0,y:0,left:0,top:0,width:1024,height:768,right:1024,bottom:768});
 const files = fs.readdirSync(root).filter(n => /^b21-\d{2}\.js$/.test(n)).sort();
-if (files.length !== 55 || files.at(-1) !== 'b21-55.js') throw Error('B67 module order');
+if (files.length !== 56 || files.at(-1) !== 'b21-56.js') throw Error('B68 module order');
 const source = files.map(n => fs.readFileSync(path.join(root, n), 'utf8')).join('');
 new vm.Script(source, {filename:'game.js'}).runInContext(dom.getInternalVMContext());
 // Browser QA covers CSS. Removing styles keeps repeated state simulations inexpensive in JSDOM.

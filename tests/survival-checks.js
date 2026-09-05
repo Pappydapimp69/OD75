@@ -126,5 +126,15 @@ function runSurvivalChecksB63(){
     const dropped=heartBits[0];S.shields=2;S.pipSupport=0;S.pipState='collect';assert(gatherHeartB60(dropped),'safe cargo not recoverable');deliverCargoB60(false);
     assert(S.runHearts===1&&S.heartCurrency===1&&dropped.dead,'recovered cargo did not bank once');
   });
+  test('Emergency drops form stable, separate recovery markers that update and disappear',()=>{
+    S.pipSupport=1;S.shields=2;S.invuln=0;transportB60().cargo=[heartFixtureB60(),heartFixtureB60()];hurt();
+    const first=cargoGroupsB68();assert(first.length===1&&first[0].count===2&&first[0].id===1,'first marker wrong');
+    const group=first[0].id,heart=heartBits[0];heart.x+=20;const moved=cargoGroupsB68()[0];assert(moved.id===group&&moved.x!==first[0].x,'centroid stale');
+    S.shields=2;S.pipState='collect';assert(gatherHeartB60(heart)&&cargoGroupsB68()[0].count===1,'collection did not update marker');
+    deliverCargoB60(false);S.shields=1;S.pipState='collect';transportB60().cargo=[heartFixtureB60()];dropCargoB63();
+    assert(cargoGroupsB68().length===2&&new Set(cargoGroupsB68().map(g=>g.id)).size===2,'drop groups merged');
+    heartBits.forEach(h=>h.dead=true);assert(cargoGroupsB68().length===0,'empty marker survived');
+    reset();assert(!S.b68DropSerial&&cargoGroupsB68().length===0,'marker state survived reset');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
