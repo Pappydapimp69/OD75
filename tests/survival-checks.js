@@ -154,5 +154,14 @@ function runSurvivalChecksB63(){
     try{drawPipBondTimerB72();assert(seen.includes('1.0s'),'away timer not drawn');seen.length=0;S.pipState='orbit';drawPipBondTimerB72();assert(!seen.length,'orbit timer added permanent clutter')}finally{X.fillText=beforeFill}
     S.pipState='return';S.b51PipBond=0;assert(pipBondSecondsRemainingB72()===0,'empty timer did not reach zero');
   });
+  test('Banking a heart-tier boundary pulses the difficulty pill and obeys pause',()=>{
+    S.stage=4;S.earlyRunHearts=0;S.runHearts=19;collectHeartBit(heartFixtureB60());updateUI();
+    assert(S.b73DifficultyTier===2&&near(S.b73DifficultyPulse,1)&&difficultyHudB65.classList.contains('b73-tier-up'),'tier cue missing');
+    assert(difficultyHudB65.textContent==='DIFF · ♥ T2 · 0/20'&&difficultyHudB65.getAttribute('aria-label').includes('Tier 2 reached'),'new tier not reported');
+    S.b39Paused=true;update(.4);assert(near(S.b73DifficultyPulse,1),'pause consumed cue');S.b39Paused=false;update(.4);assert(S.b73DifficultyPulse<1,'active play did not consume cue');
+    S.b73DifficultyPulse=.01;update(.02);updateUI();assert(!difficultyHudB65.classList.contains('b73-tier-up'),'expired cue stayed lit');
+    for(const stage of [3,11]){transportFixtureB60();S.stage=stage;S.runHearts=19;collectHeartBit(heartFixtureB60());assert(!S.b73DifficultyPulse,`stage ${stage} triggered heart-tier cue`)}
+    reset();assert(!S.b73DifficultyPulse&&!difficultyHudB65.classList.contains('b73-tier-up'),'reset retained cue');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
