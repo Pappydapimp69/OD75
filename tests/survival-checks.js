@@ -91,5 +91,13 @@ function runSurvivalChecksB63(){
     assert($('b39CoreList').textContent.includes('2.0 seconds away')&&emotionalNextText('compassion').includes('2.0 → 2.5')&&emotionalNextText('support').includes('Below 2 shields'),'copy stale');
     closeAscendedPauseB39();
   });
+  test('Difficulty HUD reports opening, heart-tier progress, max and legacy bands',()=>{
+    S.stage=2;updateUI();assert($('difficultyHudB65').textContent==='DIFF · OPENING','opening HUD wrong');
+    S.stage=4;S.earlyRunHearts=30;S.runHearts=30;updateUI();assert($('difficultyHudB65').textContent==='DIFF · ♥ T1 · 10/20','discount HUD wrong');
+    S.runHearts=40;updateUI();assert($('difficultyHudB65').textContent==='DIFF · ♥ T2 · 0/20'&&$('difficultyHudB65').getAttribute('aria-label').includes('toward tier 3'),'boundary HUD wrong');
+    S.runHearts=220;updateUI();assert($('difficultyHudB65').textContent==='DIFF · ♥ T10 MAX','max HUD wrong');
+    S.stage=11;updateUI();assert($('difficultyHudB65').textContent==='DIFF · STAGE SCALE','legacy HUD wrong');
+    reset();assert($('difficultyHudB65').textContent==='DIFF · OPENING','reset HUD stale');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
