@@ -142,5 +142,10 @@ function runSurvivalChecksB63(){
     assert(items.length===6&&items.map(x=>x.getAttribute('aria-label')).join('|')==='Hearts 12|Prism Seeds 3|Music Notes 4|Run Stars 5|Sound Choices 2|Mix Choices 1','resource HUD lost data');
     S.b47CurrencyHudMoving=true;renderCurrencyHudB47();assert($('currencyHud').classList.contains('b47-moving'),'movement fade lost');
   });
+  test('Pip dialogue is one polite status region and emergency tip stays separate',()=>{
+    assert($('pipMood').getAttribute('role')==='status'&&$('pipMood').getAttribute('aria-live')==='polite'&&$('pipMood').getAttribute('aria-atomic')==='true','Pip message semantics missing');
+    showPipMessage('lane check');assert($('pipMood').textContent.includes('lane check'),'Pip message content lost');
+    S.pipSupport=1;S.shields=1;S.pipState='return';updateUI();assert($('tip').textContent.includes('PIP RETURNING')&&!$('pipMood').textContent.includes('PIP RETURNING'),'combat tip merged into dialogue');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
