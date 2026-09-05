@@ -136,5 +136,11 @@ function runSurvivalChecksB63(){
     heartBits.forEach(h=>h.dead=true);assert(cargoGroupsB68().length===0,'empty marker survived');
     reset();assert(!S.b68DropSerial&&cargoGroupsB68().length===0,'marker state survived reset');
   });
+  test('Mobile HUD preserves every resource, accessible label and movement fade',()=>{
+    S.heartCurrency=12;S.prismSeeds=3;S.musicNotes=4;S.starPoints=5;S.pipSoundCredits=2;S.audioMixCredits=1;renderCurrencyHudB47();
+    const items=[...$('currencyHud').querySelectorAll('.b47-currency')];
+    assert(items.length===6&&items.map(x=>x.getAttribute('aria-label')).join('|')==='Hearts 12|Prism Seeds 3|Music Notes 4|Run Stars 5|Sound Choices 2|Mix Choices 1','resource HUD lost data');
+    S.b47CurrencyHudMoving=true;renderCurrencyHudB47();assert($('currencyHud').classList.contains('b47-moving'),'movement fade lost');
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
