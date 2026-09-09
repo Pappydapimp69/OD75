@@ -10,7 +10,7 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 ## Progress
 
-4 / 50 additional loops verified.
+5 / 50 additional loops verified.
 
 - Loop 1 / B77: `db8ad3f1e5f85b6998221e40338a3dce8113e0b4`. Bounded charger anticipation; 117 regression checks and 3 browser checks, desktop/mobile warning inspection. Pages run 34344355055 succeeded; public stamp, cache key and full bundle matched.
 
@@ -20,7 +20,9 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 - Loop 4 / B80: `21852dbc84376ba22905437436fc477440f07824`. Danger replanning in `b21-69.js`; 125 full-bundle regression checks and all 11 autonomy assertions pass locally and in-browser. Desktop/mobile REROUTING cues inspected with no browser warnings or errors. Pages run 34380930782 succeeded; public response, B80 stamp/cache key and normalized complete bundle independently matched (`ded01e49f1ca5bba5f09e83bef32e02a0ba393e626b427c1790d6bb52ce953c9`).
 
-In progress: loop 5 / B81, independent sound ducking. Completed boss and damage envelopes no longer leak their deepest historical attenuation into later impacts; overlaps preserve the stronger active duck and extend recovery. 128 complete-bundle regression checks, 3/3 browser envelope checks, 14/14 wave/boss mix renders and the Heartfield audio render pass. Rendered peaks remain below 0.102 with no browser warnings or errors. Finish exact-commit deployment and independent public verification before counting it.
+- Loop 5 / B81: `f1d859ef4d50ad651325e4103b449c1ad01920db`. Independent sound ducking in `b21-70.js`; completed boss and damage envelopes no longer contaminate later impacts, while overlaps preserve the stronger active duck and extend recovery. 128 complete-bundle regressions, 3/3 browser envelope checks, 14/14 wave/boss mix renders and the Heartfield audio render passed. Peaks remained below 0.102 with no browser warnings or errors. Pages run 34382554770 succeeded; public HTTP response, B81 stamp/cache key and normalized complete bundle independently matched (`68186f18fecda097e50511370226f23642ed0d0ef866f54f42a1ac6fac94ed2a`).
+
+In progress: loop 6 / B82, late-stage enemy rotations. Stages 7–10 now rotate through swarm, core-pressure and controlled charger waves with lower 13/14/15 landscape and 10/11/12 portrait caps. Stages 1–6 and stage 11+ remain unchanged. 131 complete-bundle regressions and all 3 B82 browser assertions pass; desktop/mobile roster and HUD output were inspected with no browser warnings or errors. Finish exact-commit deployment and independent public verification before counting it.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. Set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 

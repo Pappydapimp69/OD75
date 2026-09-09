@@ -163,5 +163,14 @@ function runSurvivalChecksB63(){
     for(const stage of [3,11]){transportFixtureB60();S.stage=stage;S.runHearts=19;collectHeartBit(heartFixtureB60());assert(!S.b73DifficultyPulse,`stage ${stage} triggered heart-tier cue`)}
     reset();assert(!S.b73DifficultyPulse&&!difficultyHudB65.classList.contains('b73-tier-up'),'reset retained cue');
   });
+  test('B82 stages one through six preserve the original enemy population path',()=>{
+    for(const stage of [1,4,6]){S.stage=stage;S.stageWaveCount=3;S.runHearts=180;assert(enemyRosterB82()===null,'early stage gained rotation');assert(enemyCap()===enemyCapBeforeB82(),'early cap changed')}
+  });
+  test('B82 late waves rotate every enemy type through lower rising caps',()=>{
+    const width=W,height=H;try{W=1000;H=600;S.stage=7;for(let wave=1;wave<=3;wave++){S.stageWaveCount=wave;const roster=enemyRosterB82(),expected=B82_ROSTERS[wave-1];assert(roster===expected&&enemyCap()===12+wave,'landscape rotation/cap wrong');assert(rosterEnemyB82(roster,.1)==='chaser'&&rosterEnemyB82(roster,(roster.chaser+roster.core)/2)==='core'&&rosterEnemyB82(roster,.99)==='charger','roster lost an enemy type')}W=390;H=844;for(let wave=1;wave<=3;wave++){S.stageWaveCount=wave;assert(enemyCap()===9+wave,'portrait cap wrong')}}finally{W=width;H=height}
+  });
+  test('B82 stage eleven restores the exact legacy cap and roster',()=>{
+    const width=W,height=H;try{S.stage=11;S.wave=31;S.stageWaveCount=2;S.runHearts=999;assert(enemyRosterB82()===null,'rotation leaked into legacy');W=1000;H=600;assert(enemyCap()===18&&enemyCap()===enemyCapBeforeB82(),'landscape legacy cap changed');W=390;H=844;assert(enemyCap()===15&&enemyCap()===enemyCapBeforeB82(),'portrait legacy cap changed')}finally{W=width;H=height}
+  });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
