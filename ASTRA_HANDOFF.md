@@ -25,7 +25,7 @@ The project is configured for low context cost:
 Current state:
 - Brain mode is full and stance is brief.
 - The project tracks `https://github.com/Pappydapimp69/OD75.git` on `main`.
-- B76 Pip Notices is the active build; read `docs/B76-pip-notices.md`.
+- B76 Pip Notices is the baseline for the authorized 50-loop autonomous run. Read `docs/AUTONOMOUS-BUILDS.md` for current progress and resume unfinished work.
 - Run `npm test` and `npm run build` before publishing any change.
 
 Suggested first action after launch:

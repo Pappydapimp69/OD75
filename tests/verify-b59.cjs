@@ -18,7 +18,7 @@ win.HTMLCanvasElement.prototype.setPointerCapture = () => {};
 win.HTMLCanvasElement.prototype.releasePointerCapture = () => {};
 win.HTMLCanvasElement.prototype.getBoundingClientRect = () => ({x:0,y:0,left:0,top:0,width:1024,height:768,right:1024,bottom:768});
 const files = fs.readdirSync(root).filter(n => /^b21-\d{2}\.js$/.test(n)).sort();
-if (files.length !== 65 || files.at(-1) !== 'b21-65.js') throw Error('B76 module order');
+if (files.length !== 66 || files.at(-1) !== 'b21-66.js') throw Error('B77 module order');
 const source = files.map(n => fs.readFileSync(path.join(root, n), 'utf8')).join('');
 new vm.Script(source, {filename:'game.js'}).runInContext(dom.getInternalVMContext());
 // Browser QA covers CSS. Removing styles keeps repeated state simulations inexpensive in JSDOM.
@@ -37,6 +37,8 @@ new vm.Script(fs.readFileSync(path.join(__dirname, 'launch-checks.js'), 'utf8'))
 results.push(...vm.runInContext('runLaunchChecksB75()', dom.getInternalVMContext()));
 new vm.Script(fs.readFileSync(path.join(__dirname, 'feelings-checks.js'), 'utf8')).runInContext(dom.getInternalVMContext());
 results.push(...vm.runInContext('runFeelingsChecksB76()', dom.getInternalVMContext()));
+new vm.Script(fs.readFileSync(path.join(__dirname, 'autonomy-checks.js'), 'utf8')).runInContext(dom.getInternalVMContext());
+results.push(...vm.runInContext('runAutonomyChecks()', dom.getInternalVMContext()));
 for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'} ${r.name}${r.error ? ': '+r.error : ''}`);
 dom.window.close();
 if (results.some(r => !r.ok)) process.exitCode = 1;

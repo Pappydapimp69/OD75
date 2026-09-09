@@ -13,9 +13,9 @@
 
 ## Next
 
-1. If local `main` is ahead, push it and verify the exact GitHub Pages commit, B76 stamp and assembled bundle.
-2. Playtest whether Pip's learned habits feel understandable and emotionally meaningful. Watch for overly cautious collection and false approach recognition.
-3. Memories currently last one run. Do not add controls, persistent affection scores or a live model without further design discussion.
+1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; finish an in-progress loop through public verification first.
+2. B76 is the verified baseline. B77 adds bounded charger anticipation and has 117 passing checks plus desktop/mobile browser checks.
+3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints
 

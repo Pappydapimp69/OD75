@@ -7,7 +7,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 ## Source Map
 
 - `index.html`: base shell and original launch/stage/end markup.
-- `b21-01.js` through `b21-65.js`: ordered gameplay modules and late overrides.
+- `b21-*.js`: lexically ordered gameplay modules and late overrides; see `docs/AUTONOMOUS-BUILDS.md` for the active release.
 - `scripts/build.mjs`: syntax-checks and assembles `_site/game.js` with the release stamp.
 - `tests/verify-b59.cjs`: complete JSDOM regression entrypoint.
 - `tests/*-checks.js`: focused gameplay, settings, survival, Heartfield and launch contracts.
