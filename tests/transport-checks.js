@@ -164,5 +164,17 @@ function runTransportChecksB60(){
       }finally{btn.getBoundingClientRect=rect;cancelSoundLabHoldB45();clearGamepadMenuB35()}
     }}finally{Object.defineProperty(performance,"now",{configurable:true,value:now})}
   });
+  test("B81 completed deep ducks cannot contaminate later light impacts",()=>{
+    const savedCtx=audioCtx,savedEngine=audioEngine,events=[],ctx={currentTime:0},gain={value:.46,cancelScheduledValues:t=>events.push(['cancel',t]),setTargetAtTime:(v,t,c)=>events.push(['target',v,t,c])},engine={ctx,music:{gain},voiceLimit:24,voices:new Set()};
+    try{audioCtx=ctx;audioEngine=engine;installAudioEngineB42(engine);duckMusicB42(.62,.34);ctx.currentTime=.35;smoothMusicBusB42(engine);assert(engine.b42DuckFactor===1&&Math.abs(events.at(-1)[1]-baseMusicGainB81())<1e-8,"deep duck did not recover");ctx.currentTime=.5;duckMusicB42(.78,.14);assert(engine.b42DuckFactor===.78&&Math.abs(events.at(-2)[1]-baseMusicGainB81()*.78)<1e-8,"light impact inherited deep duck")}finally{audioCtx=savedCtx;audioEngine=savedEngine}
+  });
+  test("B81 overlapping impacts keep the deeper duck and extend recovery",()=>{
+    const savedCtx=audioCtx,savedEngine=audioEngine,ctx={currentTime:1},gain={value:.46,cancelScheduledValues(){},setTargetAtTime(){}},engine={ctx,music:{gain},voiceLimit:24,voices:new Set()};
+    try{audioCtx=ctx;audioEngine=engine;installAudioEngineB42(engine);duckMusicB42(.62,.2);ctx.currentTime=1.1;duckMusicB42(.78,.5);assert(engine.b42DuckFactor===.62&&Math.abs(engine.b42DuckUntil-1.6)<1e-8,"overlap lifted or shortened deep duck");ctx.currentTime=1.61;smoothMusicBusB42(engine);assert(engine.b42DuckFactor===1,"overlap never recovered")}finally{audioCtx=savedCtx;audioEngine=savedEngine}
+  });
+  test("B81 envelopes use fast attack, slow release and stable scheduling",()=>{
+    const savedCtx=audioCtx,savedEngine=audioEngine,events=[],ctx={currentTime:2},gain={value:.46,cancelScheduledValues:t=>events.push(['cancel',t]),setTargetAtTime:(v,t,c)=>events.push(['target',v,t,c])},engine={ctx,music:{gain},voiceLimit:24,voices:new Set()};
+    try{audioCtx=ctx;audioEngine=engine;installAudioEngineB42(engine);duckMusicB42(.1,2);const size=events.length;assert(engine.b42DuckFactor===.35&&engine.b42DuckUntil===2.8,"duck bounds failed");assert(events[1][3]===B81_DUCK_ATTACK&&events[2][2]===2.8&&events[2][3]===B81_DUCK_RELEASE,"envelope timing wrong");smoothMusicBusB42(engine);assert(events.length===size,"unchanged envelope rescheduled")}finally{audioCtx=savedCtx;audioEngine=savedEngine}
+  });
   reset();return results;
 }

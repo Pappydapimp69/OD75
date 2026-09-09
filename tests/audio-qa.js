@@ -68,3 +68,4 @@ qaButtonB59("Render Heartfield audio",async()=>{
   try{const result=await renderHeartfieldAudioB74(),ok=result.rms>.0005&&result.peak<.98;status.textContent=`${ok?'PASS':'FAIL'} Heartfield audio: RMS ${result.rms.toFixed(4)}, peak ${result.peak.toFixed(3)}`;
     const player=document.createElement('audio');player.controls=true;player.src=URL.createObjectURL(audioWavB60(result.buffer));player.style.width='260px';qaPanelB59.appendChild(player)}catch(e){status.textContent='ERROR '+e.stack}
 });
+qaButtonB59("B81 duck envelopes",()=>{const rows=runTransportChecksB60().filter(r=>r.name.startsWith('B81'));$('qaResults').textContent=rows.map(r=>`${r.ok?'PASS':'FAIL'} ${r.name}${r.error?': '+r.error:''}`).join('\n');qaFrozenB59=true});
