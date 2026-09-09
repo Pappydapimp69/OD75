@@ -7,7 +7,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 ## Source Map
 
 - `index.html`: base shell and original launch/stage/end markup.
-- `b21-01.js` through `b21-64.js`: ordered gameplay modules and late overrides.
+- `b21-01.js` through `b21-65.js`: ordered gameplay modules and late overrides.
 - `scripts/build.mjs`: syntax-checks and assembles `_site/game.js` with the release stamp.
 - `tests/verify-b59.cjs`: complete JSDOM regression entrypoint.
 - `tests/*-checks.js`: focused gameplay, settings, survival, Heartfield and launch contracts.
@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B75 adds `b21-64.js`, a launch-screen compression layer. B74 Heartfield authority remains in `b21-61.js` through `b21-63.js`.
+B76 adds `b21-65.js`: run memory, emotional source scoring, early returns and approach recognition. `tests/feelings-checks.js` checks behavior; `tests/feelings-browser.js` supplies local browser scenarios. B74 Heartfield authority remains in `b21-61.js` through `b21-63.js`; B75 launch layout is `b21-64.js`.
 
 ## Access Pattern
 

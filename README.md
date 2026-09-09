@@ -2,6 +2,12 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B76: Pip notices
+
+Pip learns within each run. Safe deliveries build confidence and commitment to fuller loads; rough trips create caution, favor safer heart sources and can lead to earlier returns. After a rough reunion he stays close briefly. Approach a burdened Pip steadily and he can recognize you coming, stop gathering and meet you with his cargo. Repeated halfway reunions make recognition faster.
+
+His intentions appear beside him and his experiences are described in the existing pause view. Loving Rally and Supportive emergencies take priority. No new controls are required. ZaneGPT shaped this local emotional decision system; the game does not call a live language model. See [the B76 blueprint](docs/B76-pip-notices.md).
+
 ## B75: Immediate launch
 
 The opening screen now keeps Start and Settings visible without scrolling at phone and desktop sizes. The goal and three controls are reduced to scan-level language while the original pointer, keyboard and controller routes remain unchanged. See [the B75 blueprint](docs/B75-launch-screen.md).

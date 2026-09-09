@@ -25,7 +25,7 @@ The project is configured for low context cost:
 Current state:
 - Brain mode is full and stance is brief.
 - The project tracks `https://github.com/Pappydapimp69/OD75.git` on `main`.
-- B75 Immediate Launch is the active build; read `docs/B75-launch-screen.md`.
+- B76 Pip Notices is the active build; read `docs/B76-pip-notices.md`.
 - Run `npm test` and `npm run build` before publishing any change.
 
 Suggested first action after launch:

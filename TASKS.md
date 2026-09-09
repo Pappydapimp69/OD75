@@ -6,15 +6,16 @@
 - Brain stance set to brief.
 - Codex-native `AGENTS.md` added.
 - Canonical OD75 `main` imported at B74 commit `4ff9a11`.
-- B75 Immediate Launch implemented locally.
-- 102 automated checks pass across all 64 ordered modules.
-- Desktop and 390×844 browser layout/input checks pass without console errors.
+- B75 Immediate Launch published and verified at `457fb14`.
+- B76 Pip Notices implemented: memory changes routes, trip commitment and rendezvous.
+- 114 automated checks pass across all 65 ordered modules.
+- Browser checks confirm cautious return versus confident gathering, mobile intention cues and pause explanations.
 
 ## Next
 
-1. If local `main` is ahead, push it and verify the exact GitHub Pages commit, B75 stamp and assembled bundle.
-2. Playtest whether the compressed first screen is enough for a new player.
-3. Record concrete player friction before selecting B76; do not invent unrelated scope.
+1. If local `main` is ahead, push it and verify the exact GitHub Pages commit, B76 stamp and assembled bundle.
+2. Playtest whether Pip's learned habits feel understandable and emotionally meaningful. Watch for overly cautious collection and false approach recognition.
+3. Memories currently last one run. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints
 
