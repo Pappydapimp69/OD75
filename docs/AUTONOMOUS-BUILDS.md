@@ -10,9 +10,13 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 ## Progress
 
-0 / 50 additional loops verified.
+1 / 50 additional loops verified.
 
-In progress: B77 / loop 1, reading movement. See its blueprint and `b21-66.js`. Finish this loop before selecting another.
+- Loop 1 / B77: `db8ad3f1e5f85b6998221e40338a3dce8113e0b4`. Bounded charger anticipation; 117 regression checks and 3 browser checks, desktop/mobile warning inspection. Pages run 34344355055 succeeded; public stamp, cache key and full bundle matched.
+
+In progress: loop 2 / B78, specific caution. 119 regression checks and all 5 autonomous browser checks pass; fresh versus remembered patch selection verified in-browser, mobile pause explanation uses the existing scroll area. Finish exact-commit deployment and public verification before counting it.
+
+Continuation automation: `od75-finish-50-zanegpt-build-loops` (every 30 minutes on this task; pause at completion).
 
 ## Review boundaries
 

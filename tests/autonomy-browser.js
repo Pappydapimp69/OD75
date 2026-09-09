@@ -1,2 +1,5 @@
 qaButtonB59('Autonomous behavior checks',()=>{$('qaResults').textContent=runAutonomyChecks().map(r=>`${r.ok?'PASS':'FAIL'} ${r.name}${r.error?': '+r.error:''}`).join('\n');qaFrozenB59=true});
 qaButtonB59('B77 committed prediction',()=>{transportFixtureB60();S.shields=3;const e={type:'charger',x:130,y:0,r:14,hp:4,speed:0,dead:false,age:0,state:'aim',aim:1,vx:0,vy:0};enemies=[e];for(let i=0;i<21;i++){P.y+=2;updateEnemy(e,.04)}qaFrozenB59=true;qaStatusB59()});
+function patchSceneB78(remember){transportFixtureB60();P.pipX=0;S.shields=3;S.pipDetectRange=200;heartBits=[makeHeartSourceB74(3,100,0,40),makeHeartSourceB74(3,-125,0,40)];if(remember)rememberPatchB78(100,0);S.pipTarget=nextHeartSourceB74();qaFrozenB59=true;qaUpdateB59(.04);qaStatusB59();$('qaResults').textContent=`Chosen patch: ${S.pipTarget?.x}. Remembered patches: ${roughPatchesB78().length}`}
+qaButtonB59('B78 fresh patch',()=>patchSceneB78(false));
+qaButtonB59('B78 remembered patch',()=>patchSceneB78(true));
