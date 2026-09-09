@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B75: Immediate launch
+
+The opening screen now keeps Start and Settings visible without scrolling at phone and desktop sizes. The goal and three controls are reduced to scan-level language while the original pointer, keyboard and controller routes remain unchanged. See [the B75 blueprint](docs/B75-launch-screen.md).
+
 ## B74: Heartfield
 
 Ordinary enemies now drop zero to three heart value while preserving their previous average rewards. Two- and three-heart drops appear as layered clusters. After 2.25 seconds, nearby ordinary drops spiral into heart nodes holding up to eight hearts. Boss rewards remain individual hearts.

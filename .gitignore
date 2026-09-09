@@ -1,3 +1,4 @@
 _site/
 .qa/
 node_modules/
+.brain/
