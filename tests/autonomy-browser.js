@@ -3,3 +3,4 @@ qaButtonB59('B77 committed prediction',()=>{transportFixtureB60();S.shields=3;co
 function patchSceneB78(remember){transportFixtureB60();P.pipX=0;S.shields=3;S.pipDetectRange=200;heartBits=[makeHeartSourceB74(3,100,0,40),makeHeartSourceB74(3,-125,0,40)];if(remember)rememberPatchB78(100,0);S.pipTarget=nextHeartSourceB74();qaFrozenB59=true;qaUpdateB59(.04);qaStatusB59();$('qaResults').textContent=`Chosen patch: ${S.pipTarget?.x}. Remembered patches: ${roughPatchesB78().length}`}
 qaButtonB59('B78 fresh patch',()=>patchSceneB78(false));
 qaButtonB59('B78 remembered patch',()=>patchSceneB78(true));
+qaButtonB59('B79 missed charge',()=>{transportFixtureB60();S.shields=3;const e={type:'charger',x:100,y:0,r:14,hp:4,speed:0,dead:false,age:0,state:'charge',charge:.01,aim:1,vx:340,vy:0};enemies=[e];updateEnemy(e,.04);qaFrozenB59=true;qaStatusB59();$('qaResults').textContent=`Reset: ${e.b79.recover.toFixed(2)}s. Aim: ${e.aim.toFixed(2)}s`});
