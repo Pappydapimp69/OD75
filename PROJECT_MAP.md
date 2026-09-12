@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Standalone OD75 game workspace with Brain/GitHub workflow intact and compact agent context.
+Standalone OD75 game workspace with Brain/GitHub workflow intact and compact agent context. Built through Codex to B83, worked on in Claude Code from B84.
 
 ## Source Map
 
@@ -13,10 +13,10 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 - `tests/*-checks.js`: focused gameplay, settings, survival, Heartfield and launch contracts.
 - `.github/workflows/pages.yml`: test, assemble and deploy GitHub Pages.
 - `docs/`: versioned build blueprints and pending state.
-- `AGENTS.md`: Codex operating instructions.
+- `AGENTS.md`: agent operating instructions, environment-independent.
 - `CLAUDE.md`: Brain-managed pointer created by `brain link`; do not edit manually.
 - `TASKS.md`: active state and next work queue.
-- `ASTRA_HANDOFF.md`: compact model handoff context retained from project setup.
+- `HANDOFF.md`: compact takeover context and the per-environment toolchain.
 - `.brain/`: ignored local Brain link/cache.
 
 ## Brain State
@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B76 adds `b21-65.js`: run memory, emotional source scoring, early returns and approach recognition. `tests/feelings-checks.js` checks behavior; `tests/feelings-browser.js` supplies local browser scenarios. B74 Heartfield authority remains in `b21-61.js` through `b21-63.js`; B75 launch layout is `b21-64.js`.
+B84 adds `b21-73.js`: the mid-fight boss cue is held until `q.second` latches, so the announcement and the pattern change land together. `tests/autonomy-checks.js` covers it; `tests/autonomy-browser.js` supplies the fixture buttons. B83 reunion judgment is `b21-72.js`; B74 Heartfield authority remains in `b21-61.js` through `b21-63.js`; B75 launch layout is `b21-64.js`.
 
 ## Access Pattern
 

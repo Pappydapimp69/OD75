@@ -4,7 +4,7 @@
 
 - Brain installed and linked in full mode.
 - Brain stance set to brief.
-- Codex-native `AGENTS.md` added.
+- `AGENTS.md` and `HANDOFF.md` cover both Codex and Claude Code; work moved to Claude Code at B84.
 - Canonical OD75 `main` imported at B74 commit `4ff9a11`.
 - B75 Immediate Launch published and verified at `457fb14`.
 - B76 Pip Notices implemented: memory changes routes, trip commitment and rendezvous.
