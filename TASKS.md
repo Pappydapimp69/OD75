@@ -13,8 +13,8 @@
 
 ## Next
 
-1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; 10 of 50 loops are verified.
-2. Select loop 11 / B87 from the verified B86 baseline. No gameplay implementation is currently unfinished.
+1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; finish the in-progress loop through public verification first.
+2. B87 Focus Release is implemented locally with 152 checks and desktop/mobile browser verification. Deploy and independently verify its exact commit before counting loop 11.
 3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints

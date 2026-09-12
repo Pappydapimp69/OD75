@@ -58,10 +58,9 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B86 is the verified head at loop 10 of 50. `docs/AUTONOMOUS-BUILDS.md` records
-what each loop needed; a loop is not counted until its exact commit deploys and
-the public stamp, cache key and assembled bundle are independently checked.
-No gameplay implementation is currently unfinished; select loop 11 / B87 next.
+B86 is the verified baseline at loop 10 of 50. B87 Focus Release is implemented
+and locally verified; finish its exact-commit deployment and independent public
+stamp, cache-key and assembled-bundle checks before counting loop 11.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.

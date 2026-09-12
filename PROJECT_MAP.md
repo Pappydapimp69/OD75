@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B86 adds `b21-75.js`: the canvas backing store follows display-ratio changes even when no window resize fires. B85 cover priority is `b21-74.js`; B84 escalation timing is `b21-73.js`; B83 reunion judgment is `b21-72.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
+B87 adds `b21-76.js`: blur and hidden-document boundaries release transient keyboard, touch, basic-Overdrive and hold-to-buy state without pausing the game or cancelling automatic Ascended Pip. B86 display-ratio handling is `b21-75.js`; B85 cover priority is `b21-74.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
 
 ## Access Pattern
 
