@@ -58,9 +58,10 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B86 is the verified baseline at loop 10 of 50. B87 Focus Release is implemented
-and locally verified; finish its exact-commit deployment and independent public
-stamp, cache-key and assembled-bundle checks before counting loop 11.
+B87 Focus Release is the verified head at loop 11 of 50. Its exact release
+commit deployed successfully and the public stamp, cache key and assembled
+bundle independently matched. No gameplay implementation is currently
+unfinished; select loop 12 / B88 next.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.

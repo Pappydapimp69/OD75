@@ -10,7 +10,7 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 ## Progress
 
-10 / 50 additional loops verified.
+11 / 50 additional loops verified.
 
 - Loop 1 / B77: `db8ad3f1e5f85b6998221e40338a3dce8113e0b4`. Bounded charger anticipation; 117 regression checks and 3 browser checks, desktop/mobile warning inspection. Pages run 34344355055 succeeded; public stamp, cache key and full bundle matched.
 
@@ -32,7 +32,9 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 - Loop 10 / B86: `ba3228458bcf2385d0537a972b8a43ea8257ab6e`. Display ratio in `b21-75.js`; `resizeArena` re-read `devicePixelRatio` but only `resize` called it, and a monitor change moves the ratio without a resize, so the canvas kept the old backing store. Retrieved from Brain as `mirage#E10` rather than rediscovered. The re-arming `(resolution: Ndppx)` query uses the raw ratio, not the clamped DPR, since above the clamp of 2 a pinned query could never stop matching; a browser without `matchMedia` keeps the old behaviour. 148 complete-bundle regressions with four controls each failing exactly the guard that covers them, and a browser pass at deviceScaleFactor 1, 1.5, 2 and 3. Neither tier drags a window between two physical monitors — that check stays manual and the blueprint says so. Pages run 34685430072 succeeded; public HTTP response, B86 stamp/cache key and complete bundle independently matched (`3ceb71f757a280c4870d7c39564b3350040d9b5c0ce42b183d1cf4ece9d428c4`).
 
-In progress: loop 11 / B87, Focus Release in `b21-76.js`. Blur or hidden-document boundaries release transient keyboard, touch, basic-Overdrive and hold-to-buy state without pausing or cancelling automatic Ascended Pip. 152 complete-bundle regressions and all 32 autonomy assertions pass in desktop/mobile Chromium with no browser warnings or errors. Finish exact-commit deployment and independent public verification before counting it.
+- Loop 11 / B87: `396fa17345111a25ece1268d0518244dcae8173e`. Focus Release in `b21-76.js`; blur or hidden-document boundaries release transient keyboard, touch, basic-Overdrive and hold-to-buy state without pausing or cancelling automatic Ascended Pip. 152 complete-bundle regressions and all 32 autonomy assertions passed in desktop/mobile Chromium with no browser warnings or errors. Pages run 34686207760 succeeded; public HTTP response, B87 stamp/cache key and normalized complete bundle independently matched (`6e3b3e93113724c4611bfa96c4d7da4f71393251381543377e1e66d99c0bb146`).
+
+Next: select loop 12 / B88 from the verified B87 baseline. No gameplay implementation is currently unfinished.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. On Windows/Codex set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency; on Linux `npm ci` needs no override. `HANDOFF.md` carries the full per-environment toolchain. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 

@@ -7,14 +7,14 @@
 - `AGENTS.md` and `HANDOFF.md` cover both Codex and Claude Code; work moved to Claude Code at B84.
 - Canonical OD75 `main` imported at B74 commit `4ff9a11`.
 - B75 Immediate Launch published and verified at `457fb14`.
-- Ten additional ZaneGPT loops are publicly verified through B86 Display Ratio.
-- 148 automated checks pass across all 75 ordered modules.
-- Browser checks cover the B77-B86 autonomy, recovery, audio, encounter, companion-priority and display-ratio behaviors.
+- Eleven additional ZaneGPT loops are publicly verified through B87 Focus Release.
+- 152 automated checks pass across all 76 ordered modules.
+- Browser checks cover the B77-B87 autonomy, recovery, audio, encounter, companion-priority, display-ratio and focus-release behaviors.
 
 ## Next
 
-1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; finish the in-progress loop through public verification first.
-2. B87 Focus Release is implemented locally with 152 checks and desktop/mobile browser verification. Deploy and independently verify its exact commit before counting loop 11.
+1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; 11 of 50 loops are verified.
+2. Select loop 12 / B88 from the verified B87 baseline. No gameplay implementation is currently unfinished.
 3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints
