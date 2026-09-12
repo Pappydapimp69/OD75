@@ -6,8 +6,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const modules = fs.readdirSync(root).filter(n => /^b21-\d{2}\.js$/.test(n)).sort();
 const source = modules.map(n => fs.readFileSync(path.join(root, n), 'utf8')).join('');
 new vm.Script(source, { filename: 'game.js' });
-const version = 'B83-REUNION-JUDGMENT';
-const date = '2026-09-09';
+const version = 'B84-ESCALATION-CUE';
+const date = '2026-09-12';
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8')
   .replaceAll('OD75-2026-08-12-B21-STARDRIVE', `OD75-${date}-${version}`)
   .replaceAll('game.js?v=B21-STARDRIVE', `game.js?v=${version}`);
