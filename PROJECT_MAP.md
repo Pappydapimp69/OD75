@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B87 adds `b21-76.js`: blur and hidden-document boundaries release transient keyboard, touch, basic-Overdrive and hold-to-buy state without pausing the game or cancelling automatic Ascended Pip. B86 display-ratio handling is `b21-75.js`; B85 cover priority is `b21-74.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
+B88 adds `b21-77.js`: enemy entry points are weighted by visible perimeter length instead of equal edge labels, preserving spawn cadence, B82 rosters, caps and enemy stats. B87 focus release is `b21-76.js`; B86 display-ratio handling is `b21-75.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
 
 ## Access Pattern
 
