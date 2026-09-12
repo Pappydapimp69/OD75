@@ -15,7 +15,7 @@
 
 1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; finish an in-progress loop through public verification first.
 2. B83 is the verified baseline at loop 7 / 50. 135 checks pass against all 72 modules; Pages run 34385182639 deployed commit `64d937f` and the public bundle matched.
-3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
+3. There is no continuation automation. The `od75-finish-50-zanegpt-build-loops` heartbeat no longer exists and no session owns the run, so loops 8-50 must be driven manually or a new heartbeat created. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints
 
