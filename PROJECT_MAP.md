@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B84 adds `b21-73.js`: the mid-fight boss cue is held until `q.second` latches, so the announcement and the pattern change land together. `tests/autonomy-checks.js` covers it; `tests/autonomy-browser.js` supplies the fixture buttons. B83 reunion judgment is `b21-72.js`; B74 Heartfield authority remains in `b21-61.js` through `b21-63.js`; B75 launch layout is `b21-64.js`.
+B86 adds `b21-75.js`: the canvas backing store follows display-ratio changes even when no window resize fires. B85 cover priority is `b21-74.js`; B84 escalation timing is `b21-73.js`; B83 reunion judgment is `b21-72.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
 
 ## Access Pattern
 

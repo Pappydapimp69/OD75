@@ -58,10 +58,10 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B84 is the working head. `docs/AUTONOMOUS-BUILDS.md` says how many loops of the
-authorized 50 are verified and what each one needed; a loop is not counted
-until its exact commit deploys and the public stamp, cache key and assembled
-bundle are independently checked.
+B86 is the verified head at loop 10 of 50. `docs/AUTONOMOUS-BUILDS.md` records
+what each loop needed; a loop is not counted until its exact commit deploys and
+the public stamp, cache key and assembled bundle are independently checked.
+No gameplay implementation is currently unfinished; select loop 11 / B87 next.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.
