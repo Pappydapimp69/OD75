@@ -10,7 +10,7 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 ## Progress
 
-12 / 50 additional loops verified.
+13 / 50 additional loops verified.
 
 - Loop 1 / B77: `db8ad3f1e5f85b6998221e40338a3dce8113e0b4`. Bounded charger anticipation; 117 regression checks and 3 browser checks, desktop/mobile warning inspection. Pages run 34344355055 succeeded; public stamp, cache key and full bundle matched.
 
@@ -36,7 +36,9 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 - Loop 12 / B88: `914feacb4b15fab8ac8cb81f33aa41621197d250`. Perimeter Pressure in `b21-77.js`; ordinary enemy entry positions are sampled by visible perimeter length instead of equal edge labels while preserving B82 rosters, spawn cadence, caps, HP, damage, speed, drops and bosses. 156 complete-bundle regressions passed, including deterministic 390x844 portrait and 1280x720 landscape edge-share checks. Desktop CUA browser QA ran all 36 autonomy assertions and the B88 fixture with no failures; the in-app browser ignored the attempted mobile viewport override, so mobile coverage is from the explicit regression dimensions. Pages run 34687406074 succeeded; public HTTP response, B88 stamp/cache key, B88 marker and normalized complete bundle independently matched (`3c62755fc9fbcb1843b7606b8f49d131240cd9b9dc73bb90867fc6ebe303cbbd`).
 
-Next: select loop 13 / B89 from the verified B88 baseline. No gameplay implementation is currently unfinished.
+- Loop 13 / B89: `76c9e22fe39626b15ead7e88e41a2e90169301b0`. Arrival Read in `b21-78.js`; fresh offscreen ordinary enemies get a short edge-clamped type-colored cue that fades within 0.9s and disappears once normally visible. Spawn choice, B88 perimeter weighting, B82 rosters, caps, HP, damage, speed, collision, targeting, drops, bosses, inputs and HUD state are unchanged. 160 complete-bundle regressions passed across 78 modules. Desktop CUA browser QA verified the B89 four-edge scene and all 40 autonomy assertions with no failures. Pages run 34687721512 succeeded; public HTTP response, B89 stamp/cache key, B89 marker and normalized complete bundle independently matched (`a54153870de47f317f81031ecc73a525a4bbc63b3b46fd389baf1ef401511e27`).
+
+Next: select loop 14 / B90 from the verified B89 baseline. No gameplay implementation is currently unfinished.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. On Windows/Codex set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency; on Linux `npm ci` needs no override. `HANDOFF.md` carries the full per-environment toolchain. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 

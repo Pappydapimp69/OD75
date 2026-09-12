@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B88 adds `b21-77.js`: enemy entry points are weighted by visible perimeter length instead of equal edge labels, preserving spawn cadence, B82 rosters, caps and enemy stats. B87 focus release is `b21-76.js`; B86 display-ratio handling is `b21-75.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
+B89 adds `b21-78.js`: fresh offscreen ordinary enemies get a short edge-clamped arrival cue without changing spawn, movement, collision, targeting or stats. B88 perimeter weighting is `b21-77.js`; B87 focus release is `b21-76.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
 
 ## Access Pattern
 

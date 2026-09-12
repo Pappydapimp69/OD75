@@ -58,10 +58,10 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B88 Perimeter Pressure is the verified head at loop 12 of 50. Its exact release
+B89 Arrival Read is the verified head at loop 13 of 50. Its exact release
 commit deployed successfully and the public stamp, cache key and assembled
 bundle independently matched. No gameplay implementation is currently
-unfinished; select loop 13 / B89 next.
+unfinished; select loop 14 / B90 next.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.
