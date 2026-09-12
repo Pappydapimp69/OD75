@@ -10,7 +10,7 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 ## Progress
 
-6 / 50 additional loops verified.
+7 / 50 additional loops verified.
 
 - Loop 1 / B77: `db8ad3f1e5f85b6998221e40338a3dce8113e0b4`. Bounded charger anticipation; 117 regression checks and 3 browser checks, desktop/mobile warning inspection. Pages run 34344355055 succeeded; public stamp, cache key and full bundle matched.
 
@@ -24,7 +24,7 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 - Loop 6 / B82: `a01eb57ca799019775fbe8b8a71f4093f66a836c`. Late-stage enemy rotations in `b21-71.js`; stages 7–10 rotate through swarm, core-pressure and controlled charger waves with lower 13/14/15 landscape and 10/11/12 portrait caps. Stages 1–6 and stage 11+ remain unchanged. 131 complete-bundle regressions and all 3 B82 browser assertions passed; desktop/mobile roster and HUD output were inspected with no browser warnings or errors. Pages run 34383939398 succeeded; public HTTP response, B82 stamp/cache key and normalized complete bundle independently matched (`330c7f39c46199fa94d4c2a96c21a06f101e17c583945210b76ddc9ed33ca305`).
 
-In progress: loop 7 / B83, reunion threat judgment, owned by the continuation in task `01a085a1-0520-7880-b384-1bc2d07b4e27`. Preserve this work and do not start an overlapping release. Trusted Pip's existing Loving reunion volley prioritizes a charger on a collision course while preserving close-contact priority, shot count, power and unlock requirements. 135 full-bundle tests and all 15 autonomous browser assertions passed; fresh/trusted volleys inspected on desktop/mobile with no browser errors. Finish exact-commit deployment and public verification before counting it.
+- Loop 7 / B83: `64d937f38bc84930a3e31b96be345a4b306ff86c`. Reunion threat judgment in `b21-72.js`; trusted Pip's Loving reunion volley prioritizes a charger on a collision course while preserving close-contact priority, shot count, power and unlock requirements. 135 complete-bundle regressions and all 15 autonomous browser assertions passed; fresh/trusted volleys inspected on desktop/mobile with no browser errors. Pages run 34385182639 succeeded; public HTTP response, B83 stamp/cache key and normalized complete bundle independently matched (`5943f30e9cfdaa3a2a2470e73df08d67e76ef1baed098041a6ace7a05acdd9ec`).
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. Set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 
