@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B89 adds `b21-78.js`: fresh offscreen ordinary enemies get a short edge-clamped arrival cue without changing spawn, movement, collision, targeting or stats. B88 perimeter weighting is `b21-77.js`; B87 focus release is `b21-76.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
+B90 adds `b21-79.js`: dash cooldown readiness now gets a short player-centered arena cue when it crosses ready without changing dash mechanics, inputs, enemies or scoring. B89 arrival read is `b21-78.js`; B88 perimeter weighting is `b21-77.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
 
 ## Access Pattern
 
