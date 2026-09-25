@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B99: Variable enemies
+
+Enemies roll their own speed, health and aggression. Hearts banked by each stage end widen the speed and health ranges; aggression climbs slowly by stage. Run stars unlock the roster, including three new enemies: Sniper, Splitter and Thief. Spawn pacing follows enemy speed and fewer enemies share the screen. See [the B99 blueprint](docs/B99-variable-enemies.md).
+
 ## B98: Storm cloud cost
 
 Each Thunderstorm cloud costs 8% of maximum HEAT; gathering pauses below 8%. Starting, each cloud and a full charge now flash and ring on screen, and the sky darkens as clouds gather. See [the B98 blueprint](docs/B98-storm-cloud-cost.md).

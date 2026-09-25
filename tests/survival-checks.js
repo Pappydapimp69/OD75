@@ -2,22 +2,26 @@ function runSurvivalChecksB63(){
   const results=[],saved={...settingsB61};
   const assert=(ok,msg)=>{if(!ok)throw Error(msg)},near=(a,b)=>Math.abs(a-b)<1e-6;
   const test=(name,fn)=>{try{applySettingsB61(B61_DEFAULTS);transportFixtureB60();fn();results.push({name,ok:true})}catch(e){results.push({name,ok:false,error:e.message})}};
-  test('Opening stages freeze all numeric enemy and boss scaling',()=>{
-    for(const stage of [1,2,3]){S.stage=stage;S.wave=stage*3;S.stageWaveCount=3;S.runHearts=999;S.bossCount=4;
-      assert(difficulty()===.88&&difficultyWaveB63()===1&&difficultyStageB63()===1,'opening pressure scaled');
-      assert(enemyCap()===(H>W?8:11)&&waveGoalFor(S.wave)===8,'opening population scaled');
-      spawnEnemy('chaser');assert(enemies.at(-1).hp===2,'opening HP scaled');
-      startBossBattle();assert(S.bossMaxHp===79&&enemies.at(-1).bossStage===1,'opening boss scaled');
-    }
+  test('B99 opening stages spawn only chasers at base scale',()=>{
+    const width=W,height=H;try{W=1000;H=600;
+    for(const stage of [1,2,3]){S.stage=stage;S.starsTotal=999;S.runHearts=999;S.bossCount=0;S.b99=null;
+      for(let i=0;i<60;i++)assert(chooseSpawn()==='chaser','opening stage spawned '+chooseSpawn());
+      assert(enemyCap()===10,'landscape cap not 10');H=1200;W=600;assert(enemyCap()===8,'portrait cap not 8');W=1000;H=600;
+      enemies=[];const e=spawnEnemy('chaser');assert(e.hp===2&&e.b99.speedMul>=1&&e.b99.speedMul<=1.1,'opening chaser scaled');
+      enemies=[];startBossBattle();assert(S.bossMaxHp===72,'opening boss scaled: '+S.bossMaxHp);
+    }}finally{W=width;H=height}
   });
-  test('Stages 4 to 10 scale only with banked run hearts in capped 20-heart tiers',()=>{
-    for(const stage of [4,7,10])for(const hearts of [0,19,20,79,80,179,180,999]){
-      S.stage=stage;S.wave=99;S.runHearts=hearts;S.heartCurrency=0;S.heartTotal=99999;
-      const tier=Math.min(10,1+Math.floor(hearts/20)),w=1+(tier-1)*3;
-      const expected=.88+Math.min(1.1,(w-1)*.12)+(tier>=5?.16+Math.min(.34,(tier-5)*.045):0);
-      assert(difficultyStageB63()===tier&&near(difficulty(),expected),'wrong heart tier');
-      assert(waveGoalFor(99)===8+Math.floor((tier-1)*2/3),'wrong heart kill target');
-    }
+  test('B99 stage-end hearts set the heart level that widens speed and health ranges',()=>{
+    reset();transportFixtureB60();S.stage=3;S.runHearts=45;S.stageEnding=false;advanceToNextStage();
+    assert(S.stage===4&&stateB99().heartLevel===2,'heart level not taken at stage end');
+    S.runHearts=400;assert(stateB99().heartLevel===2,'heart level moved mid-stage');
+    const r0=traitRangesB99(0),r2=traitRangesB99(2),r12=traitRangesB99(12);
+    assert(r2.speed[0]>r0.speed[0]&&r2.speed[1]-r2.speed[0]>r0.speed[1]-r0.speed[0],'speed range did not rise and widen');
+    assert(r2.hp[1]>r2.hp[0]&&r12.hp[1]<.7*12,'health range wrong or growth not softened past level 8');
+    S.b99.heartLevel=6;const r=traitRangesB99();
+    for(let i=0;i<150;i++){enemies=[];const e=spawnEnemy('chaser');
+      assert(e.b99.speedMul>=r.speed[0]-1e-9&&e.b99.speedMul<=r.speed[1]+1e-9,'speed roll outside range');
+      assert(e.hp>=Math.round(2+r.hp[0])&&e.hp<=Math.round(2+r.hp[1]),'health roll outside range')}
   });
   test('Stage 4 discounts only opening hearts once, then counts new hearts normally',()=>{
     S.stage=3;S.wave=9;S.runHearts=60;S.stageEnding=false;advanceToNextStage();
@@ -28,15 +32,17 @@ function runSurvivalChecksB63(){
     S.stage=11;assert(difficultyStageB63()===11,'discount leaked into legacy scaling');
     reset();assert(S.earlyRunHearts===0&&S.runHearts===0,'discount survived new run');
   });
-  test('Stage 11 restores exact legacy speed, cap, health, wave and boss formulas',()=>{
-    for(const stage of [11,13,17,30]){
-      S.stage=stage;S.wave=(stage-1)*3+2;S.stageWaveCount=2;S.runHearts=0;S.bossCount=3;
-      const d=.88+Math.min(1.1,(S.wave-1)*.12)+.16+Math.min(.34,(stage-5)*.045);
-      assert(near(difficulty(),d),'legacy speed mismatch');assert(enemyCap()===(H>W?15:18),'legacy cap mismatch');
-      assert(waveGoalFor(S.wave)===Math.min(16,10+Math.min(2,Math.floor((stage-1)/8))),'legacy kill target mismatch');
-      spawnEnemy('charger');assert(enemies.at(-1).hp===3+Math.min(5,1+Math.floor((stage-5)/2)),'legacy HP mismatch');
-      startBossBattle();assert(S.bossMaxHp===54+stage*7+4*18&&enemies.at(-1).bossStage===stage+6,'legacy boss mismatch');
-    }
+  test('B99 aggression minimum rises by one to three every three stages with no cap',()=>{
+    reset();transportFixtureB60();S.stage=1;
+    for(let i=0;i<30;i++){const before=stateB99().aggMin;S.stageEnding=false;advanceToNextStage();const d=stateB99().aggMin-before;
+      if((S.stage-1)%3===0)assert(d>=1&&d<=3,'stage '+S.stage+' bump '+d);else assert(d===0,'stage '+S.stage+' bumped off-cycle')}
+    assert(stateB99().aggMin>=11,'aggression capped');const [lo,hi]=aggressionRangeB99();assert(hi===lo+3,'range not four levels wide');
+    assert(aggressionEffectB99(1)===0&&aggressionEffectB99(40)<1&&aggressionEffectB99(10)>aggressionEffectB99(4),'effect not slow and diminishing');
+  });
+  test('B99 the stage after a boss is a breather that defers the aggression bump',()=>{
+    reset();transportFixtureB60();S.stage=3;S.runHearts=100;S.bossCount=1;S.stageEnding=false;advanceToNextStage();
+    assert(S.stage===4&&stateB99().heartLevel===0&&stateB99().aggMin===1&&stateB99().bumpPending,'breather did not hold');
+    S.stageEnding=false;advanceToNextStage();assert(stateB99().heartLevel===5&&stateB99().aggMin>1&&!stateB99().bumpPending,'deferred bump or hearts not applied');
   });
   test('Run hearts count only banked pickups, survive spending and stages, and reset independently of lifetime',()=>{
     const h=heartFixtureB60();heartBits=[h];gatherHeartB60(h);assert(S.runHearts===0,'cargo counted early');
@@ -163,14 +169,41 @@ function runSurvivalChecksB63(){
     for(const stage of [3,11]){transportFixtureB60();S.stage=stage;S.runHearts=19;collectHeartBit(heartFixtureB60());assert(!S.b73DifficultyPulse,`stage ${stage} triggered heart-tier cue`)}
     reset();assert(!S.b73DifficultyPulse&&!difficultyHudB65.classList.contains('b73-tier-up'),'reset retained cue');
   });
-  test('B82 stages one through six preserve the original enemy population path',()=>{
-    for(const stage of [1,4,6]){S.stage=stage;S.stageWaveCount=3;S.runHearts=180;assert(enemyRosterB82()===null,'early stage gained rotation');assert(enemyCap()===enemyCapBeforeB82(),'early cap changed')}
+  test('B99 run stars unlock the roster like bosses and new types start rare',()=>{
+    reset();transportFixtureB60();S.stage=5;S.starsTotal=0;assert(unlockedTypesB99().join()==='chaser','locked roster leaked');
+    S.starsTotal=6;assert(unlockedTypesB99().includes('charger')&&!unlockedTypesB99().includes('core'),'charger unlock wrong');
+    S.starsTotal=52;assert(unlockedTypesB99().length===6,'full roster not unlocked');
+    const w=rosterWeightsB99();assert(Math.abs(w.thief-.2/3)<1e-9,'fresh unlock not rare');S.stage=8;assert(Math.abs(rosterWeightsB99().thief-.2)<1e-9,'unlock never matured');
   });
-  test('B82 late waves rotate every enemy type through lower rising caps',()=>{
-    const width=W,height=H;try{W=1000;H=600;S.stage=7;for(let wave=1;wave<=3;wave++){S.stageWaveCount=wave;const roster=enemyRosterB82(),expected=B82_ROSTERS[wave-1];assert(roster===expected&&enemyCap()===12+wave,'landscape rotation/cap wrong');assert(rosterEnemyB82(roster,.1)==='chaser'&&rosterEnemyB82(roster,(roster.chaser+roster.core)/2)==='core'&&rosterEnemyB82(roster,.99)==='charger','roster lost an enemy type')}W=390;H=844;for(let wave=1;wave<=3;wave++){S.stageWaveCount=wave;assert(enemyCap()===9+wave,'portrait cap wrong')}}finally{W=width;H=height}
+  test('B99 spawn gaps follow rolled speed so fast enemies arrive thinner',()=>{
+    const slow={type:'chaser',hp:2,b99:{speedMul:1}},fast={type:'chaser',hp:2,b99:{speedMul:1.6}};let a=0,b=0;
+    for(let i=0;i<200;i++){a+=spawnGapB99(slow);b+=spawnGapB99(fast)}assert(b>a*1.4,'fast enemies did not slow spawning');
+    S.waveState='active';S.bossActive=false;S.waveKills=0;S.waveGoal=99;enemies=[];S.spawn=0;spawnLogic(.01);assert(enemies.length===1&&S.spawn>=.3,'spawn pacing did not use the spawned enemy');
   });
-  test('B82 stage eleven restores the exact legacy cap and roster',()=>{
-    const width=W,height=H;try{S.stage=11;S.wave=31;S.stageWaveCount=2;S.runHearts=999;assert(enemyRosterB82()===null,'rotation leaked into legacy');W=1000;H=600;assert(enemyCap()===18&&enemyCap()===enemyCapBeforeB82(),'landscape legacy cap changed');W=390;H=844;assert(enemyCap()===15&&enemyCap()===enemyCapBeforeB82(),'portrait legacy cap changed')}finally{W=width;H=height}
+  test('B99 aggression shortens charger wind-ups and speeds charges without passing the floor',()=>{
+    const mk=agg=>{const e={type:'charger',x:P.x+200,y:P.y,r:14,hp:3,dead:false,age:0,state:'aim',aim:.8,vx:0,vy:0,flash:0};stateB99().aggMin=agg;S.b99.heartLevel=0;rollEnemyB99(e);return e};
+    const calm=mk(1),hot=mk(30);assert(hot.aim<calm.aim&&hot.aim>=.3,'wind-up scaling wrong');
+    hot.aim=.001;enemies=[hot];updateEnemy(hot,.016);assert(hot.state==='charge'&&hyp(hot.vx,hot.vy)>340*1.1,'aggressive charge not faster');
+  });
+  test('B99 sniper telegraphs, then fires one shot on the locked line',()=>{
+    S.b99=null;enemies=[];enemyShots=[];const e=spawnEnemy('sniper');e.x=P.x+220;e.y=P.y;e.b99Fire=0;
+    updateEnemy(e,.016);assert(e.b99Aim>0&&!enemyShots.length,'fired without telegraph');
+    for(let i=0;i<80&&!enemyShots.length;i++)updateEnemy(e,.016);assert(enemyShots.length===1,'no single shot after telegraph');
+  });
+  test('B99 splitter breaks into two small chasers that do not split again',()=>{
+    enemies=[];const e=spawnEnemy('splitter');kill(e);const babies=enemies.filter(o=>!o.dead&&o.b99Small);
+    assert(babies.length===2&&babies.every(b=>b.type==='chaser'&&b.hp===1),'split wrong');kill(babies[0]);assert(enemies.filter(o=>!o.dead&&o.b99Small).length===1,'baby split again');
+  });
+  test('B99 thief steals from Pip, drops it when caught and keeps it if it escapes',()=>{
+    enemies=[];heartBits=[];const h=heartFixtureB60();heartBits=[h];gatherHeartB60(h);assert(transportB60().cargo.length===1,'fixture cargo missing');
+    const e=spawnEnemy('thief');e.x=P.pipX;e.y=P.pipY;updateEnemy(e,.016);const stolen=e.b99Stolen;assert(stolen&&!transportB60().cargo.length,'thief did not steal');
+    kill(e);assert(heartBits.includes(stolen)&&!stolen.dead,'heart not dropped');
+    heartBits=[];const f=spawnEnemy('thief');f.b99Stolen=makeHeartSourceB74(1,f.x,f.y,10,false);f.x=P.x+2000;updateEnemy(f,.016);assert(f.dead&&f.b99Escaped&&!heartBits.length,'escape handling wrong');
+  });
+  test('B99 bosses scale on their own track',()=>{
+    enemies=[];S.bossCount=0;S.b99=null;startBossBattle();const base=S.bossMaxHp;enemies=[];S.b99.heartLevel=6;startBossBattle();assert(S.bossMaxHp===base+54,'heart level did not add boss health');
+    S.starsTotal=0;const t0=bossTempoB99();S.starsTotal=50;assert(bossTempoB99()>t0&&bossTempoB99()<=1.3,'star tempo wrong');
+    enemyShots=[];S.bossCount=2;S.bossActive=true;const boss=enemies.find(o=>o.type==='boss');boss.b99Ring=.01;updateBossRingB99(.05);assert(enemyShots.length>=8,'late boss ring volley missing');
   });
   applySettingsB61(saved);reset();S.audioEnabled=false;return results;
 }
