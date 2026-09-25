@@ -69,3 +69,22 @@ qaButtonB59("Render Heartfield audio",async()=>{
     const player=document.createElement('audio');player.controls=true;player.src=URL.createObjectURL(audioWavB60(result.buffer));player.style.width='260px';qaPanelB59.appendChild(player)}catch(e){status.textContent='ERROR '+e.stack}
 });
 qaButtonB59("B81 duck envelopes",()=>{const rows=runTransportChecksB60().filter(r=>r.name.startsWith('B81'));$('qaResults').textContent=rows.map(r=>`${r.ok?'PASS':'FAIL'} ${r.name}${r.error?': '+r.error:''}`).join('\n');qaFrozenB59=true});
+
+async function renderSoundEngineB92(){
+  const ctx=new OfflineAudioContext(2,Math.ceil(1.1*22050),22050),engine=new PipAudioEngine(ctx);installAudioEngineB42(engine);
+  const noise=engine.noiseBuffer.getChannelData(0);let n=920;
+  for(let i=0;i<noise.length;i++){n=(n*1664525+1013904223)>>>0;noise[i]=n/4294967296*2-1}
+  engine.b92Intensity=.8;
+  withSpatialAudioB92(engine,P.x-1000,()=>engine.voice(330,.05,.48,.14,'sawtooth',0,1800,.004,.18,0,engine.sfx));
+  withAudioPriorityB92(engine,B92_PRIORITY.critical,()=>engine.fmBell(660,.28,.42,.10,0,engine.sfx));
+  const buffer=await ctx.startRendering(),left=buffer.getChannelData(0),right=buffer.getChannelData(1);let l=0,r=0,peak=0;
+  for(let i=0;i<left.length;i++){l+=left[i]*left[i];r+=right[i]*right[i];peak=Math.max(peak,Math.abs(left[i]),Math.abs(right[i]))}
+  return {buffer,leftRms:Math.sqrt(l/left.length),rightRms:Math.sqrt(r/right.length),peak,snapshot:audioEngineSnapshotB92(engine)};
+}
+qaButtonB59('B92 engine render',async()=>{
+  qaFrozenB59=true;const status=$('qaResults'),savedS=S,savedP=P;S={...S,run:true,end:false,b39Paused:false,waveState:'active',bossActive:true,audioEnabled:true};P={...P,x:0};status.textContent='Rendering B92 production engine…';
+  try{const result=await renderSoundEngineB92(),ok=result.snapshot.limited&&result.snapshot.spatial&&result.leftRms>result.rightRms*1.12&&result.peak<.98;
+    status.textContent=`${ok?'PASS':'FAIL'} B92 engine · L ${result.leftRms.toFixed(4)} · R ${result.rightRms.toFixed(4)} · peak ${result.peak.toFixed(3)} · limiter ${result.snapshot.limited?'on':'off'}`;
+    const player=document.createElement('audio');player.controls=true;player.src=URL.createObjectURL(audioWavB60(result.buffer));player.style.width='260px';qaPanelB59.appendChild(player)
+  }catch(e){status.textContent='ERROR '+e.stack}finally{S=savedS;P=savedP}
+});
