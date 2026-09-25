@@ -43,7 +43,9 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 Direct build after loop 15: B93 Thunderstorm Charge, commit `429b435c1459f8f0356821d380cf11476c53e295`. This user-requested build does not increment the ZaneGPT loop count. 175 checks passed across 82 modules; desktop and 390×844 browser scenes verified five-cloud gathering, exactly 20% HEAT spend, visible chained strikes, full targeting and a 1.25s cooldown. Pages run `36095439314` succeeded; public stamp, cache key, marker and normalized bundle matched SHA-256 `4436464ba2fdc215ccdd876fd372296868bdeddcde5333344bab055f31832e15`.
 
-Next: select loop 16 / B94 from the verified B93 baseline. No gameplay implementation is currently unfinished.
+Direct build after B93: B94 Hold Contract in `b21-83.js`. This user-requested build does not increment the ZaneGPT loop count. 179 checks passed across 83 modules.
+
+Next: select loop 16 / B95 from the B94 baseline. No gameplay implementation is currently unfinished.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. On Windows/Codex set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency; on Linux `npm ci` needs no override. `HANDOFF.md` carries the full per-environment toolchain. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 

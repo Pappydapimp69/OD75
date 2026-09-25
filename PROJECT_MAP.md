@@ -29,6 +29,8 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 B93 adds `b21-82.js`: Thunderstorm now gathers up to five clouds across a one-second hold, spends at most 20% HEAT, launches on release, seeks random targets and ricochets by Constellation level. Quick taps strike once without ricochet; a 1.25-second cooldown prevents spam. Regression and desktop/mobile browser fixtures cover charge, release, chaining, pause and focus loss.
 
+B94 adds `b21-83.js`: every basic skill ignites at 25% HEAT and Ascended Pip at 70%. Beam and Guardian drain while held; Thunderstorm, Nova and Gravity Well charge while held, stop draining when full and strike on release. Sound Lab audition buttons get the game's button style.
+
 ## Access Pattern
 
 1. Read `AGENTS.md`, `PROJECT_MAP.md`, `TASKS.md`, and the relevant blueprint.

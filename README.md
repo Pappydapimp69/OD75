@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B94: Hold contract
+
+Every skill ignites at 25% HEAT; Ascended Pip at 70%. Press fires, release ends, and a held skill keeps going below 25%. Beam and Guardian drain while held. Thunderstorm, Nova and Gravity Well charge while held, stop draining once full and strike only on release. Sound Lab audition buttons no longer show as blank white boxes. See [the B94 blueprint](docs/B94-hold-contract.md).
+
 ## B76: Pip notices
 
 Pip learns within each run. Safe deliveries build confidence and commitment to fuller loads; rough trips create caution, favor safer heart sources and can lead to earlier returns. After a rough reunion he stays close briefly. Approach a burdened Pip steadily and he can recognize you coming, stop gathering and meet you with his cargo. Repeated halfway reunions make recognition faster.
