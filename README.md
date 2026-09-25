@@ -2,9 +2,9 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
-## B96: Sound Lab scroll
+## B97: Sound Lab wallet home
 
-The Notes / Sound Choices / Mix Choices row no longer sticks to the top of the Sound Lab; it scrolls with the page. See [the B96 blueprint](docs/B96-sound-lab-scroll.md).
+The Notes / Sound Choices / Mix Choices row stays pinned while scrolling down, and returns to its home position whenever the top row of Pip Sounds is selected or scrolled back into. See [the B97 blueprint](docs/B97-sound-lab-wallet-home.md).
 
 ## B95: Heat readout
 

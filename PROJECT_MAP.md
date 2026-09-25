@@ -35,6 +35,8 @@ B95 adds `b21-84.js`: the skill button reads HEAT against the meter maximum and 
 
 B96 adds `b21-85.js`: the Sound Lab wallet row scrolls with the page instead of sticking to the top.
 
+B97 adds `b21-86.js`: the Sound Lab wallet row pins again while scrolling down, and snaps home when the top Pip Sounds row is selected or scrolled back into.
+
 ## Access Pattern
 
 1. Read `AGENTS.md`, `PROJECT_MAP.md`, `TASKS.md`, and the relevant blueprint.
