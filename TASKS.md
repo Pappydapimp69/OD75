@@ -9,14 +9,15 @@
 - B75 Immediate Launch published and verified at `457fb14`.
 - Fifteen additional ZaneGPT loops are publicly verified through B91 Wave Closeout.
 - B93 Thunderstorm Charge is publicly verified as a direct user-requested build.
-- B94 Hold Contract is a direct user-requested build: 25% ignition, 70% Ascended Pip, charged Nova/Gravity, Sound Lab audition buttons styled.
-- 179 automated checks pass across all 83 ordered modules.
+- B94 Hold Contract is a direct user-requested build: 25% ignition, 70% Ascended Pip, charged Nova/Gravity, Sound Lab audition buttons styled. Deployed to Pages.
+- B95 Heat Readout is a direct user-requested build: button reads HEAT / max and fills with the whole meter; prominent top HEAT bar with ignition mark.
+- 180 automated checks pass across all 84 ordered modules.
 - Browser checks cover full cloud gathering and chained strike scenes at desktop and mobile sizes.
 
 ## Next
 
 1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; 15 of 50 loops are verified.
-2. Select loop 16 / B95 from the B94 baseline. No gameplay implementation is currently unfinished.
+2. Select loop 16 / B96 from the B95 baseline. No gameplay implementation is currently unfinished.
 3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints

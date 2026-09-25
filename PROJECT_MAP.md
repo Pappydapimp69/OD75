@@ -31,6 +31,8 @@ B93 adds `b21-82.js`: Thunderstorm now gathers up to five clouds across a one-se
 
 B94 adds `b21-83.js`: every basic skill ignites at 25% HEAT and Ascended Pip at 70%. Beam and Guardian drain while held; Thunderstorm, Nova and Gravity Well charge while held, stop draining when full and strike on release. Sound Lab audition buttons get the game's button style.
 
+B95 adds `b21-84.js`: the skill button reads HEAT against the meter maximum and fills with the whole meter; the top HEAT bar is a prominent gauge with an ignition mark.
+
 ## Access Pattern
 
 1. Read `AGENTS.md`, `PROJECT_MAP.md`, `TASKS.md`, and the relevant blueprint.

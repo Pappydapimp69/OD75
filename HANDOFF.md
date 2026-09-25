@@ -58,11 +58,11 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B94 Hold Contract (`b21-83.js`) is the head. B91 Wave Closeout remains loop
-15 of 50; B92, B93 and B94 were separate direct user requests. B93 release commit
+B95 Heat Readout (`b21-84.js`) is the head; B94 Hold Contract (`b21-83.js`) is deployed. B91 Wave Closeout remains loop
+15 of 50; B92–B95 were separate direct user requests. B93 release commit
 `429b435c1459f8f0356821d380cf11476c53e295` deployed successfully in Pages
 run `36095439314`; the public stamp, cache key and normalized assembled bundle
-matched. No gameplay implementation is unfinished; select loop 16 / B95 next.
+matched. No gameplay implementation is unfinished; select loop 16 / B96 next.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.

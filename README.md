@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B95: Heat readout
+
+The skill button reads HEAT against the meter's maximum and fills with the whole meter. The top HEAT bar is a clear full-width gauge with a mark at the equipped skill's ignition point. See [the B95 blueprint](docs/B95-heat-readout.md).
+
 ## B94: Hold contract
 
 Every skill ignites at 25% HEAT; Ascended Pip at 70%. Press fires, release ends, and a held skill keeps going below 25%. Beam and Guardian drain while held. Thunderstorm, Nova and Gravity Well charge while held, stop draining once full and strike only on release. Sound Lab audition buttons no longer show as blank white boxes. See [the B94 blueprint](docs/B94-hold-contract.md).
