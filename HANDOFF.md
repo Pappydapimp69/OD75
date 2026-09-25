@@ -58,11 +58,11 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B92 Sound Engine is the verified head. B91 Wave Closeout is loop 15 of 50;
-B92 was a separate direct user request. Release commit
-`354d0a3e195b2a2bfa243725c4eb1b414b213897` deployed successfully in Pages
-run `36093476470`; the public stamp, cache key and normalized assembled bundle
-matched. No gameplay implementation is unfinished; select loop 16 / B93 next.
+B93 Thunderstorm Charge is the verified head. B91 Wave Closeout remains loop
+15 of 50; B92 and B93 were separate direct user requests. Release commit
+`429b435c1459f8f0356821d380cf11476c53e295` deployed successfully in Pages
+run `36095439314`; the public stamp, cache key and normalized assembled bundle
+matched. No gameplay implementation is unfinished; select loop 16 / B94 next.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.

@@ -23,3 +23,7 @@ Press causes no damage. Quick release damages exactly one enemy. A full hold cre
 ## Playtest
 
 Does one second feel deliberate without making Thunderstorm too slow during panic?
+
+## Verified
+
+175 full-bundle checks pass across 82 modules. Desktop and 390×844 browser scenes gathered five clouds, spent exactly 20% HEAT, struck every visible target through Constellation ricochets and exposed the 1.25-second cooldown without browser errors. Pages run `36095439314` deployed commit `429b435c1459f8f0356821d380cf11476c53e295`; the public stamp, cache key and normalized bundle matched SHA-256 `4436464ba2fdc215ccdd876fd372296868bdeddcde5333344bab055f31832e15`.

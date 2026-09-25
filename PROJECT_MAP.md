@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B92 adds `b21-81.js`: the production audio graph now has SFX cleanup, final limiting, priority voice stealing, world-space impact panning and a smoothed combat-intensity mix. It also restores partial skill ignition: Beam at 50%, other basics at their existing threshold, and only Ascended Pip at full charge. B91 wave closeout is `b21-80.js`. Regression and browser audio fixtures cover both builds.
+B93 adds `b21-82.js`: Thunderstorm now gathers up to five clouds across a one-second hold, spends at most 20% HEAT, launches on release, seeks random targets and ricochets by Constellation level. Quick taps strike once without ricochet; a 1.25-second cooldown prevents spam. Regression and desktop/mobile browser fixtures cover charge, release, chaining, pause and focus loss.
 
 ## Access Pattern
 

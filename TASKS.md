@@ -8,14 +8,14 @@
 - Canonical OD75 `main` imported at B74 commit `4ff9a11`.
 - B75 Immediate Launch published and verified at `457fb14`.
 - Fifteen additional ZaneGPT loops are publicly verified through B91 Wave Closeout.
-- B92 Sound Engine is publicly verified as a direct user-requested build.
-- 170 automated checks pass across all 81 ordered modules.
-- Browser checks cover B91 closeout, B92 charge gates, and a production Web Audio render with spatial output and limiting.
+- B93 Thunderstorm Charge is publicly verified as a direct user-requested build.
+- 175 automated checks pass across all 82 ordered modules.
+- Browser checks cover full cloud gathering and chained strike scenes at desktop and mobile sizes.
 
 ## Next
 
 1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; 15 of 50 loops are verified.
-2. Select loop 16 / B93 from the verified B92 baseline. No gameplay implementation is currently unfinished.
+2. Select loop 16 / B94 from the verified B93 baseline. No gameplay implementation is currently unfinished.
 3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints
