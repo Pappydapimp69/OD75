@@ -58,10 +58,11 @@ application-state injection from `evaluate`.
 
 ## Current state
 
-B90 Dash Readiness is the verified head at loop 14 of 50. Its exact release
-commit deployed successfully and the public stamp, cache key and assembled
-bundle independently matched. No gameplay implementation is currently
-unfinished; select loop 15 / B91 next.
+B92 Sound Engine is the verified head. B91 Wave Closeout is loop 15 of 50;
+B92 was a separate direct user request. Release commit
+`354d0a3e195b2a2bfa243725c4eb1b414b213897` deployed successfully in Pages
+run `36093476470`; the public stamp, cache key and normalized assembled bundle
+matched. No gameplay implementation is unfinished; select loop 16 / B93 next.
 
 Suggested first action: read `TASKS.md`, check `git status` and the current
 Pages run, and continue the listed step.

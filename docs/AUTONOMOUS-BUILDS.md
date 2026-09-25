@@ -10,7 +10,7 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 
 ## Progress
 
-13 / 50 additional loops verified.
+15 / 50 additional loops verified.
 
 - Loop 1 / B77: `db8ad3f1e5f85b6998221e40338a3dce8113e0b4`. Bounded charger anticipation; 117 regression checks and 3 browser checks, desktop/mobile warning inspection. Pages run 34344355055 succeeded; public stamp, cache key and full bundle matched.
 
@@ -39,7 +39,9 @@ Each counted loop needs a focused blueprint, implementation, full regression and
 - Loop 13 / B89: `76c9e22fe39626b15ead7e88e41a2e90169301b0`. Arrival Read in `b21-78.js`; fresh offscreen ordinary enemies get a short edge-clamped type-colored cue that fades within 0.9s and disappears once normally visible. Spawn choice, B88 perimeter weighting, B82 rosters, caps, HP, damage, speed, collision, targeting, drops, bosses, inputs and HUD state are unchanged. 160 complete-bundle regressions passed across 78 modules. Desktop CUA browser QA verified the B89 four-edge scene and all 40 autonomy assertions with no failures. Pages run 34687721512 succeeded; public HTTP response, B89 stamp/cache key, B89 marker and normalized complete bundle independently matched (`a54153870de47f317f81031ecc73a525a4bbc63b3b46fd389baf1ef401511e27`).
 - Loop 14 / B90: `23469d908876ca9801820fd936394e34d89887ea`. Dash Readiness in `b21-79.js`; when dash cooldown crosses from cooling to ready during live play, a short player-centered arena ring/text cue appears and fades, then clears on dash, stage upgrade or reset. Dash cooldown duration, velocity, invulnerability, input routes, button UI, enemies, spawns and scoring are unchanged. 164 complete-bundle regressions passed across 79 modules. Desktop CUA browser QA verified the B90 fixture and all 44 autonomy assertions with no failures. Pages run 34688414351 succeeded; public HTTP response, B90 stamp/cache key, B90 marker and normalized complete bundle independently matched (`89a5a69146a71f3480b3fbe3d5e123ef8d41496095c4e6642578c713a32ff644`).
 
-Next: select loop 15 / B91 from the verified B90 baseline. No gameplay implementation is currently unfinished.
+- Loop 15 / B91: `354d0a3e195b2a2bfa243725c4eb1b414b213897`. Wave Closeout in `b21-80.js`; ordinary kills at two and one remaining show a short player-centered count while pause and transition behavior remain safe. The same release includes the separately requested B92 Sound Engine overhaul and repaired skill gates. 170 complete-bundle regressions passed across 81 modules. Browser QA verified Beam locked at 49.99 and open at 50, Pip locked at 99.99 and open at 100, plus a production Web Audio render with spatial separation and a 0.375 peak through the limiter. Pages run 36093476470 succeeded; public stamp, cache key, B91/B92 markers and normalized complete bundle matched (`45f38172dbbb86ee3cda9ce27726b420dff694acb36c0ce302d8d404b38621e3`).
+
+Next: select loop 16 / B93 from the verified B92 baseline. No gameplay implementation is currently unfinished.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. On Windows/Codex set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency; on Linux `npm ci` needs no override. `HANDOFF.md` carries the full per-environment toolchain. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 

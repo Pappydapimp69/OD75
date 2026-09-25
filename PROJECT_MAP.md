@@ -27,7 +27,7 @@ Standalone OD75 game workspace with Brain/GitHub workflow intact and compact age
 
 ## Current Build
 
-B90 adds `b21-79.js`: dash cooldown readiness now gets a short player-centered arena cue when it crosses ready without changing dash mechanics, inputs, enemies or scoring. B89 arrival read is `b21-78.js`; B88 perimeter weighting is `b21-77.js`. `tests/autonomy-checks.js` covers these behaviors and `tests/autonomy-browser.js` supplies their browser fixtures.
+B92 adds `b21-81.js`: the production audio graph now has SFX cleanup, final limiting, priority voice stealing, world-space impact panning and a smoothed combat-intensity mix. It also restores partial skill ignition: Beam at 50%, other basics at their existing threshold, and only Ascended Pip at full charge. B91 wave closeout is `b21-80.js`. Regression and browser audio fixtures cover both builds.
 
 ## Access Pattern
 

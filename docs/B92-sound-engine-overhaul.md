@@ -25,3 +25,7 @@ Critical cues survive a full routine voice pool; ordinary cues still obey the ca
 ## Playtest
 
 Does combat sound clearer and more physical without the adaptive percussion making late waves tiring?
+
+## Verified
+
+170 full-bundle checks pass across 81 modules. Browser Web Audio rendered spatial output at L 0.0727 / R 0.0189 RMS with a 0.375 peak and the limiter active. Beam/Pip boundary fixtures passed. Pages run `36093476470` deployed commit `354d0a3e195b2a2bfa243725c4eb1b414b213897`; the public stamp, cache key and normalized bundle matched SHA-256 `45f38172dbbb86ee3cda9ce27726b420dff694acb36c0ce302d8d404b38621e3`.
