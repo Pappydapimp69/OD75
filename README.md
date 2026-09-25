@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B96: Sound Lab scroll
+
+The Notes / Sound Choices / Mix Choices row no longer sticks to the top of the Sound Lab; it scrolls with the page. See [the B96 blueprint](docs/B96-sound-lab-scroll.md).
+
 ## B95: Heat readout
 
 The skill button reads HEAT against the meter's maximum and fills with the whole meter. The top HEAT bar is a clear full-width gauge with a mark at the equipped skill's ignition point. See [the B95 blueprint](docs/B95-heat-readout.md).

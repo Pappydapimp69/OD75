@@ -33,6 +33,8 @@ B94 adds `b21-83.js`: every basic skill ignites at 25% HEAT and Ascended Pip at 
 
 B95 adds `b21-84.js`: the skill button reads HEAT against the meter maximum and fills with the whole meter; the top HEAT bar is a prominent gauge with an ignition mark.
 
+B96 adds `b21-85.js`: the Sound Lab wallet row scrolls with the page instead of sticking to the top.
+
 ## Access Pattern
 
 1. Read `AGENTS.md`, `PROJECT_MAP.md`, `TASKS.md`, and the relevant blueprint.
