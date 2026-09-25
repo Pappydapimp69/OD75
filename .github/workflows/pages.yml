@@ -89,7 +89,7 @@ jobs:
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
-          s=Path('_site/game.js').read_text()
+          s=Path('_site/game.js').read_text(encoding='utf-8')
           for marker in [
               'const B50_BOSS_TELEGRAPH_START=.55',
               'const B51_PIP_BOND_SECONDS=1.0',
@@ -208,7 +208,7 @@ jobs:
           assert s.rfind('update=function(dt)') > s.index('// B90 Dash readiness')
           assert s.index('// B91 Wave closeout') > s.index('// B90 Dash readiness')
           assert s.index('// B92 Sound engine') > s.index('// B91 Wave closeout')
-          assert s.rfind('canIgniteOverdriveB38=function(type') > s.index('// B92 Skill charge contract')
+          assert s.rfind('canIgniteOverdriveB38=function(id=') > s.index('// B92 Skill charge contract')
           assert s.rfind('chooseSpawn=function()') > s.index('// B82 Stages seven')
           PY
           sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-24-B92-SOUND-ENGINE/g' _site/index.html
