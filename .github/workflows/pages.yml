@@ -126,10 +126,10 @@ jobs:
               'function releaseTransientInputB87()',
               'function perimeterSpawnPointB88(',
               'function arrivalCueB89(',
-              'function dashReadyCueB90()'
-              ,'function waveCloseCueB91()'
-              ,'function installAudioEngineB92(engine)'
-              ,'const B92_BEAM_IGNITION_PERCENT=50'
+              'function dashReadyCueB90()',
+              'function waveCloseCueB91()',
+              'function installAudioEngineB92(engine)',
+              'const B92_BEAM_IGNITION_PERCENT=50'
           ]:
               assert marker in s, marker
           assert s.rfind('pipWithPlayer=function()') > s.find('function pipWithPlayer()')

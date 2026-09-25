@@ -74,7 +74,7 @@ PipAudioEngine.prototype.scheduleStep=function(time){
 };
 function audioEngineSnapshotB92(engine=audioEngine){return engine?{intensity:engine.b92Intensity||0,target:engine.b92TargetIntensity||0,voices:engine.voices?.size||0,stolen:engine.b92StolenVoices||0,limited:!!engine.b92Limiter,spatial:!!engine.b92SfxPresence}:null}
 
-// Only Ascended Pip needs a full meter. Beam becomes usable at half charge; other basics retain their frequent-use threshold.
+// B92 Skill charge contract: only Ascended Pip needs a full meter. Beam becomes usable at half charge; other basics retain their frequent-use threshold.
 const B92_BEAM_IGNITION_PERCENT=50;
 const canIgniteBeforeB92=canIgniteOverdriveB38;
 canIgniteOverdriveB38=function(id=S?.overType){
