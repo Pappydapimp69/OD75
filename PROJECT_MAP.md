@@ -41,6 +41,8 @@ B98 adds `b21-87.js`: Thunderstorm clouds cost 8% HEAT each, gathering pauses be
 
 B99 adds `b21-88.js`: variable enemies. Heart level (stage-end hearts ÷ 20) sets speed/health ranges, stage sets aggression, run stars unlock the roster (Sniper, Splitter, Thief added), spawn gaps follow rolled speed, bosses scale on their own track. Supersedes B63's enemy scaling and B82's rosters.
 
+B100 adds `b21-89.js`: every kill feeds HEAT scaled by type and rolled toughness; combo is a bonus; the post-Overdrive 65% cut is removed.
+
 ## Access Pattern
 
 1. Read `AGENTS.md`, `PROJECT_MAP.md`, `TASKS.md`, and the relevant blueprint.

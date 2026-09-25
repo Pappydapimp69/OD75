@@ -14,14 +14,15 @@
 - B96 Sound Lab Scroll is a direct user-requested build: the wallet row scrolls with the Sound Lab instead of sticking. Deployed.
 - B97 Sound Lab Wallet Home: the wallet row pins while scrolling down and returns home when the top Pip Sounds row is selected or scrolled back into. Deployed.
 - B98 Storm Cloud Cost: each cloud costs 8% HEAT, gathering pauses below 8%, start/full flashes and storm visuals. Deployed.
-- B99 Variable Enemies: heart-level trait ranges, stage aggression, star roster, speed-paced spawns, Sniper/Splitter/Thief, boss scaling.
-- 187 automated checks pass across all 88 ordered modules.
+- B99 Variable Enemies: heart-level trait ranges, stage aggression, star roster, speed-paced spawns, Sniper/Splitter/Thief, boss scaling. Deployed.
+- B100 Heat Flow: every kill feeds HEAT by toughness, combo is a bonus, no post-Overdrive cut.
+- 190 automated checks pass across all 89 ordered modules.
 - Browser checks cover full cloud gathering and chained strike scenes at desktop and mobile sizes.
 
 ## Next
 
 1. Continue the authorized **50 additional ZaneGPT build loops**. `docs/AUTONOMOUS-BUILDS.md` is the progress authority; 15 of 50 loops are verified.
-2. Select loop 16 / B100 from the B99 baseline. No gameplay implementation is currently unfinished.
+2. Select loop 16 / B101 from the B100 baseline. No gameplay implementation is currently unfinished.
 3. The continuation heartbeat is `od75-finish-50-zanegpt-build-loops`; pause it after 50 verified loops. Do not add controls, persistent affection scores or a live model without further design discussion.
 
 ## Constraints

@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B100: Heat flow
+
+Every kill now feeds HEAT, scaled by the enemy's toughness, with combo as a bonus instead of a gate. The post-Overdrive 65% cut is gone. See [the B100 blueprint](docs/B100-heat-flow.md).
+
 ## B99: Variable enemies
 
 Enemies roll their own speed, health and aggression. Hearts banked by each stage end widen the speed and health ranges; aggression climbs slowly by stage. Run stars unlock the roster, including three new enemies: Sniper, Splitter and Thief. Spawn pacing follows enemy speed and fewer enemies share the screen. See [the B99 blueprint](docs/B99-variable-enemies.md).

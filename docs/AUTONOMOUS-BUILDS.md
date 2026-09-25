@@ -55,7 +55,9 @@ Direct build after B97: B98 Storm Cloud Cost in `b21-87.js`. User-requested; doe
 
 Direct build after B98: B99 Variable Enemies in `b21-88.js`. User-requested; does not increment the loop count. 187 checks passed across 88 modules.
 
-Next: select loop 16 / B100 from the B99 baseline. No gameplay implementation is currently unfinished.
+Direct build after B99: B100 Heat Flow in `b21-89.js`. User-requested; does not increment the loop count. 190 checks passed across 89 modules.
+
+Next: select loop 16 / B101 from the B100 baseline. No gameplay implementation is currently unfinished.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. On Windows/Codex set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency; on Linux `npm ci` needs no override. `HANDOFF.md` carries the full per-environment toolchain. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 
