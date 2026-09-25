@@ -1,5 +1,5 @@
 name: Deploy OD75 to Pages
-run-name: OD75 B97 ${{ github.sha }}
+run-name: OD75 B98 ${{ github.sha }}
 
 on:
   push:
@@ -33,10 +33,10 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-fund --no-audit
           npm test
-      - name: Verify B97 Sound Lab wallet home and previous build contracts
+      - name: Verify B98 storm cloud cost and previous build contracts
         run: |
           test -f index.html
-          for f in b21-{01..86}.js; do test -f "$f"; node --check "$f"; done
+          for f in b21-{01..87}.js; do test -f "$f"; node --check "$f"; done
           ! grep -q 'payload-' index.html
           ! grep -q 'DecompressionStream' index.html
           grep -Fq 'const B50_BOSS_TELEGRAPH_START=.55' b21-37.js
@@ -85,7 +85,7 @@ jobs:
         run: |
           rm -rf _site; mkdir _site
           cp index.html _site/
-          cat b21-{01..86}.js > _site/game.js
+          cat b21-{01..87}.js > _site/game.js
           node --check _site/game.js
           python - <<'PY'
           from pathlib import Path
@@ -140,7 +140,9 @@ jobs:
               '#overdrive.b95gauge::before',
               '#stageUp #soundLabWalletB53{position:static',
               'function homeSoundLabB97()',
-              'function firstPipSoundRowB97()'
+              'function firstPipSoundRowB97()',
+              'const B98_STORM_CLOUD_COST=8',
+              'function gatherStormCloudB98(charge)'
           ]:
               assert marker in s, marker
           assert s.rfind('pipWithPlayer=function()') > s.find('function pipWithPlayer()')
@@ -231,12 +233,15 @@ jobs:
           assert s.rfind('updateUI=function()') > s.index('// B95 Heat readout')
           assert s.index('// B96 Sound Lab wallet') > s.index('// B95 Heat readout')
           assert s.index('// B97 Sound Lab wallet') > s.index('// B96 Sound Lab wallet')
+          assert s.index('// B98 Thunderstorm clouds cost HEAT') > s.index('// B97 Sound Lab wallet')
+          assert s.rfind('tickStormB93=function(dt)') > s.index('// B98 Thunderstorm clouds cost HEAT')
+          assert s.rfind('releaseStormB93=function()') > s.index('// B98 Thunderstorm clouds cost HEAT')
           assert s.rfind('chooseSpawn=function()') > s.index('// B82 Stages seven')
           PY
-          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-25-B97-SOUND-LAB-WALLET-HOME/g' _site/index.html
-          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B97-SOUND-LAB-WALLET-HOME/g' _site/index.html
-          grep -Fq 'OD75-2026-09-25-B97-SOUND-LAB-WALLET-HOME' _site/index.html
-          grep -Fq 'game.js?v=B97-SOUND-LAB-WALLET-HOME' _site/index.html
+          sed -i 's/OD75-2026-08-12-B21-STARDRIVE/OD75-2026-09-25-B98-STORM-CLOUD-COST/g' _site/index.html
+          sed -i 's/game.js?v=B21-STARDRIVE/game.js?v=B98-STORM-CLOUD-COST/g' _site/index.html
+          grep -Fq 'OD75-2026-09-25-B98-STORM-CLOUD-COST' _site/index.html
+          grep -Fq 'game.js?v=B98-STORM-CLOUD-COST' _site/index.html
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v6

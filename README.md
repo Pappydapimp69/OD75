@@ -2,6 +2,10 @@
 
 [Play OD75](https://pappydapimp69.github.io/OD75/)
 
+## B98: Storm cloud cost
+
+Each Thunderstorm cloud costs 8% of maximum HEAT; gathering pauses below 8%. Starting, each cloud and a full charge now flash and ring on screen, and the sky darkens as clouds gather. See [the B98 blueprint](docs/B98-storm-cloud-cost.md).
+
 ## B97: Sound Lab wallet home
 
 The Notes / Sound Choices / Mix Choices row stays pinned while scrolling down, and returns to its home position whenever the top row of Pip Sounds is selected or scrolled back into. See [the B97 blueprint](docs/B97-sound-lab-wallet-home.md).

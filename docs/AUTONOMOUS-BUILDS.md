@@ -51,7 +51,9 @@ Direct build after B95: B96 Sound Lab Scroll in `b21-85.js`. User-requested; doe
 
 Direct build after B96: B97 Sound Lab Wallet Home in `b21-86.js`. User-requested; does not increment the loop count.
 
-Next: select loop 16 / B98 from the B97 baseline. No gameplay implementation is currently unfinished.
+Direct build after B97: B98 Storm Cloud Cost in `b21-87.js`. User-requested; does not increment the loop count.
+
+Next: select loop 16 / B99 from the B98 baseline. No gameplay implementation is currently unfinished.
 
 Validation notes: use `rg -uuu` with an explicit path to find ignored numbered modules. On Windows/Codex set `NODE_PATH=C:/Users/Kompooter/Documents/OD75/node_modules` for the existing JSDOM dependency; on Linux `npm ci` needs no override. `HANDOFF.md` carries the full per-environment toolchain. Check the entire test outcome, not only the final passing lines. `scripts/serve.mjs` serves `_site` at port 8175 and local fixtures at `/qa`; inspect whether a server is already running before starting one. Update build version, test module count/order, both workflow module lists and stamp/cache key together. Browser tests use CUA and production-path fixture buttons, never application-state injection from evaluate.
 

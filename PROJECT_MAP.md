@@ -37,6 +37,8 @@ B96 adds `b21-85.js`: the Sound Lab wallet row scrolls with the page instead of 
 
 B97 adds `b21-86.js`: the Sound Lab wallet row pins again while scrolling down, and snaps home when the top Pip Sounds row is selected or scrolled back into.
 
+B98 adds `b21-87.js`: Thunderstorm clouds cost 8% HEAT each, gathering pauses below 8%, and charging gets start/cloud/full flashes, a darkening sky and arcing lightning.
+
 ## Access Pattern
 
 1. Read `AGENTS.md`, `PROJECT_MAP.md`, `TASKS.md`, and the relevant blueprint.
